@@ -343,7 +343,7 @@ void W_Precache(void)
 	UTIL_PrecacheOtherWeapon("weapon_knife");//Прикрепляем нож к игре
 
 	//mp44
-	UTIL_PrecacheOtherWeapon("weapon_mp44");
+	//UTIL_PrecacheOtherWeapon("weapon_mp44");
 
 #if !defined( OEM_BUILD ) && !defined( HLDEMO_BUILD )
 	// python
