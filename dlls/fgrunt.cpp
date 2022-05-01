@@ -673,7 +673,7 @@ void CFGrunt::GibMonster(void)
 		}
 		else
 		{
-			pGun = DropItem("weapon_9mmAR", vecGunPos, vecGunAngles);
+			pGun = DropItem("weapon_sten", vecGunPos, vecGunAngles); //дропает пусть аптечку...
 		}
 		if (pGun)
 		{
@@ -1087,7 +1087,7 @@ void CFGrunt::HandleAnimEvent(MonsterEvent_t* pEvent)
 		}
 		else
 		{
-			DropItem("weapon_9mmAR", vecGunPos, vecGunAngles);
+			DropItem("weapon_sten", vecGunPos, vecGunAngles);
 		}
 		if (FBitSet(pev->weapons, FGRUNT_GRENADELAUNCHER))
 		{
@@ -1311,6 +1311,7 @@ void CFGrunt::Precache()
 
 	m_iBrassShell = PRECACHE_MODEL("models/shell.mdl");// brass shell
 	m_iShotgunShell = PRECACHE_MODEL("models/shotgunshell.mdl");
+	UTIL_PrecacheOther("item_healthkit");
 
 	TalkInit();
 	CTalkMonster::Precache();

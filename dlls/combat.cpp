@@ -1503,6 +1503,52 @@ Go to the trouble of combining multiple pellets into a single damage call.
 This version is used by Players, uses the random seed generator to sync client and server side shots.
 ================
 */
+
+extern int    gmsgWaterSplash;
+void CBaseEntity::FireBulletsWater(Vector vecSrc, Vector vecEnd)
+{
+	if (!(POINT_CONTENTS(vecEnd) == CONTENTS_WATER && POINT_CONTENTS(vecSrc) != CONTENTS_WATER))
+		return;
+
+	// Ищем растояние между vecSrc и vecEnd
+	float x = vecEnd.x - vecSrc.x;
+	float y = vecEnd.y - vecSrc.y;
+	float z = vecEnd.z - vecSrc.z;
+	float len = sqrt(x * x + y * y + z * z);
+
+	// Делим по полам
+	Vector vecTemp = Vector((vecEnd.x + vecSrc.x) / 2, (vecEnd.y + vecSrc.y) / 2, (vecEnd.z + vecSrc.z) / 2);
+
+	if (len <= 1)
+	{
+		MESSAGE_BEGIN(MSG_ALL, gmsgWaterSplash);
+		WRITE_COORD(vecTemp.x);
+		WRITE_COORD(vecTemp.y);
+		WRITE_COORD(vecTemp.z);
+		MESSAGE_END();
+
+		switch (RANDOM_LONG(1, 3))
+		{
+		case 1:
+			UTIL_EmitAmbientSound(ENT(0), vecTemp, "items/water_splash/water_splash1.wav", 1, ATTN_NORM, 0, 100);
+			break;
+		case 2:
+			UTIL_EmitAmbientSound(ENT(0), vecTemp, "items/water_splash/water_splash2.wav", 1, ATTN_NORM, 0, 100);
+			break;
+		case 3:
+			UTIL_EmitAmbientSound(ENT(0), vecTemp, "items/water_splash/water_splash3.wav", 1, ATTN_NORM, 0, 100);
+			break;
+		}
+	}
+	else
+	{
+		if (POINT_CONTENTS(vecTemp) == CONTENTS_WATER)
+			FireBulletsWater(vecSrc, vecTemp);
+		else
+			FireBulletsWater(vecTemp, vecEnd);
+	}
+}
+
 Vector CBaseEntity::FireBulletsPlayer ( ULONG cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread, float flDistance, int iBulletType, int iTracerFreq, int iDamage, entvars_t *pevAttacker, int shared_rand )
 {
 	static int tracerCount;
@@ -1573,6 +1619,11 @@ Vector CBaseEntity::FireBulletsPlayer ( ULONG cShots, Vector vecSrc, Vector vecD
 				pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgMP44AMM, vecDir, &tr, DMG_BULLET);
 				break;
 
+			case BULLET_PLAYER_K43:
+				pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgK43, vecDir, &tr, DMG_BULLET);
+				break;
+
+
 			case BULLET_NONE: // FIX 
 				pEntity->TraceAttack(pevAttacker, 50, vecDir, &tr, DMG_CLUB);
 				TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
@@ -1588,6 +1639,9 @@ Vector CBaseEntity::FireBulletsPlayer ( ULONG cShots, Vector vecSrc, Vector vecD
 		}
 		// make bullet trails
 		UTIL_BubbleTrail( vecSrc, tr.vecEndPos, (flDistance * tr.flFraction) / 64.0 );
+
+		FireBulletsWater( vecSrc, tr.vecEndPos );
+
 	}
 	ApplyMultiDamage(pev, pevAttacker);
 

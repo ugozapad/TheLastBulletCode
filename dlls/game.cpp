@@ -306,6 +306,11 @@ cvar_t	sk_plr_MP44AMM_bullet1 = { "sk_plr_MP44AMM_bullet1", "0" };
 cvar_t	sk_plr_MP44AMM_bullet2 = { "sk_plr_MP44AMM_bullet2", "0" };
 cvar_t	sk_plr_MP44AMM_bullet3 = { "sk_plr_MP44AMM_bullet3", "0" };
 
+// k43 Round
+cvar_t	sk_plr_K43_bullet1 = { "sk_plr_K43_bullet1", "0" };
+cvar_t	sk_plr_K43_bullet2 = { "sk_plr_K43_bullet2", "0" };
+cvar_t	sk_plr_K43_bullet3 = { "sk_plr_K43_bullet3", "0" };
+
 // MP5 Round
 cvar_t	sk_plr_9mmAR_bullet1 = {"sk_plr_9mmAR_bullet1","0"};
 cvar_t	sk_plr_9mmAR_bullet2 = {"sk_plr_9mmAR_bullet2","0"};
@@ -419,11 +424,11 @@ cvar_t	sk_scientist_heal1	= { "sk_scientist_heal1","0" };
 cvar_t	sk_scientist_heal2	= { "sk_scientist_heal2","0" };	
 cvar_t	sk_scientist_heal3	= { "sk_scientist_heal3","0" };	
 
-//new healtykit eat
+//new healtykit eat//такс
 //
-cvar_t	sk_cacaohealthkit1 = { "sk_sk_cacaohealthkit1", "0" };
-cvar_t	sk_cacaohealthkit2 = { "sk_sk_cacaohealthkit2", "0" };
-cvar_t	sk_cacaohealthkit3 = { "sk_sk_cacaohealthkit3", "0" };
+cvar_t	sk_cacaohealthkit1 = { "sk_cacaohealthkit1", "0" };
+cvar_t	sk_cacaohealthkit2 = { "sk_cacaohealthkit2", "0" };
+cvar_t	sk_cacaohealthkit3 = { "sk_cacaohealthkit3", "0" };
 
 cvar_t	sk_whiskeyhealthkit1 = { "sk_whiskeyhealthkit1", "0" };
 cvar_t	sk_whiskeyhealthkit2 = { "sk_whiskeyhealthkit2", "0" };
@@ -761,10 +766,15 @@ void GameDLLInit( void )
 	CVAR_REGISTER ( &sk_plr_357_bullet2 );// {"sk_plr_357_bullet2","0"};
 	CVAR_REGISTER ( &sk_plr_357_bullet3 );// {"sk_plr_357_bullet3","0"};
 
-	//mp44
-	CVAR_REGISTER(&sk_plr_MP44AMM_bullet1);// {"sk_plr_MP44AMM_bullet1","0"};
-	CVAR_REGISTER(&sk_plr_MP44AMM_bullet2);// {"sk_plr_MP44AMM_bullet2","0"};
-	CVAR_REGISTER(&sk_plr_MP44AMM_bullet3);// {"sk_plr_MP44AMM_bullet3","0"};
+	//mp44//
+	CVAR_REGISTER ( &sk_plr_MP44AMM_bullet1 );// {"sk_plr_MP44AMM_bullet1","0"};
+	CVAR_REGISTER ( &sk_plr_MP44AMM_bullet2 );// {"sk_plr_MP44AMM_bullet2","0"};
+	CVAR_REGISTER ( &sk_plr_MP44AMM_bullet3 );// {"sk_plr_MP44AMM_bullet3","0"};
+
+	//k43
+	CVAR_REGISTER ( &sk_plr_K43_bullet1 );// {"sk_plr_K43_bullet1","0"};
+	CVAR_REGISTER ( &sk_plr_K43_bullet2 );// {"sk_plr_K43_bullet2","0"};
+	CVAR_REGISTER ( &sk_plr_K43_bullet3 );// {"sk_plr_K43_bullet3","0"};
 
 
 	// MP5 Round
@@ -874,6 +884,18 @@ void GameDLLInit( void )
 	CVAR_REGISTER ( &sk_healthkit1 );
 	CVAR_REGISTER ( &sk_healthkit2 );
 	CVAR_REGISTER ( &sk_healthkit3 );
+
+	CVAR_REGISTER(&sk_cacaohealthkit1); ///какао!
+	CVAR_REGISTER(&sk_cacaohealthkit2);
+	CVAR_REGISTER(&sk_cacaohealthkit3);
+
+	CVAR_REGISTER(&sk_whiskeyhealthkit1); ///виски!
+	CVAR_REGISTER(&sk_whiskeyhealthkit2);
+	CVAR_REGISTER(&sk_whiskeyhealthkit3);
+	
+	CVAR_REGISTER(&sk_Eathealthkit1); ///гор€ча€ еда!
+	CVAR_REGISTER(&sk_Eathealthkit2);
+	CVAR_REGISTER(&sk_Eathealthkit3);
 
 	CVAR_REGISTER ( &sk_scientist_heal1 );
 	CVAR_REGISTER ( &sk_scientist_heal2 );

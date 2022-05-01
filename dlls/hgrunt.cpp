@@ -286,7 +286,7 @@ void CHGrunt :: GibMonster ( void )
 		CBaseEntity *pGun;
 		if (FBitSet( pev->weapons, HGRUNT_SHOTGUN ))
 		{
-			pGun = DropItem( "weapon_crossbow", vecGunPos, vecGunAngles );
+			pGun = DropItem( "weapon_sniperrifle", vecGunPos, vecGunAngles );
 		}
 		else
 		{
@@ -859,7 +859,7 @@ void CHGrunt :: HandleAnimEvent( MonsterEvent_t *pEvent )
 			// now spawn a gun.
 			if (FBitSet( pev->weapons, HGRUNT_SHOTGUN ))
 			{
-				 DropItem( "weapon_crossbow", vecGunPos, vecGunAngles );
+				 DropItem( "weapon_sniperrifle", vecGunPos, vecGunAngles );
 			}
 			else
 			{
@@ -2534,7 +2534,9 @@ void CDeadHGrunt :: Spawn( void )
 	MonsterInitDead();
 }
 
-////superAssHolledNazziMen
+////superAssHolledNazziMen////
+///начало кода супер-солдата///
+
 
 class CSupGrunt : public CHGrunt
 {
@@ -2543,6 +2545,7 @@ public:
 	void Precache(void);
 	void Shoot(void);
 	void HandleAnimEvent(MonsterEvent_t *pEvent);
+	void GibMonster(void);
 };
 
 
@@ -2649,6 +2652,7 @@ void CSupGrunt::Precache()
 	PRECACHE_SOUND("weapons/sbarrel1.wav");
 
 	PRECACHE_SOUND("zombie/claw_miss2.wav");// because we use the basemonster SWIPE animation event
+	UTIL_PrecacheOther("ammo_venomclip");
 
 	// get voice pitch
 	if (RANDOM_LONG(0, 1))
@@ -2689,6 +2693,43 @@ void CSupGrunt::Shoot(void)
 
 
 
+void CSupGrunt::GibMonster(void)
+{
+	Vector	vecGunPos;
+	Vector	vecGunAngles;
+
+	if (GetBodygroup(2) != 2)
+	{// throw a gun if the grunt has one
+		GetAttachment(0, vecGunPos, vecGunAngles);
+
+		CBaseEntity* pGun;
+		if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
+		{
+			pGun = DropItem("weapon_sniperrifle", vecGunPos, vecGunAngles);
+		}
+		else
+		{
+			pGun = DropItem("weapon_venom", vecGunPos, vecGunAngles);
+		}
+		if (pGun)
+		{
+			pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
+			pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
+		}
+
+		if (FBitSet(pev->weapons, HGRUNT_GRENADELAUNCHER))
+		{
+			pGun = DropItem("ammo_ARgrenades", vecGunPos, vecGunAngles);
+			if (pGun)
+			{
+				pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
+				pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
+			}
+		}
+	}
+
+	CBaseMonster::GibMonster();
+}
 
 
 
@@ -2714,11 +2755,11 @@ void CSupGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 		// now spawn a gun.
 		if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
 		{
-			DropItem("weapon_crossbow", vecGunPos, vecGunAngles);
+			DropItem("weapon_sniperrifle", vecGunPos, vecGunAngles);
 		}
 		else
 		{
-			DropItem("weapon_venom", vecGunPos, vecGunAngles);
+			DropItem("ammo_venomclip", vecGunPos, vecGunAngles);
 		}
 		
 
@@ -2825,7 +2866,13 @@ void CSupGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 	}
 }
 
+////
+//конец кода супер-солдата
+///
+
+
 ///Bio_nazz_grunt
+///начало био-солдата
 
 
 
@@ -2836,6 +2883,7 @@ public:
 	void Precache(void);
 	void Shoot(void);
 	void HandleAnimEvent(MonsterEvent_t *pEvent);
+	void GibMonster(void);
 };
 
 
@@ -2921,7 +2969,6 @@ void CBioGrunt::Precache()
 		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC 
 	else
 		PRECACHE_MODEL("models/newNpc/bionazi.mdl");
-
 	PRECACHE_SOUND("hgrunt/gr_mgun1.wav");
 	PRECACHE_SOUND("hgrunt/gr_mgun2.wav");
 
@@ -2940,8 +2987,10 @@ void CBioGrunt::Precache()
 	PRECACHE_SOUND("weapons/glauncher.wav");
 
 	PRECACHE_SOUND("weapons/sbarrel1.wav");
+	PRECACHE_SOUND("weapons/mp44/mp44_shoot.wav");
 
 	PRECACHE_SOUND("zombie/claw_miss2.wav");// because we use the basemonster SWIPE animation event
+	UTIL_PrecacheOther("controller_energy_ball");
 
 	// get voice pitch
 	if (RANDOM_LONG(0, 1))
@@ -2951,6 +3000,7 @@ void CBioGrunt::Precache()
 
 	m_iBrassShell = PRECACHE_MODEL("models/shell.mdl");// brass shell
 	m_iShotgunShell = PRECACHE_MODEL("models/shotgunshell.mdl");
+	UTIL_PrecacheOther ("item_healthkit");
 }
 
 //=========================================================
@@ -2970,7 +3020,10 @@ void CBioGrunt::Shoot(void)
 
 	Vector	vecShellVelocity = gpGlobals->v_right * RANDOM_FLOAT(40, 90) + gpGlobals->v_up * RANDOM_FLOAT(75, 200) + gpGlobals->v_forward * RANDOM_FLOAT(-40, 40);
 	EjectBrass(vecShootOrigin - vecShootDir * 24, vecShellVelocity, pev->angles.y, m_iBrassShell, TE_BOUNCE_SHELL);
-	FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_10DEGREES, 2048, BULLET_PLAYER_MP44AMM); // shoot +-5 degrees
+	CBaseMonster* pBall = (CBaseMonster*)Create("controller_energy_ball", vecShootOrigin, pev->angles, edict());
+	pBall->pev->velocity = vecShootDir * 150;
+	
+	//FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_10DEGREES, 2048, BULLET_PLAYER_MP44AMM); // shoot +-5 degrees
 
 	pev->effects |= EF_MUZZLEFLASH;
 
@@ -2980,6 +3033,43 @@ void CBioGrunt::Shoot(void)
 	SetBlending(0, angDir.x);
 }
 
+void CBioGrunt::GibMonster(void)
+{
+	Vector	vecGunPos;
+	Vector	vecGunAngles;
+
+	if (GetBodygroup(2) != 2)
+	{// throw a gun if the grunt has one
+		GetAttachment(0, vecGunPos, vecGunAngles);
+
+		CBaseEntity* pGun;
+		if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
+		{
+			pGun = DropItem("weapon_sniperrifle", vecGunPos, vecGunAngles);
+		}
+		else
+		{
+			pGun = DropItem("item_healthkit", vecGunPos, vecGunAngles);
+		}
+		if (pGun)
+		{
+			pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
+			pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
+		}
+
+		if (FBitSet(pev->weapons, HGRUNT_GRENADELAUNCHER))
+		{
+			pGun = DropItem("ammo_ARgrenades", vecGunPos, vecGunAngles);
+			if (pGun)
+			{
+				pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
+				pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
+			}
+		}
+	}
+
+	CBaseMonster::GibMonster();
+}
 
 
 ///weapon_mp44_bio-grunt(его оружие  в руках)
@@ -3004,13 +3094,13 @@ void CBioGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 		// now spawn a gun.
 		if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
 		{
-			DropItem("weapon_crossbow", vecGunPos, vecGunAngles);
+			DropItem("weapon_sniperrifle", vecGunPos, vecGunAngles);
 		}
+		
 		else
 		{
-			DropItem("weapon_mp44", vecGunPos, vecGunAngles);
+			DropItem("item_healthkit", vecGunPos, vecGunAngles);
 		}
-
 
 	}
 	break;
@@ -3061,11 +3151,11 @@ void CBioGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 			// the first round of the three round burst plays the sound and puts a sound in the world sound list.
 			if (RANDOM_LONG(0, 1))
 			{
-				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/venom/hks1.wav", 1, ATTN_NORM);
+				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/mp44/mp44_shoot.wav", 1, ATTN_NORM);
 			}
 			else
 			{
-				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/venom/hks2.wav", 1, ATTN_NORM);
+				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/mp44/mp44_shoot.wav", 1, ATTN_NORM);
 			}
 		}
 		else
@@ -3115,9 +3205,11 @@ void CBioGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 	}
 }
 
+///конец био солдата
+
 ////////
 //===============//
-///Nazzi_mp44 обычный нацик но с мп44.
+///Nazzi_mp44.Начало элитного нацика с мп44
 
 //nazz_grunt_mp44
 
@@ -3130,6 +3222,7 @@ public:
 	void Precache(void);
 	void Shoot(void);
 	void HandleAnimEvent(MonsterEvent_t *pEvent);
+	void GibMonster(void);
 };
 
 
@@ -3274,6 +3367,45 @@ void CNazzGrunt::Shoot(void)
 	SetBlending(0, angDir.x);
 }
 
+void CNazzGrunt::GibMonster(void)
+{
+	Vector	vecGunPos;
+	Vector	vecGunAngles;
+
+	if (GetBodygroup(2) != 2)
+	{// throw a gun if the grunt has one
+		GetAttachment(0, vecGunPos, vecGunAngles);
+
+		CBaseEntity* pGun;
+		if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
+		{
+			pGun = DropItem("weapon_sniperrifle", vecGunPos, vecGunAngles);
+		}
+		else
+		{
+			pGun = DropItem("weapon_mp44", vecGunPos, vecGunAngles);
+		}
+		if (pGun)
+		{
+			pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
+			pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
+		}
+
+		if (FBitSet(pev->weapons, HGRUNT_GRENADELAUNCHER))
+		{
+			pGun = DropItem("ammo_ARgrenades", vecGunPos, vecGunAngles);
+			if (pGun)
+			{
+				pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
+				pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
+			}
+		}
+	}
+
+	CBaseMonster::GibMonster();
+}
+
+
 
 
 ///weapon_mp44_nazzi-grunt(его оружие  в руках)
@@ -3298,7 +3430,7 @@ void CNazzGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 		// now spawn a gun.
 		if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
 		{
-			DropItem("weapon_crossbow", vecGunPos, vecGunAngles);
+			DropItem("weapon_sniperrifle", vecGunPos, vecGunAngles);
 		}
 		else
 		{

@@ -110,6 +110,7 @@ struct skilldata_t
 	float plrDmgTripmine;
 	float plrDmgSniper;
 	float plrDmgMP44AMM;
+	float plrDmgK43;
 	
 // weapons shared by monsters
 	float monDmg9MM;
@@ -123,6 +124,9 @@ struct skilldata_t
 	float healthchargerCapacity;
 	float healthkitCapacity;
 	float scientistHeal;
+	float cacaohealth;
+	float whiskeyHealth;
+	float EatHealthKit;
 
 // monster damage adj
 	float monHead;

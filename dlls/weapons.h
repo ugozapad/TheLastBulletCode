@@ -83,6 +83,7 @@ public:
 #define WEAPON_STEN			    18
 #define WEAPON_KNIFE 19 //Порядковый номер нашего оружия
 #define	WEAPON_MP44			20
+#define	WEAPON_K43RIFLE		21
 
 #define WEAPON_ALLWEAPONS		(~(1<<WEAPON_SUIT))
 
@@ -150,6 +151,7 @@ public:
 
 
 
+
 // the default amount of ammo that comes with each gun when it spawns
 #define GLOCK_DEFAULT_GIVE			9
 #define PYTHON_DEFAULT_GIVE			6
@@ -196,6 +198,7 @@ typedef	enum
 	BULLET_PLAYER_CROWBAR, // crowbar swipe
 	BULLET_PLAYER_338,
 	BULLET_PLAYER_MP44AMM,
+	BULLET_PLAYER_K43,
 
 	BULLET_MONSTER_9MM,
 	BULLET_MONSTER_MP5,
@@ -1043,7 +1046,7 @@ public:
 	int GetItemInfo(ItemInfo* p);
 	int AddToPlayer(CBasePlayer* pPlayer);
 	void PrimaryAttack(void);
-	void SecondaryAttack(void);
+	//void SecondaryAttack(void);
 	BOOL Deploy(void);
 	void Holster(int skiplocal = 0);
 	void Reload(void);
@@ -1179,5 +1182,37 @@ public:
 private:
 	unsigned short m_usMp44Fire;
 };
+
+
+class CWrifle : public CBasePlayerWeapon
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	int iItemSlot(void) { return 2; }
+	int GetItemInfo(ItemInfo* p); //в чем твоя проблема?
+	int AddToPlayer(CBasePlayer* pPlayer);
+	void PrimaryAttack(void);
+	void SecondaryAttack(void);
+	BOOL Deploy(void);
+	void Holster(int skiplocal = 0);//починилось
+	void Reload(void);
+	void WeaponIdle(void);
+
+	BOOL m_fInZoom;// don't save this. 
+
+	virtual BOOL UseDecrement(void)
+	{
+#if defined( CLIENT_WEAPONS )
+		return TRUE;
+#else
+		return FALSE;
+#endif
+	}
+
+private:
+	unsigned short m_usRifleK43Fire;
+};
+
 
 #endif // WEAPONS_H

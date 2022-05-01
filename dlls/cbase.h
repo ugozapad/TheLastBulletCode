@@ -143,6 +143,9 @@ public:
 class CBaseEntity 
 {
 public:
+
+	void		FireBulletsWater(Vector vecEnd, Vector vecSrc);
+
 	// Constructor.  Set engine to use C/C++ callback functions
 	// pointers to engine data
 	entvars_t *pev;		// Don't need to save/restore this pointer, the engine resets it
@@ -359,6 +362,7 @@ public:
 	int ammo_argrens;
 	int ammo_338;
 	int ammo_mp44;
+	int ammo_wrifle;
 	
 	//Special stuff for grenades and satchels.
 	float m_flStartThrow;

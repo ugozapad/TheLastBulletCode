@@ -185,6 +185,8 @@ int gmsgSetFOV = 0;
 int gmsgShowMenu = 0;
 int gmsgGeigerRange = 0;
 int gmsgTeamNames = 0;
+int gmsgWaterSplash = 0;
+
 
 int gmsgStatusText = 0;
 int gmsgStatusValue = 0; 
@@ -234,6 +236,8 @@ void LinkUserMessages( void )
 	gmsgFade = REG_USER_MSG("ScreenFade", sizeof(ScreenFade));
 	gmsgAmmoX = REG_USER_MSG("AmmoX", 2);
 	gmsgTeamNames = REG_USER_MSG( "TeamNames", -1 );
+	gmsgWaterSplash = REG_USER_MSG("WaterSplash", -1);
+
 
 	gmsgStatusText = REG_USER_MSG("StatusText", -1);
 	gmsgStatusValue = REG_USER_MSG("StatusValue", 3); 
@@ -1140,6 +1144,7 @@ void CBasePlayer::TabulateAmmo()
 	ammo_hornets = AmmoInventory( GetAmmoIndex( "Hornets" ) );
 	ammo_338 = AmmoInventory(GetAmmoIndex("338"));
 	ammo_mp44 = AmmoInventory(GetAmmoIndex("mp44"));
+	ammo_wrifle = AmmoInventory(GetAmmoIndex("k43"));
 }
 
 
@@ -3573,6 +3578,8 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 		GiveNamedItem("ammo_sten");//наши патроны
 		GiveNamedItem("weapon_knife");
 		GiveNamedItem("weapon_mp44");
+		GiveNamedItem("weapon_wrifle");
+		GiveNamedItem("ammo_wrifle");
 
 #endif
 		gEvilImpulse101 = FALSE;

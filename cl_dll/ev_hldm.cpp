@@ -77,6 +77,7 @@ void EV_FireVenom2(struct event_args_s* args);
 void EV_StenFire(struct event_args_s *args); // ваше оружие
 void EV_KnifeFire(struct event_args_s *args);
 void EV_Mp44(struct event_args_s *args);
+void EV_RifleK43Fire(struct event_args_s* args);
 
 void EV_TrainPitchAdjust( struct event_args_s *args );
 }
@@ -98,6 +99,20 @@ void EV_TrainPitchAdjust( struct event_args_s *args );
 // play a strike sound based on the texture that was hit by the attack traceline.  VecSrc/VecEnd are the
 // original traceline endpoints used by the attacker, iBulletType is the type of bullet that hit the texture.
 // returns volume of strike instrument (crowbar) to play
+
+// mazor begin
+void EV_HLDM_MuzzleFlash(vec3_t pos, float amount)
+{
+dlight_t *dl = gEngfuncs.pEfxAPI->CL_AllocDlight(0);
+dl->origin = pos;
+dl->color.r = 255; // red
+dl->color.g = 255; // green
+dl->color.b = 180; // blue
+dl->radius = amount * 300;
+dl->die = gEngfuncs.GetClientTime() + 0.01;
+}
+// mazor end
+
 float EV_HLDM_PlayTextureSound( int idx, pmtrace_t *ptr, float *vecSrc, float *vecEnd, int iBulletType )
 {
 	// hit the world, try to play sound based on texture material type
@@ -301,6 +316,7 @@ void EV_HLDM_DecalGunshot( pmtrace_t *pTrace, int iBulletType )
 		case BULLET_PLAYER_BUCKSHOT:
 		case BULLET_PLAYER_357:
 		case BULLET_PLAYER_MP44AMM:
+		case BULLET_PLAYER_K43:
 
 		default:
 			// smoke and decal
@@ -449,6 +465,12 @@ void EV_HLDM_FireBullets( int idx, float *forward, float *right, float *up, int 
 
 				break;
 
+			case BULLET_PLAYER_K43:
+
+				EV_HLDM_PlayTextureSound(idx, &tr, vecSrc, vecEnd, iBulletType);
+				EV_HLDM_DecalGunshot(&tr, iBulletType);
+
+				break;
 
 			}
 		}
@@ -491,7 +513,7 @@ void EV_FireGlock1( event_args_t *args )
 
 		V_PunchAxis( 0, -2.0 );
 	}
-
+	
 	EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20, -12, 4 );
 
 	EV_EjectBrass ( ShellOrigin, ShellVelocity, angles[ YAW ], shell, TE_BOUNCE_SHELL ); 
@@ -499,6 +521,10 @@ void EV_FireGlock1( event_args_t *args )
 	gEngfuncs.pEventAPI->EV_PlaySound( idx, origin, CHAN_WEAPON, "weapons/pl_gun3.wav", gEngfuncs.pfnRandomFloat(0.92, 1.0), ATTN_NORM, 0, 98 + gEngfuncs.pfnRandomLong( 0, 3 ) );
 
 	EV_GetGunPosition( args, vecSrc, origin );
+
+	// mazor begin
+	EV_HLDM_MuzzleFlash(vecSrc, 1.0 + gEngfuncs.pfnRandomFloat(-0.2, 0.2));
+	// mazor end
 	
 	VectorCopy( forward, vecAiming );
 
@@ -600,6 +626,11 @@ void EV_FireShotGunDouble( event_args_t *args )
 	gEngfuncs.pEventAPI->EV_PlaySound( idx, origin, CHAN_WEAPON, "weapons/dbarrel1.wav", gEngfuncs.pfnRandomFloat(0.98, 1.0), ATTN_NORM, 0, 85 + gEngfuncs.pfnRandomLong( 0, 0x1f ) );
 
 	EV_GetGunPosition( args, vecSrc, origin );
+
+	// mazor begin
+	EV_HLDM_MuzzleFlash(vecSrc, 1.0 + gEngfuncs.pfnRandomFloat(-0.2, 0.2));
+	// mazor end
+
 	VectorCopy( forward, vecAiming );
 
 	if ( gEngfuncs.GetMaxClients() > 1 )
@@ -652,6 +683,11 @@ void EV_FireShotGunSingle( event_args_t *args )
 	gEngfuncs.pEventAPI->EV_PlaySound( idx, origin, CHAN_WEAPON, "weapons/sbarrel1.wav", gEngfuncs.pfnRandomFloat(0.95, 1.0), ATTN_NORM, 0, 93 + gEngfuncs.pfnRandomLong( 0, 0x1f ) );
 
 	EV_GetGunPosition( args, vecSrc, origin );
+
+	// mazor begin
+	EV_HLDM_MuzzleFlash(vecSrc, 1.0 + gEngfuncs.pfnRandomFloat(-0.2, 0.2));
+	// mazor end
+
 	VectorCopy( forward, vecAiming );
 
 	if ( gEngfuncs.GetMaxClients() > 1 )
@@ -717,6 +753,11 @@ void EV_FireMP5( event_args_t *args )
 	}
 
 	EV_GetGunPosition( args, vecSrc, origin );
+
+	// mazor begin
+	EV_HLDM_MuzzleFlash(vecSrc, 1.0 + gEngfuncs.pfnRandomFloat(-0.2, 0.2));
+	// mazor end
+
 	VectorCopy( forward, vecAiming );
 
 	if ( gEngfuncs.GetMaxClients() > 1 )
@@ -805,6 +846,10 @@ void EV_FirePython( event_args_t *args )
 
 	EV_GetGunPosition( args, vecSrc, origin );
 	
+	// mazor begin
+	EV_HLDM_MuzzleFlash(vecSrc, 1.0 + gEngfuncs.pfnRandomFloat(-0.2, 0.2));
+	// mazor end
+
 	VectorCopy( forward, vecAiming );
 
 	EV_HLDM_FireBullets( idx, forward, right, up, 1, vecSrc, vecAiming, 8192, BULLET_PLAYER_357, 0, 0, args->fparam1, args->fparam2 );
@@ -1234,6 +1279,10 @@ void EV_FireCrossbow2( event_args_t *args )
 
 	EV_GetGunPosition( args, vecSrc, origin );
 
+	// mazor begin
+	EV_HLDM_MuzzleFlash(vecSrc, 1.0 + gEngfuncs.pfnRandomFloat(-0.2, 0.2));
+	// mazor end
+
 	VectorMA( vecSrc, 8192, forward, vecEnd );
 
 	gEngfuncs.pEventAPI->EV_PlaySound( idx, origin, CHAN_WEAPON, "weapons/xbow_fire1.wav", 1, ATTN_NORM, 0, 93 + gEngfuncs.pfnRandomLong(0,0xF) );
@@ -1326,6 +1375,49 @@ void EV_FireCrossbow( event_args_t *args )
 //======================
 //	   CROSSBOW END 
 //======================
+
+//======================
+//	  Water Slash Start
+//======================
+void EV_HLDM_WaterSplash(float x, float y, float z)
+{
+	int  iWaterSplash = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/effects/splash1.spr");
+	TEMPENTITY* pTemp = gEngfuncs.pEfxAPI->R_TempSprite(Vector(x, y, z + 50),
+		Vector(0, 0, 0),
+		0.5, iWaterSplash, kRenderTransAdd, kRenderFxNone, 1.0, 0.5, FTENT_SPRANIMATE | FTENT_FADEOUT | FTENT_COLLIDEKILL);
+
+	if (pTemp)
+	{
+		pTemp->fadeSpeed = 90.0;
+		pTemp->entity.curstate.framerate = 100.0;
+		pTemp->entity.curstate.renderamt = 155;
+		pTemp->entity.curstate.rendercolor.r = 255;
+		pTemp->entity.curstate.rendercolor.g = 255;
+		pTemp->entity.curstate.rendercolor.b = 255;
+	}
+
+	iWaterSplash = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/effects/splash2.spr");
+	pTemp = gEngfuncs.pEfxAPI->R_TempSprite(Vector(x, y, z),
+		Vector(0, 0, 0),
+		0.2, iWaterSplash, kRenderTransAdd, kRenderFxNone, 1.0, 0.5, FTENT_SPRANIMATE | FTENT_FADEOUT | FTENT_COLLIDEKILL);
+
+	if (pTemp)
+	{
+		pTemp->fadeSpeed = 60.0;
+		pTemp->entity.curstate.framerate = 50.0;
+		pTemp->entity.curstate.renderamt = 100;
+		pTemp->entity.curstate.rendercolor.r = 255;
+		pTemp->entity.curstate.rendercolor.g = 255;
+		pTemp->entity.curstate.rendercolor.b = 255;
+		pTemp->entity.angles = Vector(90, 0, 0);
+	}
+}
+//======================
+//	   Water Slash End
+//======================
+
+
+
 
 //======================
 //	    RPG START 
@@ -1663,9 +1755,68 @@ void EV_SnarkFire( event_args_t *args )
 //======================
 //	   SQUEAK END
 //======================
+//======================
+// K43 START
+//======================
+
+void EV_RifleK43Fire(event_args_t* args)
+{
+	int idx;
+	vec3_t origin;
+	vec3_t angles;
+	vec3_t velocity;
+
+	vec3_t vecSrc, vecAiming;
+	vec3_t up, right, forward;
+	float flSpread = 0.01;
+
+	idx = args->entindex;
+	VectorCopy(args->origin, origin);
+	VectorCopy(args->angles, angles);
+	VectorCopy(args->velocity, velocity);
+
+	AngleVectors(angles, forward, right, up);
+
+	if (EV_IsLocal(idx))
+	{
+		// Python uses different body in multiplayer versus single player
+		int multiplayer = gEngfuncs.GetMaxClients() == 1 ? 0 : 1;
+
+		// Add muzzle flash to current weapon model
+		EV_MuzzleFlash();
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(PYTHON_FIRE1, multiplayer ? 1 : 0);
+
+		V_PunchAxis(0, -10.0);
+	}
+
+	switch (gEngfuncs.pfnRandomLong(0, 1))
+	{
+	case 0:
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/k43/k43_fire.wav.wav", gEngfuncs.pfnRandomFloat(0.8, 0.9), ATTN_NORM, 0, PITCH_NORM);
+		break;
+	case 1:
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/k43/k43_fire.wav.wav", gEngfuncs.pfnRandomFloat(0.8, 0.9), ATTN_NORM, 0, PITCH_NORM);
+		break;
+	}
+
+	EV_GetGunPosition(args, vecSrc, origin);
+
+	// mazor begin
+	EV_HLDM_MuzzleFlash(vecSrc, 1.0 + gEngfuncs.pfnRandomFloat(-0.2, 0.2));
+	// mazor end
+
+	VectorCopy(forward, vecAiming);
+
+	EV_HLDM_FireBullets(idx, forward, right, up, 1, vecSrc, vecAiming, 8192, BULLET_PLAYER_K43, 0, 0, args->fparam1, args->fparam2);
+}
+
 
 //======================
-// RIFLE START
+// K43 END
+//======================
+
+//======================
+// SnipeRIFLE START
 //======================
 enum sniperrifle_e {
 	SNIPERRIFLE_DRAW = 0,
@@ -1715,10 +1866,10 @@ void EV_FireSniper(event_args_t* args)
 
 	VectorCopy(forward, vecAiming);
 
-	EV_HLDM_FireBullets(idx, forward, right, up, 1, vecSrc, vecAiming, 8192, BULLET_PLAYER_338, 0, 0, args->fparam1, args->fparam2);
+	EV_HLDM_FireBullets(idx, forward, right, up, 1, vecSrc, vecAiming, 8192, BULLET_PLAYER_K43, 0, 0, args->fparam1, args->fparam2);
 }
 //======================
-// RIFLE END 
+// SNIPERIFLE END 
 //======================
 
 
@@ -1772,6 +1923,11 @@ void EV_FireVenom(event_args_t* args)
 	}
 
 	EV_GetGunPosition(args, vecSrc, origin);
+
+	// mazor begin
+	EV_HLDM_MuzzleFlash(vecSrc, 1.0 + gEngfuncs.pfnRandomFloat(-0.2, 0.2));
+	// mazor end
+
 	VectorCopy(forward, vecAiming);
 
 	if (gEngfuncs.GetMaxClients() > 1)
@@ -1926,6 +2082,11 @@ void EV_Mp44Fire(event_args_t *args)//рисуем выстрел
 	}
 
 	EV_GetGunPosition(args, vecSrc, origin);//получить позицию пушки
+
+	// mazor begin
+	EV_HLDM_MuzzleFlash(vecSrc, 1.0 + gEngfuncs.pfnRandomFloat(-0.2, 0.2));
+	// mazor end
+
 	VectorCopy(forward, vecAiming);//копируем вектор направления пули
 
 	//стреляем

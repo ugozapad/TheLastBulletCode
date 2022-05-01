@@ -71,6 +71,7 @@ CVenom g_Venom;
 CStenGun g_StenGun; // ваше оружие
 CKnife g_Knife; //Объявляем класс ножа
 CMP44 g_Mp44; // ваше оружие
+CWrifle g_RifleK43; // ваше оружие
 
 
 /*
@@ -629,6 +630,7 @@ void HUD_InitClientWeapons( void )
 	HUD_PrepEntity(&g_StenGun, &player); // ваше оружие стен
 	HUD_PrepEntity(&g_Knife, &player); //Прорисовка худа(нож)
 	HUD_PrepEntity(&g_Mp44, &player); // ваше оружие мп44
+	HUD_PrepEntity(&g_RifleK43, &player); // ваше оружие k43
 }
 
 /*
@@ -758,6 +760,10 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 			break;
 
 		case WEAPON_STEN: // ваше оружие
+			pWeapon = &g_StenGun;
+			break;
+
+		case WEAPON_K43RIFLE: // ваше оружие
 			pWeapon = &g_StenGun;
 			break;
 

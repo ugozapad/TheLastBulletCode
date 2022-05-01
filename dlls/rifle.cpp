@@ -48,13 +48,13 @@ LINK_ENTITY_TO_CLASS(weapon_sniperrifle, CSniperrifle);
 int CSniperrifle::GetItemInfo(ItemInfo* p)
 {
     p->pszName = STRING(pev->classname);
-    p->pszAmmo1 = "338";
-    p->iMaxAmmo1 = _338_MAX_CARRY;
+    p->pszAmmo1 = "k43";
+    p->iMaxAmmo1 = 120;
     p->pszAmmo2 = NULL;
     p->iMaxAmmo2 = -1;
-    p->iMaxClip = SNIPERRIFLE_MAX_CLIP;
+    p->iMaxClip = 10;
     p->iFlags = 0;
-    p->iSlot = 0;
+    p->iSlot = 2;
     p->iPosition = 3;
     p->iId = m_iId = WEAPON_SNIPERRIFLE;
     p->iWeight = SNIPERRIFLE_WEIGHT;
@@ -92,7 +92,7 @@ void CSniperrifle::Precache(void)
     PRECACHE_MODEL("models/w_sniper.mdl");
     PRECACHE_MODEL("models/p_sniper.mdl");
 
-    PRECACHE_MODEL("models/w_sniper_clip.mdl");
+    PRECACHE_MODEL("models/w_sniper_clip.mdl");//ammo
     PRECACHE_SOUND("items/9mmclip1.wav");
 
     PRECACHE_SOUND("weapons/sniper_miss.wav");
@@ -122,29 +122,29 @@ void CSniperrifle::Holster(int skiplocal /* = 0 */)
     SendWeaponAnim(SNIPERRIFLE_HOLSTER);
 }
 
-void CSniperrifle::SecondaryAttack(void)
-{
-    if (m_pPlayer->pev->fov != 0)
-    {
-        m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 0; // 0 means reset to default fov
-        m_fInZoom = 0;
-#ifndef CLIENT_DLL
-        UTIL_ScreenFade(m_pPlayer, Vector(0, 0, 0), 0.5, 0.25, 255, FFADE_IN);
-#endif
-        EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sniper_zoom.wav", RANDOM_FLOAT(0.95, 1.0), ATTN_NORM, 0, 93 + RANDOM_LONG(0, 0xF));
-    }
-    else if (m_pPlayer->pev->fov != 15)
-    {
-        m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 15;
-        m_fInZoom = 1;
-#ifndef CLIENT_DLL
-        UTIL_ScreenFade(m_pPlayer, Vector(0, 0, 0), 0.5, 0.25, 255, FFADE_IN);
-#endif
-        EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sniper_zoom.wav", RANDOM_FLOAT(0.95, 1.0), ATTN_NORM, 0, 93 + RANDOM_LONG(0, 0xF));
-    }
-    pev->nextthink = UTIL_WeaponTimeBase() + 0.1;
-    m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0;
-}
+//void CSniperrifle::SecondaryAttack(void)
+//{
+//    if (m_pPlayer->pev->fov != 0)
+//    {
+//        m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 0; // 0 means reset to default fov
+//        m_fInZoom = 0;
+//#ifndef CLIENT_DLL
+//        UTIL_ScreenFade(m_pPlayer, Vector(0, 0, 0), 0.5, 0.25, 255, FFADE_IN);
+//#endif
+//        EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sniper_zoom.wav", RANDOM_FLOAT(0.95, 1.0), ATTN_NORM, 0, 93 + RANDOM_LONG(0, 0xF));
+//    }
+//    else if (m_pPlayer->pev->fov != 15)
+//    {
+//        m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 15;
+//        m_fInZoom = 1;
+//#ifndef CLIENT_DLL
+//        UTIL_ScreenFade(m_pPlayer, Vector(0, 0, 0), 0.5, 0.25, 255, FFADE_IN);
+//#endif
+//        EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sniper_zoom.wav", RANDOM_FLOAT(0.95, 1.0), ATTN_NORM, 0, 93 + RANDOM_LONG(0, 0xF));
+//    }
+//    pev->nextthink = UTIL_WeaponTimeBase() + 0.1;
+//    m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0;
+//}
 
 void CSniperrifle::PrimaryAttack(void)
 {
@@ -200,7 +200,7 @@ void CSniperrifle::Shoot(float flSpread, float flCycleTime, BOOL fUseAutoAim)
     }
 
     Vector vecDir;
-    vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, Vector(flSpread, flSpread, flSpread), 8192, BULLET_PLAYER_338, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed);
+    vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, Vector(flSpread, flSpread, flSpread), 8192, BULLET_PLAYER_K43, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed);
 
     PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), fUseAutoAim ? m_usFireSniper : m_usFireSniper, 0.0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, 0, 0, (m_iClip == 0) ? 1 : 0, 0);
 
@@ -220,7 +220,7 @@ void CSniperrifle::Reload(void)
         SecondaryAttack();
     }
 
-    if (m_pPlayer->ammo_338 <= 0)
+    if (m_pPlayer->ammo_wrifle <= 0)
         return;
 
     if (m_pPlayer->pev->fov != 0)
@@ -275,7 +275,7 @@ class CSniperrifleAmmo : public CBasePlayerAmmo
     }
     BOOL AddAmmo(CBaseEntity* pOther)
     {
-        if (pOther->GiveAmmo(AMMO_SNIPERRIFLECLIP_GIVE, "338", _338_MAX_CARRY) != -1)
+        if (pOther->GiveAmmo(10, "k43", 120) != -1)
         {
             EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", 1, ATTN_NORM);
             return TRUE;
@@ -283,6 +283,6 @@ class CSniperrifleAmmo : public CBasePlayerAmmo
         return FALSE;
     }
 };
-LINK_ENTITY_TO_CLASS(ammo_338, CSniperrifleAmmo);
+LINK_ENTITY_TO_CLASS(ammo_k43, CSniperrifleAmmo);
 
 #endif

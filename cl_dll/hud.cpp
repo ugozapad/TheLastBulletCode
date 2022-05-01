@@ -128,6 +128,11 @@ int __MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 {
 	return gHUD.MsgFunc_GameMode( pszName, iSize, pbuf );
 }
+int __MsgFunc_WaterSplash(const char* pszName, int iSize, void* pbuf)
+{
+	gHUD.MsgFunc_WaterSplash(pszName, iSize, pbuf);
+	return 1;
+}
 
 // TFFree Command Menu
 void __CmdFunc_OpenCommandMenu(void)
@@ -320,6 +325,7 @@ void CHud :: Init( void )
 
 	HOOK_MESSAGE( Spectator );
 	HOOK_MESSAGE( AllowSpec );
+	HOOK_MESSAGE(WaterSplash);
 	
 	HOOK_MESSAGE( SpecFade );
 	HOOK_MESSAGE( ResetFade );

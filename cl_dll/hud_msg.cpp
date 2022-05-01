@@ -26,6 +26,21 @@ extern IParticleMan *g_pParticleMan;
 
 #define MAX_CLIENTS 32
 
+extern void EV_HLDM_WaterSplash(float x, float y, float z);
+
+int CHud::MsgFunc_WaterSplash(const char* pszName, int iSize, void* pbuf)
+{
+	BEGIN_READ(pbuf, iSize);
+	float X, Y, Z;
+
+	X = READ_COORD();
+	Y = READ_COORD();
+	Z = READ_COORD();
+
+	EV_HLDM_WaterSplash(X, Y, Z);
+	return 1;
+}
+
 #if !defined( _TFC )
 extern BEAM *pBeam;
 extern BEAM *pBeam2;

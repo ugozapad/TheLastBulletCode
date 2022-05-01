@@ -178,6 +178,7 @@ void DecalGunshot( TraceResult *pTrace, int iBulletType )
 		case BULLET_PLAYER_BUCKSHOT:
 		case BULLET_PLAYER_357:
 		case BULLET_PLAYER_MP44AMM:
+		case BULLET_PLAYER_K43:
 		default:
 			// smoke and decal
 			UTIL_GunshotDecalTrace( pTrace, DamageDecal( pEntity, DMG_BULLET ) );
@@ -384,6 +385,10 @@ void W_Precache(void)
 	// mp44
 	UTIL_PrecacheOtherWeapon("weapon_mp44");
 	UTIL_PrecacheOther("ammo_mp44");
+
+	// rifle_k43
+	UTIL_PrecacheOtherWeapon("weapon_wrifle");
+	UTIL_PrecacheOther("ammo_wrifle");
 
 	// Venom
 	UTIL_PrecacheOtherWeapon("weapon_venom");

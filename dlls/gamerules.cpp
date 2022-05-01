@@ -269,6 +269,9 @@ void CGameRules::RefreshSkillData ( void )
 	// MP44AMMO
 	gSkillData.plrDmgMP44AMM = GetSkillCvar("sk_plr_MP44AMM_bullet");
 
+	// K43
+	gSkillData.plrDmgK43 = GetSkillCvar("sk_plr_K43_bullet");
+
 	// Rifle
 	gSkillData.plrDmgSniper = GetSkillCvar("sk_plr_snpr_bullet");
 
@@ -295,6 +298,12 @@ void CGameRules::RefreshSkillData ( void )
 	gSkillData.healthchargerCapacity = GetSkillCvar ( "sk_healthcharger" );
 	gSkillData.healthkitCapacity = GetSkillCvar ( "sk_healthkit" );
 	gSkillData.scientistHeal = GetSkillCvar ( "sk_scientist_heal" );
+
+	//new healthykit
+	gSkillData.cacaohealth = GetSkillCvar("sk_cacaohealthkit");
+	gSkillData.whiskeyHealth = GetSkillCvar("sk_whiskeyhealthkit");
+	gSkillData.EatHealthKit = GetSkillCvar("sk_Eathealthkit");
+
 
 	// monster damage adj
 	gSkillData.monHead = GetSkillCvar( "sk_monster_head" );

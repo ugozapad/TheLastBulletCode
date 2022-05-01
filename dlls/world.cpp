@@ -478,6 +478,9 @@ void CWorld :: Spawn( void )
 
 void CWorld :: Precache( void )
 {
+
+	
+
 	g_pLastSpawn = NULL;
 	
 #if 1
@@ -554,6 +557,12 @@ void CWorld :: Precache( void )
 	PRECACHE_SOUND ("weapons/ric3.wav");
 	PRECACHE_SOUND ("weapons/ric4.wav");
 	PRECACHE_SOUND ("weapons/ric5.wav");
+	PRECACHE_MODEL("sprites/effects/splash1.spr");
+	PRECACHE_MODEL("sprites/effects/splash2.spr");
+	PRECACHE_SOUND("items/water_splash/water_splash1.wav");
+	PRECACHE_SOUND("items/water_splash/water_splash2.wav");
+	PRECACHE_SOUND("items/water_splash/water_splash3.wav");
+
 //
 // Setup light animation tables. 'a' is total darkness, 'z' is maxbright.
 //
