@@ -1,3 +1,18 @@
+/***
+*
+*	Copyright (c) 1996-2001, Valve LLC. All rights reserved.
+*
+*	This product contains software technology licensed from Id
+*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
+*	All Rights Reserved.
+*
+*   Use, distribution, and modification of this source code and/or resulting
+*   object code is restricted to non-commercial enhancements to products from
+*   Valve LLC.  All other use, distribution, or modification is prohibited
+*   without written permission from Valve LLC.
+*
+****/
+
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
@@ -5,35 +20,42 @@
 #include "weapons.h"
 #include "nodes.h"
 #include "player.h"
-
-#include "soundent.h"//подключаем новые файлы
+#include "soundent.h"
 #include "gamerules.h"
 
-enum mp5_e//загружаем анимации
+enum mp5_e
 {
-	MP5_LONGIDLE = 0,//Длинное бездействие
-	MP5_IDLE1,//Бездействие
-	MP5_LAUNCH,//Выстрел подстволкой
-	MP5_RELOAD,//Перезарядка
-	MP5_DEPLOY,//Взятие в руки
-	MP5_FIRE1,//Выстрел
-	MP5_FIRE2,//Выстрел
-	MP5_FIRE3,//Выстрел
+	MP5_LONGIDLE = 0,
+	MP5_IDLE1,
+	MP5_LAUNCH,
+	MP5_RELOAD,
+	MP5_DEPLOY,
+	MP5_FIRE1,
+	MP5_FIRE2,
+	MP5_FIRE3,
 };
 
+
+
 LINK_ENTITY_TO_CLASS(weapon_sten, CStenGun);
+//LINK_ENTITY_TO_CLASS( weapon_mp5, CMP5 );
+
+
+//=========================================================
+//=========================================================
 
 void CStenGun::Spawn()
 {
-	pev->classname = MAKE_STRING("weapon_sten"); // здесь имя энтити которое надо будет затем вписать в фгд
+	pev->classname = MAKE_STRING("weapon_sten"); // hack to allow for old names
 	Precache();
-	SET_MODEL(ENT(pev), "models/w_sten.mdl"); // Тут должна быть модель вашего оружия
+	SET_MODEL(ENT(pev), "models/w_sten.mdl");
 	m_iId = WEAPON_STEN;
 
 	m_iDefaultAmmo = 50;
 
-	FallInit();
+	FallInit();// get ready to fall down.
 }
+
 
 void CStenGun::Precache(void)
 {
@@ -55,25 +77,24 @@ void CStenGun::Precache(void)
 	m_usStenFire = PRECACHE_EVENT(1, "events/sten.sc");
 }
 
-int CStenGun::GetItemInfo(ItemInfo *p)
+int CStenGun::GetItemInfo(ItemInfo* p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "mp5";
 	p->iMaxAmmo1 = _9MM_MAX_CARRY;
+	p->pszAmmo2 = "NULL";
+	p->iMaxAmmo2 = -1;
 	p->iMaxClip = MP5_MAX_CLIP;
-	p->iSlot = 2; // слот в худе ( помните также, что елси здесь вы написали например 2 то в игре будет занят 3 слот, т.к в коде исчесление начинаеться от нуля)
-	p->iPosition = 3; // позиция в слоте ( то же самое что и в слоте - елси вам надо занять 4 позицию , то пишите 3 в коде)
+	p->iSlot = 2;
+	p->iPosition = 2;
 	p->iFlags = 0;
 	p->iId = m_iId = WEAPON_STEN;
-	p->iWeight = MP5_WEIGHT; //
-	p->pszAmmo2 = NULL; //
-	p->iMaxAmmo2 = -1;
+	p->iWeight = MP5_WEIGHT;
 
 	return 1;
 }
 
-
-int CStenGun::AddToPlayer(CBasePlayer *pPlayer)
+int CStenGun::AddToPlayer(CBasePlayer* pPlayer)
 {
 	if (CBasePlayerWeapon::AddToPlayer(pPlayer))
 	{
@@ -86,74 +107,63 @@ int CStenGun::AddToPlayer(CBasePlayer *pPlayer)
 }
 
 
-BOOL CStenGun::Deploy()//Поднимаем оружие
+
+BOOL CStenGun::Deploy()
 {
-	return DefaultDeploy("models/v_sten.mdl"/* модель в руках игрока*/, "models/p_sten.mdl"/*модель в руках противника*/, MP5_DEPLOY/*анимация      поднятия*/, "mp5"/*перфикс анимации игрока*/);
+	return DefaultDeploy("models/v_sten.mdl", "models/p_sten.mdl", MP5_DEPLOY, "mp5");
 }
 
-
-
-void CStenGun::WeaponIdle(void) //Бездействие
+void CStenGun::PrimaryAttack()
 {
-	ResetEmptySound();
-
-	m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
-
-	if (m_flTimeWeaponIdle > gpGlobals->time)
+	// don't fire underwater
+	if (m_pPlayer->pev->waterlevel == 3)
+	{
+		PlayEmptySound();
+		m_flNextPrimaryAttack = 0.15;
 		return;
-
-	int iAnim; //обьявляем целую пременную которая будет храить номер случайной анимации
-	switch (RANDOM_LONG(0, 1))//случайное число от 0 до 1 для выбора анимации
-	{
-	case 0:  //если 0 то длинное бездействие
-		iAnim = MP5_LONGIDLE;
-		break;
-
-	default:
-	case 1: //если не ноль, а что-то другое то просто бездействие
-		iAnim = MP5_IDLE1;
-		break;
 	}
 
-	SendWeaponAnim(iAnim); //проиграть ать анимацию которая содержится в переменной
-
-	m_flTimeWeaponIdle = gpGlobals->time + RANDOM_FLOAT(10, 15); // через сколько снова запустить функцию бездействия
-}
-
-void CStenGun::PrimaryAttack()//Первичная атака
-{
-	//не стрелять под водой
-	if (m_pPlayer->pev->waterlevel == 3)//если игрок под водой
+	if (m_iClip <= 0)
 	{
-		PlayEmptySound();//играть звук невозможности стрелять
-		m_flNextPrimaryAttack = 0.15;//когда следующий выстрел
-		return;//выходим из этой функции
+		PlayEmptySound();
+		m_flNextPrimaryAttack = 0.15;
+		return;
 	}
 
-	if (m_iClip <= 0)//если патронов 0 или меньше 0 то
-	{
-		PlayEmptySound();//играть звук невозможности стрелять
-		m_flNextPrimaryAttack = 0.15;//когда следующий выстрел
-		return;//выходим из этой функции
-	}
+	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
+	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 
-	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME; //устанавливаем громкость оружия
-	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH; //устанавливаем яркость вспышки оружия
-
-	m_iClip--; //уменьшаем количество патронов на 1 
+	m_iClip--;
 
 
 	m_pPlayer->pev->effects = (int)(m_pPlayer->pev->effects) | EF_MUZZLEFLASH;
 
-	// проигрывание анимации стрельбы игроком
+	// player "shoot" animation
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-	//присваиваем вектору vecSrc положение пушки
-	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecAiming = m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);//присваиваем вектору vecAiming место попадания пули
-	Vector vecDir;
-	//теперь стреляем
-	vecDir = m_pPlayer->FireBulletsPlayer(1/*количество пуль одновременно*/, vecSrc/*откуда вылетает пуля(положение пушки) */, vecAiming/*куда попадает пуля*/, VECTOR_CONE_1DEGREES/*векторный конус разброса*/, 8192/*дальность*/, BULLET_PLAYER_MP5/*тип пуль (повреждение)*/, 2/* количество трассирующих пуль*/, 0, m_pPlayer->pev, m_pPlayer->random_seed);
 
+	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+	Vector vecSrc = m_pPlayer->GetGunPosition();
+	Vector vecAiming = m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
+	Vector vecDir;
+
+#ifdef CLIENT_DLL
+	if (!bIsMultiplayer())
+#else
+	if (g_pGameRules->IsMultiplayer())
+#endif
+	{
+		// optimized multiplayer. Widened to make it easier to hit a moving player
+		vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, VECTOR_CONE_6DEGREES, 8192, BULLET_PLAYER_MP5, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed);
+	}
+	else
+	{
+		// single player spread
+		vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, VECTOR_CONE_3DEGREES, 8192, BULLET_PLAYER_MP5, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed);
+
+
+		m_pPlayer->WeaponScreenPunch(0.9, 1.2);
+
+	}
 
 	int flags;
 #if defined( CLIENT_WEAPONS )
@@ -162,13 +172,13 @@ void CStenGun::PrimaryAttack()//Первичная атака
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usStenFire, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, 0, 0, 0, 0); //Посылаем эвент на клиент
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usStenFire, 0.0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, 0, 0, 0, 0);
 
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
-		// HEV костюм говорит что нет патронов
+		// HEV suit - indicate out of ammo condition
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.1;//когда следующий выстрел
+	m_flNextPrimaryAttack = GetNextAttackDelay(0.1);
 
 	if (m_flNextPrimaryAttack < UTIL_WeaponTimeBase())
 		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.1;
@@ -177,12 +187,69 @@ void CStenGun::PrimaryAttack()//Первичная атака
 
 }
 
-void CStenGun::Reload(void)//Перезарядка
+
+
+void CStenGun::Reload(void)
 {
-	DefaultReload(100/*максимальный размер обоймы*/, MP5_RELOAD/*анимация перезарядки*/, 4 /*время перезарядки*/);
+	if (m_pPlayer->ammo_mp5 <= 0)
+		return;
+
+	/*int iResult;*/
+
+
+	/*iResult = */DefaultReload(MP5_MAX_CLIP, MP5_RELOAD, 1.5);
+
+
+	/*if (iResult)
+	{
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15);
+		SetThink(&CStenGun::SpawnClip);
+		pev->nextthink = gpGlobals->time + 0.8;
+	}*/
 }
 
+//void CStenGun::SpawnClip()
+//{
+//	int m_iClipmp5;
+//	if (m_iClip == 0)
+//	{
+//		m_iClipmp5 = PRECACHE_MODEL("models/w_9mmARclip_empty.mdl");// ставим модель магазина.
+//	}
+//	else
+//	{
+//		m_iClipmp5 = PRECACHE_MODEL("models/w_9mmARclip.mdl");
+//	}
+//	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+//	Vector	vecClipVelocity = m_pPlayer->pev->velocity
+//		+ gpGlobals->v_right * RANDOM_FLOAT(0, 5)
+//		+ gpGlobals->v_up * RANDOM_FLOAT(-10, -15)
+//		+ gpGlobals->v_forward * 1;
+//	EjectBrass(pev->origin + gpGlobals->v_up * -4 + gpGlobals->v_forward * 1, vecClipVelocity, pev->angles.y, m_iClipmp5, TE_BOUNCE_NULL);//собственно вместо TE_BOUNCE_NULL можете выставить звук любого материала, а потом заменить его...(если хотите чтобы магазин издавал звук при падении).
+//}
 
+void CStenGun::WeaponIdle(void)
+{
+	ResetEmptySound();
 
+	m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
 
+	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
+		return;
 
+	int iAnim;
+	switch (RANDOM_LONG(0, 1))
+	{
+	case 0:
+		iAnim = MP5_LONGIDLE;
+		break;
+
+	default:
+	case 1:
+		iAnim = MP5_IDLE1;
+		break;
+	}
+
+	SendWeaponAnim(iAnim);
+
+	m_flTimeWeaponIdle = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15); // how long till we do this again.
+}

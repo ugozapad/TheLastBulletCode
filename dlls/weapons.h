@@ -1214,5 +1214,11 @@ private:
 	unsigned short m_usRifleK43Fire;
 };
 
+class CPlasmaGun : public CBasePlayerWeapon
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+};
 
 #endif // WEAPONS_H

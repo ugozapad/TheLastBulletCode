@@ -179,6 +179,7 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\dlls\$(TargetName).p
     <ClCompile Include="..\..\dlls\osprey.cpp" />
     <ClCompile Include="..\..\dlls\pathcorner.cpp" />
     <ClCompile Include="..\..\dlls\plane.cpp" />
+    <ClCompile Include="..\..\dlls\plasmagun.cpp" />
     <ClCompile Include="..\..\dlls\plats.cpp" />
     <ClCompile Include="..\..\dlls\player.cpp" />
     <ClCompile Include="..\..\dlls\python.cpp" />
