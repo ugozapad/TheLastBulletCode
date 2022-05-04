@@ -252,43 +252,13 @@ void CMP5::SecondaryAttack( void )
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 }
 
-void CMP5::Reload( void )
+void CMP5::Reload(void)
 {
-	if ( m_pPlayer->ammo_mp5 <= 0 )
+	if (m_pPlayer->ammo_mp5 <= 0)
 		return;
 
-	/*int iResult;*/
-
-	
-		/*iResult = */DefaultReload(MP5_MAX_CLIP, MP5_RELOAD, 1.5);
-
-
-	/*if (iResult)
-	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15);
-		SetThink(&CMP5::SpawnClip);
-		pev->nextthink = gpGlobals->time + 0.8;
-	}*/
+	DefaultReload(MP5_MAX_CLIP, MP5_RELOAD, 1.5);
 }
-
-//void CMP5::SpawnClip()
-//{
-//	int m_iClipmp5;
-//	if (m_iClip == 0)
-//	{
-//		m_iClipmp5 = PRECACHE_MODEL("models/w_9mmARclip_empty.mdl");// ставим модель магазина.
-//	}
-//	else
-//	{
-//		m_iClipmp5 = PRECACHE_MODEL("models/w_9mmARclip.mdl");
-//	}
-//	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
-//	Vector	vecClipVelocity = m_pPlayer->pev->velocity
-//		+ gpGlobals->v_right * RANDOM_FLOAT(0, 5)
-//		+ gpGlobals->v_up * RANDOM_FLOAT(-10, -15)
-//		+ gpGlobals->v_forward * 1;
-//	EjectBrass(pev->origin + gpGlobals->v_up * -4 + gpGlobals->v_forward * 1, vecClipVelocity, pev->angles.y, m_iClipmp5, TE_BOUNCE_NULL);//собственно вместо TE_BOUNCE_NULL можете выставить звук любого материала, а потом заменить его...(если хотите чтобы магазин издавал звук при падении).
-//}
 
 void CMP5::WeaponIdle( void )
 {
