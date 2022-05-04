@@ -203,6 +203,7 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\cl_dlls\$(TargetName
     <ClCompile Include="..\..\pm_shared\pm_math.c" />
     <ClCompile Include="..\..\pm_shared\pm_shared.c" />
     <ClCompile Include="..\..\public\interface.cpp" />
+    <ClCompile Include="K43_Rifle.cpp" />
     <ClCompile Include="Knife.cpp" />
     <ClCompile Include="MP44.cpp" />
     <ClCompile Include="Sten.cpp" />

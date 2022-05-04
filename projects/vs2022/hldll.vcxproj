@@ -221,6 +221,7 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\dlls\$(TargetName).p
     <ClCompile Include="BonusWhiskey.cpp" />
     <ClCompile Include="DrinkMed.cpp" />
     <ClCompile Include="EeatHelthyKit.cpp" />
+    <ClCompile Include="K43_Rifle.cpp" />
     <ClCompile Include="Knife.cpp" />
     <ClCompile Include="MP44.cpp" />
     <ClCompile Include="Sten.cpp" />
