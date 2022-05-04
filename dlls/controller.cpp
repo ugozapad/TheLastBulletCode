@@ -389,7 +389,7 @@ void CController :: Precache()
 	PRECACHE_SOUND_ARRAY( pPainSounds );
 	PRECACHE_SOUND_ARRAY( pDeathSounds );
 
-	PRECACHE_MODEL( "sprites/xspark4.spr");
+	PRECACHE_MODEL( "sprites/plasmo_fire.spr");
 
 	UTIL_PrecacheOther( "controller_energy_ball" );
 	UTIL_PrecacheOther( "controller_head_ball" );
@@ -848,7 +848,7 @@ void CController :: RunAI( void )
 	{
 		if (m_pBall[i] == NULL)
 		{
-			m_pBall[i] = CSprite::SpriteCreate( "sprites/xspark4.spr", pev->origin, TRUE );
+			m_pBall[i] = CSprite::SpriteCreate( "sprites/plasmo_fire.spr", pev->origin, TRUE );
 			m_pBall[i]->SetTransparency( kRenderGlow, 255, 255, 255, 255, kRenderFxNoDissipation );
 			m_pBall[i]->SetAttachment( edict(), (i + 3) );
 			m_pBall[i]->SetScale( 1.0 );
@@ -1159,7 +1159,7 @@ void CControllerHeadBall :: Spawn( void )
 	pev->movetype = MOVETYPE_FLY;
 	pev->solid = SOLID_BBOX;
 
-	SET_MODEL(ENT(pev), "sprites/xspark4.spr");
+	SET_MODEL(ENT(pev), "sprites/plasmo_fire.spr");
 	pev->rendermode = kRenderTransAdd;
 	pev->rendercolor.x = 255;
 	pev->rendercolor.y = 255;
@@ -1184,7 +1184,7 @@ void CControllerHeadBall :: Spawn( void )
 
 void CControllerHeadBall :: Precache( void )
 {
-	PRECACHE_MODEL("sprites/xspark1.spr");
+	PRECACHE_MODEL("sprites/plasmo_fire.spr");
 	PRECACHE_SOUND("debris/zap4.wav");
 	PRECACHE_SOUND("weapons/electro4.wav");
 }
@@ -1353,7 +1353,7 @@ void CControllerZapBall :: Spawn( void )
 	pev->movetype = MOVETYPE_FLY;
 	pev->solid = SOLID_BBOX;
 
-	SET_MODEL(ENT(pev), "sprites/xspark4.spr");
+	SET_MODEL(ENT(pev), "sprites/plasmo_fire.spr");
 	pev->rendermode = kRenderTransAdd;
 	pev->rendercolor.x = 255;
 	pev->rendercolor.y = 255;
@@ -1375,7 +1375,7 @@ void CControllerZapBall :: Spawn( void )
 
 void CControllerZapBall :: Precache( void )
 {
-	PRECACHE_MODEL("sprites/xspark4.spr");
+	PRECACHE_MODEL("sprites/plasmo_fire.spr");
 	// PRECACHE_SOUND("debris/zap4.wav");
 	// PRECACHE_SOUND("weapons/electro4.wav");
 }

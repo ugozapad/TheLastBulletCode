@@ -125,7 +125,7 @@ public:
 #define SATCHEL_MAX_CARRY		5
 #define TRIPMINE_MAX_CARRY		5
 #define SNARK_MAX_CARRY			15
-#define HORNET_MAX_CARRY		8
+#define HORNET_MAX_CARRY		60
 #define M203_GRENADE_MAX_CARRY	10
 #define _338_MAX_CARRY 200
 
@@ -167,7 +167,7 @@ public:
 #define SATCHEL_DEFAULT_GIVE		1
 #define TRIPMINE_DEFAULT_GIVE		1
 #define SNARK_DEFAULT_GIVE			5
-#define HIVEHAND_DEFAULT_GIVE		8
+#define HIVEHAND_DEFAULT_GIVE		60
 #define SNIPERRIFLE_DEFAULT_GIVE	10
 #define VENOM_DEFAULT_GIVE			100
 
@@ -881,6 +881,8 @@ private:
 
 class CHgun : public CBasePlayerWeapon
 {
+
+	typedef CBasePlayerWeapon BaseClass;
 public:
 	void Spawn( void );
 	void Precache( void );
@@ -890,6 +892,7 @@ public:
 
 	void PrimaryAttack( void );
 	void SecondaryAttack( void );
+	void ItemPostFrame( void );
 	BOOL Deploy( void );
 	BOOL IsUseable( void );
 	void Holster( int skiplocal = 0 );
@@ -900,6 +903,8 @@ public:
 	float m_flRechargeTime;
 	
 	int m_iFirePhase;// don't save me.
+
+	bool m_bInReload;
 
 	virtual BOOL UseDecrement( void )
 	{ 
