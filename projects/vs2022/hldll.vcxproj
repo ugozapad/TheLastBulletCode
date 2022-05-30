@@ -118,11 +118,13 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\dlls\$(TargetName).p
     <ClCompile Include="..\..\dlls\animating.cpp" />
     <ClCompile Include="..\..\dlls\animation.cpp" />
     <ClCompile Include="..\..\dlls\apache.cpp" />
+    <ClCompile Include="..\..\dlls\BadBarney.cpp" />
     <ClCompile Include="..\..\dlls\barnacle.cpp" />
     <ClCompile Include="..\..\dlls\barney.cpp" />
     <ClCompile Include="..\..\dlls\bigmomma.cpp" />
     <ClCompile Include="..\..\dlls\bloater.cpp" />
     <ClCompile Include="..\..\dlls\bmodels.cpp" />
+    <ClCompile Include="..\..\dlls\BonusWhiskey.cpp" />
     <ClCompile Include="..\..\dlls\bullsquid.cpp" />
     <ClCompile Include="..\..\dlls\buttons.cpp" />
     <ClCompile Include="..\..\dlls\cbase.cpp" />
@@ -133,8 +135,11 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\dlls\$(TargetName).p
     <ClCompile Include="..\..\dlls\crowbar.cpp" />
     <ClCompile Include="..\..\dlls\defaultai.cpp" />
     <ClCompile Include="..\..\dlls\doors.cpp" />
+    <ClCompile Include="..\..\dlls\DrinkMed.cpp" />
+    <ClCompile Include="..\..\dlls\EeatHelthyKit.cpp" />
     <ClCompile Include="..\..\dlls\effects.cpp" />
     <ClCompile Include="..\..\dlls\egon.cpp" />
+    <ClCompile Include="..\..\dlls\ExampleGun.cpp" />
     <ClCompile Include="..\..\dlls\explode.cpp" />
     <ClCompile Include="..\..\dlls\fgrunt.cpp" />
     <ClCompile Include="..\..\dlls\flyingmonster.cpp" />
@@ -164,6 +169,7 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\dlls\$(TargetName).p
     <ClCompile Include="..\..\dlls\ichthyosaur.cpp" />
     <ClCompile Include="..\..\dlls\islave.cpp" />
     <ClCompile Include="..\..\dlls\items.cpp" />
+    <ClCompile Include="..\..\dlls\Knife.cpp" />
     <ClCompile Include="..\..\dlls\leech.cpp" />
     <ClCompile Include="..\..\dlls\lights.cpp" />
     <ClCompile Include="..\..\dlls\maprules.cpp" />
@@ -171,12 +177,14 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\dlls\$(TargetName).p
     <ClCompile Include="..\..\dlls\monsters.cpp" />
     <ClCompile Include="..\..\dlls\monsterstate.cpp" />
     <ClCompile Include="..\..\dlls\mortar.cpp" />
+    <ClCompile Include="..\..\dlls\MP44.cpp" />
     <ClCompile Include="..\..\dlls\mp5.cpp" />
     <ClCompile Include="..\..\dlls\multiplay_gamerules.cpp" />
     <ClCompile Include="..\..\dlls\nihilanth.cpp" />
     <ClCompile Include="..\..\dlls\nodes.cpp" />
     <ClCompile Include="..\..\dlls\observer.cpp" />
     <ClCompile Include="..\..\dlls\osprey.cpp" />
+    <ClCompile Include="..\..\dlls\Otis.cpp" />
     <ClCompile Include="..\..\dlls\pathcorner.cpp" />
     <ClCompile Include="..\..\dlls\plane.cpp" />
     <ClCompile Include="..\..\dlls\plats.cpp" />
@@ -198,6 +206,7 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\dlls\$(TargetName).p
     <ClCompile Include="..\..\dlls\spectator.cpp" />
     <ClCompile Include="..\..\dlls\squadmonster.cpp" />
     <ClCompile Include="..\..\dlls\squeakgrenade.cpp" />
+    <ClCompile Include="..\..\dlls\Sten.cpp" />
     <ClCompile Include="..\..\dlls\subs.cpp" />
     <ClCompile Include="..\..\dlls\talkmonster.cpp" />
     <ClCompile Include="..\..\dlls\teamplay_gamerules.cpp" />
@@ -217,13 +226,6 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\dlls\$(TargetName).p
     <ClCompile Include="..\..\pm_shared\pm_debug.c" />
     <ClCompile Include="..\..\pm_shared\pm_math.c" />
     <ClCompile Include="..\..\pm_shared\pm_shared.c" />
-    <ClCompile Include="BadBarney.cpp" />
-    <ClCompile Include="BonusWhiskey.cpp" />
-    <ClCompile Include="DrinkMed.cpp" />
-    <ClCompile Include="EeatHelthyKit.cpp" />
-    <ClCompile Include="Knife.cpp" />
-    <ClCompile Include="MP44.cpp" />
-    <ClCompile Include="Sten.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dlls\activity.h" />

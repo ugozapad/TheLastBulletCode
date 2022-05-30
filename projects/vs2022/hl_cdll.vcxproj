@@ -151,6 +151,7 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\cl_dlls\$(TargetName
     <ClCompile Include="..\..\cl_dll\in_camera.cpp" />
     <ClCompile Include="..\..\cl_dll\menu.cpp" />
     <ClCompile Include="..\..\cl_dll\message.cpp" />
+    <ClCompile Include="..\..\cl_dll\NotePaper.cpp" />
     <ClCompile Include="..\..\cl_dll\saytext.cpp" />
     <ClCompile Include="..\..\cl_dll\statusbar.cpp" />
     <ClCompile Include="..\..\cl_dll\status_icons.cpp" />
@@ -181,6 +182,8 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\cl_dlls\$(TargetName
     <ClCompile Include="..\..\dlls\gauss.cpp" />
     <ClCompile Include="..\..\dlls\handgrenade.cpp" />
     <ClCompile Include="..\..\dlls\hornetgun.cpp" />
+    <ClCompile Include="..\..\dlls\Knife.cpp" />
+    <ClCompile Include="..\..\dlls\MP44.cpp" />
     <ClCompile Include="..\..\dlls\mp5.cpp" />
     <ClCompile Include="..\..\dlls\python.cpp" />
     <ClCompile Include="..\..\dlls\rifle.cpp" />
@@ -188,6 +191,7 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\cl_dlls\$(TargetName
     <ClCompile Include="..\..\dlls\satchel.cpp" />
     <ClCompile Include="..\..\dlls\shotgun.cpp" />
     <ClCompile Include="..\..\dlls\squeakgrenade.cpp" />
+    <ClCompile Include="..\..\dlls\Sten.cpp" />
     <ClCompile Include="..\..\dlls\tripmine.cpp" />
     <ClCompile Include="..\..\dlls\venom.cpp" />
     <ClCompile Include="..\..\dlls\wpn_shared\hl_wpn_glock.cpp" />
@@ -203,9 +207,6 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\cl_dlls\$(TargetName
     <ClCompile Include="..\..\pm_shared\pm_math.c" />
     <ClCompile Include="..\..\pm_shared\pm_shared.c" />
     <ClCompile Include="..\..\public\interface.cpp" />
-    <ClCompile Include="Knife.cpp" />
-    <ClCompile Include="MP44.cpp" />
-    <ClCompile Include="Sten.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\cl_dll\ammo.h" />
@@ -226,6 +227,7 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\cl_dlls\$(TargetName
     <ClInclude Include="..\..\cl_dll\interpolation.h" />
     <ClInclude Include="..\..\cl_dll\in_defs.h" />
     <ClInclude Include="..\..\cl_dll\kbutton.h" />
+    <ClInclude Include="..\..\cl_dll\NotePaper.h" />
     <ClInclude Include="..\..\cl_dll\StudioModelRenderer.h" />
     <ClInclude Include="..\..\cl_dll\tri.h" />
     <ClInclude Include="..\..\cl_dll\util_vector.h" />

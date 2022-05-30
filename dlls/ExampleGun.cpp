@@ -1,3 +1,4 @@
+#if 0
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
@@ -68,3 +69,4 @@ int CExampleGun::AddToPlayer( CBasePlayer *pPlayer )
    }
    return FALSE;
 }
+#endif

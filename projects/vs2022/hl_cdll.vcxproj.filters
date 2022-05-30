@@ -318,13 +318,16 @@
     <ClCompile Include="..\..\dlls\venom.cpp">
       <Filter>Source Files\_hl\dlls</Filter>
     </ClCompile>
-    <ClCompile Include="Sten.cpp">
+    <ClCompile Include="..\..\cl_dll\NotePaper.cpp">
+      <Filter>Source Files\cl_dll</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dlls\Knife.cpp">
       <Filter>Source Files\_hl\dlls</Filter>
     </ClCompile>
-    <ClCompile Include="Knife.cpp">
+    <ClCompile Include="..\..\dlls\MP44.cpp">
       <Filter>Source Files\_hl\dlls</Filter>
     </ClCompile>
-    <ClCompile Include="MP44.cpp">
+    <ClCompile Include="..\..\dlls\Sten.cpp">
       <Filter>Source Files\_hl\dlls</Filter>
     </ClCompile>
   </ItemGroup>
@@ -447,6 +450,9 @@
       <Filter>Header Files\cl_dll</Filter>
     </ClInclude>
     <ClInclude Include="..\..\cl_dll\view.h">
+      <Filter>Header Files\cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cl_dll\NotePaper.h">
       <Filter>Header Files\cl_dll</Filter>
     </ClInclude>
   </ItemGroup>
