@@ -1145,8 +1145,8 @@ void CBasePlayer::TabulateAmmo()
 	ammo_338 = AmmoInventory(GetAmmoIndex("338"));
 	ammo_mp44 = AmmoInventory(GetAmmoIndex("mp44"));
 	ammo_wrifle = AmmoInventory(GetAmmoIndex("k43"));
-	//ammo_ppsh = AmmoInventory(GetAmmoIndex("ppsh"));
-	//ammo_tommy = AmmoInventory(GetAmmoIndex("tommy"));
+	ammo_ppsh = AmmoInventory(GetAmmoIndex("ppsh"));
+	ammo_tommy = AmmoInventory(GetAmmoIndex("tommy"));
 }
 
 

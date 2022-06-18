@@ -82,7 +82,7 @@ void CPPSH::Precache(void)
 int CPPSH::GetItemInfo(ItemInfo* p)
 {
 	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = "uranium";
+	p->pszAmmo1 = "ppsh";
 	p->iMaxAmmo1 = 200;
 	p->pszAmmo2 = "NULL";
 	p->iMaxAmmo2 = -1;
@@ -112,7 +112,7 @@ int CPPSH::AddToPlayer(CBasePlayer* pPlayer)
 
 BOOL CPPSH::Deploy()
 {
-	return DefaultDeploy("models/v_PPSH.mdl", "models/p_PPSH.mdl", MP5_DEPLOY, "uranium");
+	return DefaultDeploy("models/v_PPSH.mdl", "models/p_PPSH.mdl", MP5_DEPLOY, "mp5");
 }
 
 void CPPSH::PrimaryAttack()
@@ -193,7 +193,7 @@ void CPPSH::PrimaryAttack()
 
 void CPPSH::Reload(void)
 {
-	if (m_pPlayer->ammo_mp5 <= 0)
+	if (m_pPlayer->ammo_ppsh <= 0)
 		return;
 
 	/*int iResult;*/
@@ -272,7 +272,7 @@ class CPPSHAMMO : public CBasePlayerAmmo
 	}
 	BOOL AddAmmo(CBaseEntity* pOther)
 	{
-		int bResult = (pOther->GiveAmmo(71, "uranium", 200) != -1);
+		int bResult = (pOther->GiveAmmo(71, "ppsh", 200) != -1);
 		if (bResult)
 		{
 			EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", 1, ATTN_NORM);

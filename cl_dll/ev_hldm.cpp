@@ -319,8 +319,8 @@ void EV_HLDM_DecalGunshot( pmtrace_t *pTrace, int iBulletType )
 		case BULLET_PLAYER_357:
 		case BULLET_PLAYER_MP44AMM:
 		case BULLET_PLAYER_K43:
-		//case BULLET_PLAYER_PPSHAMMO:
-		//case BULLET_PLAYER_TOMMYAMMO:
+		case BULLET_PLAYER_PPSHAMMO:
+		case BULLET_PLAYER_TOMMYAMMO:
 
 		default:
 			// smoke and decal
@@ -469,10 +469,10 @@ void EV_HLDM_FireBullets( int idx, float *forward, float *right, float *up, int 
 
 				break;
 
-			/*case BULLET_PLAYER_PPSHAMMO:
+			case BULLET_PLAYER_PPSHAMMO:
 
 				EV_HLDM_PlayTextureSound(idx, &tr, vecSrc, vecEnd, iBulletType);
-				EV_HLDM_DecalGunshot(&tr, iBulletType);*/
+				EV_HLDM_DecalGunshot(&tr, iBulletType);
 
 				break;
 

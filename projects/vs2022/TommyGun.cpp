@@ -81,7 +81,7 @@ void CTOMMY::Precache(void)
 int CTOMMY::GetItemInfo(ItemInfo* p)
 {
 	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = "uranium";
+	p->pszAmmo1 = "tommy";
 	p->iMaxAmmo1 = 200;
 	p->pszAmmo2 = "NULL";
 	p->iMaxAmmo2 = -1;
@@ -111,7 +111,7 @@ int CTOMMY::AddToPlayer(CBasePlayer* pPlayer)
 
 BOOL CTOMMY::Deploy()
 {
-	return DefaultDeploy("models/v_tommy.mdl", "models/p_tommy.mdl", MP5_DEPLOY, "uranium");
+	return DefaultDeploy("models/v_tommy.mdl", "models/p_tommy.mdl", MP5_DEPLOY, "mp5" );
 }
 
 void CTOMMY::PrimaryAttack()
@@ -192,7 +192,7 @@ void CTOMMY::PrimaryAttack()
 
 void CTOMMY::Reload(void)
 {
-	if (m_pPlayer->ammo_mp5 <= 0)
+	if (m_pPlayer->ammo_tommy <= 0)
 		return;
 
 	/*int iResult;*/
@@ -271,7 +271,7 @@ class CTOMMYAMMO : public CBasePlayerAmmo
 	}
 	BOOL AddAmmo(CBaseEntity* pOther)
 	{
-		int bResult = (pOther->GiveAmmo(27, "uranium", 200) != -1);
+		int bResult = (pOther->GiveAmmo(27, "tommy", 200) != -1);
 		if (bResult)
 		{
 			EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", 1, ATTN_NORM);

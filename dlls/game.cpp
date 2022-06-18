@@ -307,14 +307,14 @@ cvar_t	sk_plr_MP44AMM_bullet2 = { "sk_plr_MP44AMM_bullet2", "0" };
 cvar_t	sk_plr_MP44AMM_bullet3 = { "sk_plr_MP44AMM_bullet3", "0" };
 
 ////// ppsh Round
-//cvar_t	sk_plr_PPSHAMMO_bullet1 = { "sk_plr_PPSHAMMO_bullet1", "0" };
-//cvar_t	sk_plr_PPSHAMMO_bullet2 = { "sk_plr_PPSHAMMO_bullet2", "0" };
-//cvar_t	sk_plr_PPSHAMMO_bullet3 = { "sk_plr_PPSHAMMO_bullet3", "0" };
+cvar_t	sk_plr_PPSHAMMO_bullet1 = { "sk_plr_PPSHAMMO_bullet1", "0" };
+cvar_t	sk_plr_PPSHAMMO_bullet2 = { "sk_plr_PPSHAMMO_bullet2", "0" };
+cvar_t	sk_plr_PPSHAMMO_bullet3 = { "sk_plr_PPSHAMMO_bullet3", "0" };
 //
 ////// tommy Round
-//cvar_t	sk_plr_TOMMYAMMO_bullet1 = { "sk_plr_TOMMYAMMO_bullet1", "0" };
-//cvar_t	sk_plr_TOMMYAMMO_bullet2 = { "sk_plr_TOMMYAMMO_bullet2", "0" };
-//cvar_t	sk_plr_TOMMYAMMO_bullet3 = { "sk_plr_TOMMYAMMO_bullet3", "0" };
+cvar_t	sk_plr_TOMMYAMMO_bullet1 = { "sk_plr_TOMMYAMMO_bullet1", "0" };
+cvar_t	sk_plr_TOMMYAMMO_bullet2 = { "sk_plr_TOMMYAMMO_bullet2", "0" };
+cvar_t	sk_plr_TOMMYAMMO_bullet3 = { "sk_plr_TOMMYAMMO_bullet3", "0" };
 
 // k43 Round
 cvar_t	sk_plr_K43_bullet1 = { "sk_plr_K43_bullet1", "0" };
