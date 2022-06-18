@@ -856,4 +856,3 @@ void CDeadBarneyMad::Spawn()
 	MonsterInitDead();
 }
 
-

@@ -78,6 +78,8 @@ void EV_StenFire(struct event_args_s *args); // ваше оружие
 void EV_KnifeFire(struct event_args_s *args);
 void EV_Mp44(struct event_args_s *args);
 void EV_RifleK43Fire(struct event_args_s* args);
+void EV_PpshFire(struct event_args_s* args);
+void EV_TommyFire(struct event_args_s* args);
 
 void EV_TrainPitchAdjust( struct event_args_s *args );
 }
@@ -317,6 +319,8 @@ void EV_HLDM_DecalGunshot( pmtrace_t *pTrace, int iBulletType )
 		case BULLET_PLAYER_357:
 		case BULLET_PLAYER_MP44AMM:
 		case BULLET_PLAYER_K43:
+		//case BULLET_PLAYER_PPSHAMMO:
+		//case BULLET_PLAYER_TOMMYAMMO:
 
 		default:
 			// smoke and decal
@@ -462,6 +466,13 @@ void EV_HLDM_FireBullets( int idx, float *forward, float *right, float *up, int 
 
 				EV_HLDM_PlayTextureSound(idx, &tr, vecSrc, vecEnd, iBulletType);
 				EV_HLDM_DecalGunshot(&tr, iBulletType);
+
+				break;
+
+			/*case BULLET_PLAYER_PPSHAMMO:
+
+				EV_HLDM_PlayTextureSound(idx, &tr, vecSrc, vecEnd, iBulletType);
+				EV_HLDM_DecalGunshot(&tr, iBulletType);*/
 
 				break;
 
@@ -1968,6 +1979,129 @@ void EV_FireVenom2(event_args_t* args)
 }
 //======================
 //		 VENOM END
+//======================
+
+//======================
+//		PPSH start
+//======================
+void EV_PpshFire(event_args_t* args)//рисуем выстрел
+{
+	int idx;
+	vec3_t origin;
+	vec3_t angles;
+	vec3_t velocity;
+
+	vec3_t ShellVelocity;
+	vec3_t ShellOrigin;
+	int shell;
+	vec3_t vecSrc, vecAiming;
+	vec3_t up, right, forward;
+	float flSpread = 0.01;
+
+	idx = args->entindex;
+	VectorCopy(args->origin, origin);
+	VectorCopy(args->angles, angles);
+	VectorCopy(args->velocity, velocity);
+
+	AngleVectors(angles, forward, right, up);
+
+	shell = gEngfuncs.pEventAPI->EV_FindModelIndex("models/shell.mdl");//гильзы
+
+	if (EV_IsLocal(idx))
+	{
+		// добавить вспышку к стволу оружия
+		EV_MuzzleFlash();
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(MP5_FIRE1 + gEngfuncs.pfnRandomLong(0, 2), 2);//анимация стрельбы
+
+		V_PunchAxis(0, gEngfuncs.pfnRandomFloat(-2, 2));
+	}
+
+	EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20, -12, 4); //Позиция откуда будут вылетать и лететь гильзы. 
+
+	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], shell, TE_BOUNCE_SHELL); //бросаем медную гильзу
+
+	switch (gEngfuncs.pfnRandomLong(0, 1))//случайный звук выстрела и гильз
+	{
+	case 0:
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/ppsh/shoot_ppsh.wav", 1, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
+		break;
+	case 1:
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/ppsh/shoot_ppsh2.wav", 1, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
+		break;
+	}
+
+	EV_GetGunPosition(args, vecSrc, origin);//получить позицию пушки
+	VectorCopy(forward, vecAiming);//копируем вектор направления пули
+
+	//стреляем
+	EV_HLDM_FireBullets(idx, forward, right, up, 1/*количество пуль вылетающих одновременно*/, vecSrc/*откуда вылетает пуля (позиция пушки)*/, vecAiming/*куда попадает пуля*/, 8192/*дальность*/, BULLET_PLAYER_MP5/*тип пуль */, 2/*количество трассирующих пуль*/, &tracerCount[idx - 1], args->fparam1, args->fparam2);
+
+}
+
+//======================
+//		 PPSH END
+//======================
+
+//======================
+//		TommyGun start
+//======================
+
+void EV_TommyFire(event_args_t* args)//рисуем выстрел
+{
+	int idx;
+	vec3_t origin;
+	vec3_t angles;
+	vec3_t velocity;
+
+	vec3_t ShellVelocity;
+	vec3_t ShellOrigin;
+	int shell;
+	vec3_t vecSrc, vecAiming;
+	vec3_t up, right, forward;
+	float flSpread = 0.01;
+
+	idx = args->entindex;
+	VectorCopy(args->origin, origin);
+	VectorCopy(args->angles, angles);
+	VectorCopy(args->velocity, velocity);
+
+	AngleVectors(angles, forward, right, up);
+
+	shell = gEngfuncs.pEventAPI->EV_FindModelIndex("models/shell.mdl");//гильзы
+
+	if (EV_IsLocal(idx))
+	{
+		// добавить вспышку к стволу оружия
+		EV_MuzzleFlash();
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(MP5_FIRE1 + gEngfuncs.pfnRandomLong(0, 2), 2);//анимация стрельбы
+
+		V_PunchAxis(0, gEngfuncs.pfnRandomFloat(-2, 2));
+	}
+
+	EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20, -12, 4); //Позиция откуда будут вылетать и лететь гильзы. 
+
+	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], shell, TE_BOUNCE_SHELL); //бросаем медную гильзу
+
+	switch (gEngfuncs.pfnRandomLong(0, 1))//случайный звук выстрела и гильз
+	{
+	case 0:
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/tommy/tommy_shoot.wav", 1, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
+		break;
+	case 1:
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/tommy/tommy_shoot2.wav", 1, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
+		break;
+	}
+
+	EV_GetGunPosition(args, vecSrc, origin);//получить позицию пушки
+	VectorCopy(forward, vecAiming);//копируем вектор направления пули
+
+	//стреляем
+	EV_HLDM_FireBullets(idx, forward, right, up, 1/*количество пуль вылетающих одновременно*/, vecSrc/*откуда вылетает пуля (позиция пушки)*/, vecAiming/*куда попадает пуля*/, 8192/*дальность*/, BULLET_PLAYER_MP5/*тип пуль */, 2/*количество трассирующих пуль*/, &tracerCount[idx - 1], args->fparam1, args->fparam2);
+
+}
+
+//======================
+//		 TommyGun end
 //======================
 
 //======================

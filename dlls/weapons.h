@@ -84,6 +84,8 @@ public:
 #define WEAPON_KNIFE 19 //Порядковый номер нашего оружия
 #define	WEAPON_MP44			20
 #define	WEAPON_K43RIFLE		21
+#define	WEAPON_PPSH		22
+#define	WEAPON_TOMMY		23
 
 #define WEAPON_ALLWEAPONS		(~(1<<WEAPON_SUIT))
 
@@ -199,6 +201,8 @@ typedef	enum
 	BULLET_PLAYER_338,
 	BULLET_PLAYER_MP44AMM,
 	BULLET_PLAYER_K43,
+	//BULLET_PLAYER_PPSHAMMO,
+	//BULLET_PLAYER_TOMMYAMMO,
 
 	BULLET_MONSTER_9MM,
 	BULLET_MONSTER_MP5,
@@ -1132,6 +1136,60 @@ public:
 private:
 	unsigned short m_usStenFire;
 };
+
+class CPPSH : public CBasePlayerWeapon
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	BOOL Deploy(void);//пуха в руках
+	void WeaponIdle(void); //спокойсвтие пухи
+	void PrimaryAttack(); //пушка делает пих-пах
+	void Reload(void); //перезарядка
+	int iItemSlot(void) { return 0; }
+	int GetItemInfo(ItemInfo* p);
+	int AddToPlayer(CBasePlayer*);
+
+
+	virtual BOOL UseDecrement(void)
+	{
+#if defined( CLIENT_WEAPONS )
+		return TRUE;
+#else
+		return FALSE;
+#endif
+	}
+private:
+	unsigned short m_usPpshFire;
+};
+
+//tommygun
+class CTOMMY : public CBasePlayerWeapon
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	BOOL Deploy(void);//пуха в руках
+	void WeaponIdle(void); //спокойсвтие пухи
+	void PrimaryAttack(); //пушка делает пих-пах
+	void Reload(void); //перезарядка
+	int iItemSlot(void) { return 0; }
+	int GetItemInfo(ItemInfo* p);
+	int AddToPlayer(CBasePlayer*);
+
+
+	virtual BOOL UseDecrement(void)
+	{
+#if defined( CLIENT_WEAPONS )
+		return TRUE;
+#else
+		return FALSE;
+#endif
+	}
+private:
+	unsigned short m_usTommyFire;
+};
+
 
 class CKnife : public CBasePlayerWeapon
 {

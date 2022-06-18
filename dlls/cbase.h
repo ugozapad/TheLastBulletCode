@@ -363,6 +363,9 @@ public:
 	int ammo_338;
 	int ammo_mp44;
 	int ammo_wrifle;
+	//int ammo_ppsh;
+	//int ammo_tommy;
+	
 	
 	//Special stuff for grenades and satchels.
 	float m_flStartThrow;

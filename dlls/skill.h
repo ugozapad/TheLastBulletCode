@@ -111,7 +111,9 @@ struct skilldata_t
 	float plrDmgSniper;
 	float plrDmgMP44AMM;
 	float plrDmgK43;
-	
+	//float plrDmgPPSHAMMO;
+	//float plrDmgTOMMYAMMO;
+
 // weapons shared by monsters
 	float monDmg9MM;
 	float monDmgMP5;

@@ -269,6 +269,12 @@ void CGameRules::RefreshSkillData ( void )
 	// MP44AMMO
 	gSkillData.plrDmgMP44AMM = GetSkillCvar("sk_plr_MP44AMM_bullet");
 
+	////// PPSH
+	//gSkillData.plrDmgPPSHAMMO = GetSkillCvar("sk_plr_PPSHAMMO_bullet");
+
+	////// TOMMY
+	//gSkillData.plrDmgTOMMYAMMO = GetSkillCvar("sk_plr_TOMMYAMMO_bullet");
+
 	// K43
 	gSkillData.plrDmgK43 = GetSkillCvar("sk_plr_K43_bullet");
 

@@ -62,6 +62,17 @@ enum decal_e
 	DECAL_SMALLSCORCH3,	// Small scorch mark
 	DECAL_MOMMABIRTH,	// Big momma birth splatter
 	DECAL_MOMMASPLAT,
+	DECAL_BIGBLOOD1,
+	//новое для летающих мясистых кусков мяса
+	DECAL_BIGBLOOD2,
+	DECAL_SPR_SPLT1,
+	DECAL_SPR_SPLT2,
+	DECAL_SPR_SPLT3,
+	DECAL_ALIENHEADSHOT1,
+	DECAL_ALIENHEADSHOT2,
+	DECAL_HUMANHEADSHOT1,
+	DECAL_HUMANHEADSHOT2,
+
 };
 
 typedef struct 

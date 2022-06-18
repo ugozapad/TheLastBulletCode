@@ -224,7 +224,9 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\dlls\$(TargetName).p
     <ClCompile Include="K43_Rifle.cpp" />
     <ClCompile Include="Knife.cpp" />
     <ClCompile Include="MP44.cpp" />
+    <ClCompile Include="ppsh_weapons.cpp" />
     <ClCompile Include="Sten.cpp" />
+    <ClCompile Include="TommyGun.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dlls\activity.h" />
@@ -272,6 +274,9 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\dlls\$(TargetName).p
     <ClInclude Include="..\..\pm_shared\pm_materials.h" />
     <ClInclude Include="..\..\pm_shared\pm_movevars.h" />
     <ClInclude Include="..\..\pm_shared\pm_shared.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

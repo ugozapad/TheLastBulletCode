@@ -37,7 +37,7 @@ extern Vector VecBModelOrigin( entvars_t* pevBModel );
 extern entvars_t *g_pevLastInflictor;
 
 #define GERMAN_GIB_COUNT		4
-#define	HUMAN_GIB_COUNT			6
+#define	HUMAN_GIB_COUNT			11 //6(шесть) - 6ывшее число. 
 #define ALIEN_GIB_COUNT			4
 
 
@@ -180,6 +180,8 @@ void CGib :: SpawnHeadGib( entvars_t *pevVictim )
 	pGib->LimitVelocity();
 }
 
+
+
 void CGib :: SpawnRandomGibs( entvars_t *pevVictim, int cGibs, int human )
 {
 	int cSplat;
@@ -300,46 +302,118 @@ void CBaseMonster::FadeMonster( void )
 // GibMonster - create some gore and get rid of a monster's
 // model.
 //=========================================================
-void CBaseMonster :: GibMonster( void )
+void CBaseMonster::GibMonster(void)
+
 {
-	TraceResult	tr;
-	BOOL		gibbed = FALSE;
+		TraceResult	tr;
+		BOOL		gibbed = FALSE;
+		UTIL_TraceLine(pev->origin, pev->origin - Vector(0, 0, 100), ignore_monsters, edict(), &tr);
 
-	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "common/bodysplat.wav", 1, ATTN_NORM);		
+		//EMIT_SOUND(ENT(pev), CHAN_WEAPON, "common/bodysplat.wav", 1, ATTN_NORM); Gunship : not needed anymore
 
-	// only humans throw skulls !!!UNDONE - eventually monsters will have their own sets of gibs
-	if ( HasHumanGibs() )
+	switch (RANDOM_LONG(0, 4)) // Gunship : MOAR Bodysplat sonds!
 	{
-		if ( CVAR_GET_FLOAT("violence_hgibs") != 0 )	// Only the player will ever get here
-		{
-			CGib::SpawnHeadGib( pev );
-			CGib::SpawnRandomGibs(pev, 10, 1); // throw some human gibs.
-		}
-		gibbed = TRUE;
-	}
-	else if ( HasAlienGibs() )
-	{
-		if ( CVAR_GET_FLOAT("violence_agibs") != 0 )	// Should never get here, but someone might call it directly
-		{
-			CGib::SpawnRandomGibs( pev, 10, 0 );	// Throw alien gibs
-		}
-		gibbed = TRUE;
+		case 0:	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "common/bodysplat.wav", 1, ATTN_NORM);	break;
+		case 1:	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "common/bodysplat2.wav", 1, ATTN_NORM);	break;
+		case 2:	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "common/bodysplat3.wav", 1, ATTN_NORM);	break;
+		case 3:	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "common/bodysplat4.wav", 1, ATTN_NORM);	break;
+		case 4:	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "common/bodysplat5.wav", 1, ATTN_NORM);	break;
+	
 	}
 
-	if ( !IsPlayer() )
-	{
-		if ( gibbed )
+		// only humans throw skulls !!!UNDONE - eventually monsters will have their own sets of gibs
+		if (HasHumanGibs())
+		{
+			if (CVAR_GET_FLOAT("violence_hgibs") != 0)	// Only the player will ever get here
+				{
+					CGib::SpawnHeadGib(pev);
+					CGib::SpawnRandomGibs(pev, 10, 1);	// throw some human gibs. Gunship : Spawn 10 gibs
+					switch (RANDOM_LONG(0, 1)) // Gunship : Spawn Bodysplat decals!
+				{
+					case 0:	UTIL_DecalTrace(&tr, DECAL_BIGBLOOD1);	break;	
+					case 1:	UTIL_DecalTrace(&tr, DECAL_BIGBLOOD2);	break;						
+				}
+			}
+			
+				gibbed = TRUE;
+		}
+		else if (HasAlienGibs())	
+		{			
+				if (CVAR_GET_FLOAT("violence_agibs") != 0)	// Should never get here, but someone might call it directly					
+				{					
+						CGib::SpawnRandomGibs(pev, 10, 0);	//Gunship : Throw 10 alien gibs now
+
+						
+						switch (RANDOM_LONG(0, 2)) // Gunship : Spawn alien Bodysplat decals!	
+						{	
+						case 0:	UTIL_DecalTrace(&tr, DECAL_SPR_SPLT1);	break;							
+						case 1:	UTIL_DecalTrace(&tr, DECAL_SPR_SPLT2);	break;				
+						case 2:	UTIL_DecalTrace(&tr, DECAL_SPR_SPLT3);	break;
+						}	
+				}
+				gibbed = TRUE;	
+		}
+	
+		if (!IsPlayer())	
+		{
+		if (gibbed)	
 		{
 			// don't remove players!
-			SetThink ( &CBaseMonster::SUB_Remove );
+			/*SetThink(SUB_Remove);*/
+			SetThink(&CBaseEntity::SUB_Remove);
 			pev->nextthink = gpGlobals->time;
 		}
-		else
+		else	
 		{
-			FadeMonster();
-		}
+			FadeMonster();	
+		}			
 	}
 }
+
+
+//старая функуция
+//void CBaseMonster::GibMonster(void)
+//{
+//	TraceResult	tr;
+//	BOOL		gibbed = FALSE;
+//
+//	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "common/bodysplat.wav", 1, ATTN_NORM);		
+//
+//	// only humans throw skulls !!!UNDONE - eventually monsters will have their own sets of gibs
+//	if ( HasHumanGibs() )
+//	{
+//		if ( CVAR_GET_FLOAT("violence_hgibs") != 0 )	// Only the player will ever get here
+//		{
+//			CGib::SpawnHeadGib( pev );
+//			CGib::SpawnRandomGibs(pev, 10, 1); // throw some human gibs.
+//		}
+//		gibbed = TRUE;
+//	}
+//	else if ( HasAlienGibs() )
+//	{
+//		if ( CVAR_GET_FLOAT("violence_agibs") != 0 )	// Should never get here, but someone might call it directly
+//		{
+//			CGib::SpawnRandomGibs( pev, 10, 0 );	// Throw alien gibs
+//		}
+//		gibbed = TRUE;
+//	}
+//
+//	if ( !IsPlayer() )
+//	{
+//		if ( gibbed )
+//		{
+//			// don't remove players!
+//			SetThink ( &CBaseMonster::SUB_Remove );
+//			pev->nextthink = gpGlobals->time;
+//		}
+//		else
+//		{
+//			FadeMonster();
+//		}
+//	}
+//}
+
+
 
 //=========================================================
 // GetDeathActivity - determines the best type of death
@@ -708,14 +782,63 @@ void CGib :: WaitTillLand ( void )
 //
 // Gib bounces on the ground or wall, sponges some blood down, too!
 //
-void CGib :: BounceGibTouch ( CBaseEntity *pOther )
-{
-	Vector	vecSpot;
-	TraceResult	tr;
-	
-	//if ( RANDOM_LONG(0,1) )
-	//	return;// don't bleed everytime
 
+//старая функуция
+//void CGib :: BounceGibTouch ( CBaseEntity *pOther )
+//{
+//	Vector	vecSpot;
+//	TraceResult	tr;
+//	
+//	//if ( RANDOM_LONG(0,1) )
+//	//	return;// don't bleed everytime
+//
+//	if (pev->flags & FL_ONGROUND)
+//	{
+//		pev->velocity = pev->velocity * 0.9;
+//		pev->angles.x = 0;
+//		pev->angles.z = 0;
+//		pev->avelocity.x = 0;
+//		pev->avelocity.z = 0;
+//	}
+//	else
+//	{
+//		if ( g_Language != LANGUAGE_GERMAN && m_cBloodDecals > 0 && m_bloodColor != DONT_BLEED )
+//		{
+//			vecSpot = pev->origin + Vector ( 0 , 0 , 8 );//move up a bit, and trace down.
+//			UTIL_TraceLine ( vecSpot, vecSpot + Vector ( 0, 0, -24 ),  ignore_monsters, ENT(pev), & tr);
+//
+//			UTIL_BloodDecalTrace( &tr, m_bloodColor );
+//
+//			m_cBloodDecals--; 
+//		}
+//
+//		if ( m_material != matNone && RANDOM_LONG(0,2) == 0 )
+//		{
+//			float volume;
+//			float zvel = fabs(pev->velocity.z);
+//		
+//			volume = 0.8 * min(1.0, ((float)zvel) / 450.0);
+//
+//			CBreakable::MaterialSoundRandom( edict(), (Materials)m_material, volume );
+//		}
+//	}
+//}
+
+void CGib::BounceGibTouch(CBaseEntity* pOther)
+{
+	Vector    vecSpot;
+	TraceResult    tr;
+
+	switch (RANDOM_LONG(0, 6)) // Gunship : Flesh fleshy bounce sounds <img src="images/smilies/biggrin.gif" border="0" alt="">
+	{
+	case 0:EMIT_SOUND(ENT(pev), CHAN_WEAPON, "debris/flesh1.wav", 0.55, ATTN_NORM); break;
+	case 1:EMIT_SOUND(ENT(pev), CHAN_WEAPON, "debris/flesh2.wav", 0.55, ATTN_NORM); break;
+	case 2:EMIT_SOUND(ENT(pev), CHAN_WEAPON, "debris/flesh3.wav", 0.55, ATTN_NORM); break;
+	case 3:EMIT_SOUND(ENT(pev), CHAN_WEAPON, "debris/flesh4.wav", 0.55, ATTN_NORM); break;
+	case 4:EMIT_SOUND(ENT(pev), CHAN_WEAPON, "debris/flesh5.wav", 0.55, ATTN_NORM); break;
+	case 5:EMIT_SOUND(ENT(pev), CHAN_WEAPON, "debris/flesh6.wav", 0.55, ATTN_NORM); break;
+	case 6:EMIT_SOUND(ENT(pev), CHAN_WEAPON, "debris/flesh7.wav", 0.55, ATTN_NORM); break;
+	}
 	if (pev->flags & FL_ONGROUND)
 	{
 		pev->velocity = pev->velocity * 0.9;
@@ -726,27 +849,36 @@ void CGib :: BounceGibTouch ( CBaseEntity *pOther )
 	}
 	else
 	{
-		if ( g_Language != LANGUAGE_GERMAN && m_cBloodDecals > 0 && m_bloodColor != DONT_BLEED )
+		if (g_Language != LANGUAGE_GERMAN && m_cBloodDecals > 0 && m_bloodColor != DONT_BLEED)
 		{
-			vecSpot = pev->origin + Vector ( 0 , 0 , 8 );//move up a bit, and trace down.
-			UTIL_TraceLine ( vecSpot, vecSpot + Vector ( 0, 0, -24 ),  ignore_monsters, ENT(pev), & tr);
+			vecSpot = pev->origin + Vector(0, 0, 8);//move up a bit, and trace down.
+			UTIL_TraceLine(vecSpot, vecSpot + Vector(0, 0, -24), ignore_monsters, ENT(pev), &tr);
+			
+			UTIL_BloodDecalTrace(&tr, m_bloodColor);
+			UTIL_BloodDrips(vecSpot, vecSpot, m_bloodColor, 80); // Gunship : MOAR Blood ( Blood Drips )
+			//UTIL_BloodStream( vecSpot, UTIL_RandomBloodVector(), 71, RANDOM_LONG(100, 250) ); херня...только красная кровь
 
-			UTIL_BloodDecalTrace( &tr, m_bloodColor );
-
-			m_cBloodDecals--; 
+			if (m_bloodColor == BLOOD_COLOR_RED) // Gunship : MOAR Blood Again ( Blood streams )
+			{
+				UTIL_BloodStream(vecSpot, UTIL_RandomBloodVector(), 71, RANDOM_LONG(100, 250));
+			}
+			else
+			{
+				UTIL_BloodStream(vecSpot, UTIL_RandomBloodVector(), m_bloodColor, RANDOM_LONG(100, 250));
+			}
+			m_cBloodDecals--;
 		}
-
-		if ( m_material != matNone && RANDOM_LONG(0,2) == 0 )
+		if (m_material != matNone && RANDOM_LONG(0, 2) == 0)
 		{
 			float volume;
 			float zvel = fabs(pev->velocity.z);
-		
 			volume = 0.8 * min(1.0, ((float)zvel) / 450.0);
-
-			CBreakable::MaterialSoundRandom( edict(), (Materials)m_material, volume );
+			CBreakable::MaterialSoundRandom(edict(), (Materials)m_material, volume);
 		}
 	}
 }
+
+
 
 //
 // Sticky gib puts blood on the wall and stays put. 
@@ -1321,19 +1453,83 @@ void CBaseMonster::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector ve
 */
 
 //=========================================================
-// TraceAttack
+// TraceAttack//старая функуция
 //=========================================================
-void CBaseMonster :: TraceAttack( entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType)
-{
-	if ( pev->takedamage )
-	{
-		m_LastHitGroup = ptr->iHitgroup;
+//void CBaseMonster :: TraceAttack( entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType)
+//{
+//	if ( pev->takedamage )
+//	{
+//		m_LastHitGroup = ptr->iHitgroup;
+//
+//		switch ( ptr->iHitgroup )
+//		{
+//		case HITGROUP_GENERIC:
+//			break;
+//		case HITGROUP_HEAD:
+//			flDamage *= gSkillData.monHead;
+//			break;
+//		case HITGROUP_CHEST:
+//			flDamage *= gSkillData.monChest;
+//			break;
+//		case HITGROUP_STOMACH:
+//			flDamage *= gSkillData.monStomach;
+//			break;
+//		case HITGROUP_LEFTARM:
+//		case HITGROUP_RIGHTARM:
+//			flDamage *= gSkillData.monArm;
+//			break;
+//		case HITGROUP_LEFTLEG:
+//		case HITGROUP_RIGHTLEG:
+//			flDamage *= gSkillData.monLeg;
+//			break;
+//		default:
+//			break;
+//		}
+//
+//		SpawnBlood(ptr->vecEndPos, BloodColor(), flDamage);// a little surface blood.
+//		TraceBleed( flDamage, vecDir, ptr, bitsDamageType );
+//		AddMultiDamage( pevAttacker, this, flDamage, bitsDamageType );
+//	}
+//}
 
-		switch ( ptr->iHitgroup )
-		{
+//бла бла бла
+
+void CBaseMonster::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
+{
+	if (pev->takedamage)
+    {
+	    m_LastHitGroup = ptr->iHitgroup;
+		TraceResult Bloodtr;
+		Vector vecTraceDir;
+		vecTraceDir = vecDir * -1;
+		switch (ptr->iHitgroup)
+	    {
 		case HITGROUP_GENERIC:
 			break;
 		case HITGROUP_HEAD:
+			switch (RANDOM_LONG(0, 1)) // Two Headshot Sounds
+			{
+		case 0:	UTIL_EmitAmbientSound(ENT(0), vecTraceDir, "common/headshot1.wav", 2, ATTN_NORM, 0, 100);;	break;			case 1:	UTIL_EmitAmbientSound(ENT(0), vecTraceDir, "common/headshot2.wav", 2, ATTN_NORM, 0, 100);;	break;
+			}
+
+			UTIL_TraceLine(ptr->vecEndPos, ptr->vecEndPos + vecTraceDir * -172, ignore_monsters, ENT(pev), &Bloodtr);
+			SpawnBlood(ptr->vecEndPos, BloodColor(), flDamage * 44);
+			if (m_bloodColor == BLOOD_COLOR_RED) // New Blood Decals from head!
+			{
+			switch (RANDOM_LONG(0, 1))
+				{
+				case 0:	UTIL_DecalTrace(&Bloodtr, DECAL_HUMANHEADSHOT1);	break;
+				case 1:	UTIL_DecalTrace(&Bloodtr, DECAL_HUMANHEADSHOT2);	break;
+				}
+			}
+			else
+			{
+				switch (RANDOM_LONG(0, 1)) // New Blood Decals from head ( for aliens )!
+				{
+				case 0:	UTIL_DecalTrace(&Bloodtr, DECAL_ALIENHEADSHOT1);	break;
+				case 1:	UTIL_DecalTrace(&Bloodtr, DECAL_ALIENHEADSHOT2);	break;
+				}
+			}
 			flDamage *= gSkillData.monHead;
 			break;
 		case HITGROUP_CHEST:
@@ -1353,10 +1549,9 @@ void CBaseMonster :: TraceAttack( entvars_t *pevAttacker, float flDamage, Vector
 		default:
 			break;
 		}
-
 		SpawnBlood(ptr->vecEndPos, BloodColor(), flDamage);// a little surface blood.
-		TraceBleed( flDamage, vecDir, ptr, bitsDamageType );
-		AddMultiDamage( pevAttacker, this, flDamage, bitsDamageType );
+		TraceBleed(flDamage, vecDir, ptr, bitsDamageType);
+		AddMultiDamage(pevAttacker, this, flDamage, bitsDamageType);
 	}
 }
 
@@ -1618,6 +1813,14 @@ Vector CBaseEntity::FireBulletsPlayer ( ULONG cShots, Vector vecSrc, Vector vecD
 			case BULLET_PLAYER_MP44AMM:
 				pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgMP44AMM, vecDir, &tr, DMG_BULLET);
 				break;
+
+			//case BULLET_PLAYER_PPSHAMMO:
+			//	pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgPPSHAMMO, vecDir, &tr, DMG_BULLET);
+			//	break;
+
+			//case BULLET_PLAYER_TOMMYAMMO:
+			//	pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgTOMMYAMMO, vecDir, &tr, DMG_BULLET);
+			//	break;
 
 			case BULLET_PLAYER_K43:
 				pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgK43, vecDir, &tr, DMG_BULLET);

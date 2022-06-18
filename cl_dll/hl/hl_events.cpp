@@ -44,6 +44,8 @@ void EV_StenFire(struct event_args_s *args); // ваше оружие
 void EV_KnifeFire(struct event_args_s *args);
 void EV_Mp44Fire(struct event_args_s *args); // ваше оружие
 void EV_RifleK43Fire(struct event_args_s* args); // ваше оружие
+void EV_PpshFire(struct event_args_s* args); // ваше оружие
+void EV_TommyFire(struct event_args_s* args); // ваше оружие
 
 void EV_TrainPitchAdjust( struct event_args_s *args );
 }
@@ -88,5 +90,7 @@ void Game_HookEvents( void )
 	gEngfuncs.pfnHookEvent("events/sten.sc",                    EV_StenFire);//добавить
 	gEngfuncs.pfnHookEvent("events/mp44.sc", EV_StenFire);
 	gEngfuncs.pfnHookEvent("events/k43.sc", EV_RifleK43Fire);
+	gEngfuncs.pfnHookEvent("events/ppsh.sc", EV_PpshFire);
+	gEngfuncs.pfnHookEvent("events/tommy.sc", EV_TommyFire);
 
 }

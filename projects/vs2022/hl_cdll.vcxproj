@@ -206,7 +206,9 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\cl_dlls\$(TargetName
     <ClCompile Include="K43_Rifle.cpp" />
     <ClCompile Include="Knife.cpp" />
     <ClCompile Include="MP44.cpp" />
+    <ClCompile Include="ppsh_weapons.cpp" />
     <ClCompile Include="Sten.cpp" />
+    <ClCompile Include="TommyGun.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\cl_dll\ammo.h" />

@@ -353,3 +353,186 @@ int CZombie::IgnoreConditions ( void )
 	
 }
 
+//новый зомбяка, из крипты. Ну крч тамумия красно-одноглазая.
+
+class CCryptZombie : public CZombie
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+};
+
+LINK_ENTITY_TO_CLASS(monster_cryptzombie, CCryptZombie);
+
+void CCryptZombie::Spawn()
+{
+	Precache();
+
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC 
+	else
+		SET_MODEL(ENT(pev), "models/newNpc/zombieCryptKnife.mdl");
+	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
+
+	pev->solid = SOLID_SLIDEBOX;
+	pev->movetype = MOVETYPE_STEP;
+	m_bloodColor = BLOOD_COLOR_GREEN;
+	pev->health = gSkillData.zombieHealth;
+	pev->view_ofs = VEC_VIEW;// position of the eyes relative to monster's origin.
+	m_flFieldOfView = 0.5;// indicates the width of this monster's forward view cone ( as a dotproduct result )
+	m_MonsterState = MONSTERSTATE_NONE;
+	m_afCapability = bits_CAP_DOORS_GROUP;
+
+	MonsterInit();
+}
+
+void CCryptZombie::Precache()
+{
+	int i;
+
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC 
+	else
+		PRECACHE_MODEL("models/newNpc/zombieCryptKnife.mdl");
+
+	for (i = 0; i < ARRAYSIZE(pAttackHitSounds); i++)
+		PRECACHE_SOUND((char*)pAttackHitSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAttackMissSounds); i++)
+		PRECACHE_SOUND((char*)pAttackMissSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAttackSounds); i++)
+		PRECACHE_SOUND((char*)pAttackSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pIdleSounds); i++)
+		PRECACHE_SOUND((char*)pIdleSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAlertSounds); i++)
+		PRECACHE_SOUND((char*)pAlertSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pPainSounds); i++)
+		PRECACHE_SOUND((char*)pPainSounds[i]);
+}
+
+
+///и еще один зомби нацист! он и будет делать бум!
+
+class CNazzZombie : public CZombie
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+};
+
+LINK_ENTITY_TO_CLASS(monster_nazzzombie, CNazzZombie);
+
+void CNazzZombie::Spawn()
+{
+	Precache();
+
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC 
+	else
+		SET_MODEL(ENT(pev), "models/newNpc/nazzi_zombie.mdl");
+	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
+
+	pev->solid = SOLID_SLIDEBOX;
+	pev->movetype = MOVETYPE_STEP;
+	m_bloodColor = BLOOD_COLOR_GREEN;
+	pev->health = gSkillData.zombieHealth;
+	pev->view_ofs = VEC_VIEW;// position of the eyes relative to monster's origin.
+	m_flFieldOfView = 0.5;// indicates the width of this monster's forward view cone ( as a dotproduct result )
+	m_MonsterState = MONSTERSTATE_NONE;
+	m_afCapability = bits_CAP_DOORS_GROUP;
+
+	MonsterInit();
+}
+
+void CNazzZombie::Precache()
+{
+	int i;
+
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC 
+	else
+		PRECACHE_MODEL("models/newNpc/nazzi_zombie.mdl");
+
+	for (i = 0; i < ARRAYSIZE(pAttackHitSounds); i++)
+		PRECACHE_SOUND((char*)pAttackHitSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAttackMissSounds); i++)
+		PRECACHE_SOUND((char*)pAttackMissSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAttackSounds); i++)
+		PRECACHE_SOUND((char*)pAttackSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pIdleSounds); i++)
+		PRECACHE_SOUND((char*)pIdleSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAlertSounds); i++)
+		PRECACHE_SOUND((char*)pAlertSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pPainSounds); i++)
+		PRECACHE_SOUND((char*)pPainSounds[i]);
+}
+
+///Еще один зомби нацист! Но на этот раз он с балломном и тоже делает бум!
+
+class CNazzFiregunZombie : public CZombie
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+};
+
+LINK_ENTITY_TO_CLASS(monster_firegunnazzombie, CNazzFiregunZombie);
+
+void CNazzFiregunZombie::Spawn()
+{
+	Precache();
+
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC 
+	else
+		SET_MODEL(ENT(pev), "models/newNpc/firegun_zombie.mdl");
+	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
+
+	pev->solid = SOLID_SLIDEBOX;
+	pev->movetype = MOVETYPE_STEP;
+	m_bloodColor = BLOOD_COLOR_GREEN;
+	pev->health = gSkillData.zombieHealth;
+	pev->view_ofs = VEC_VIEW;// position of the eyes relative to monster's origin.
+	m_flFieldOfView = 0.5;// indicates the width of this monster's forward view cone ( as a dotproduct result )
+	m_MonsterState = MONSTERSTATE_NONE;
+	m_afCapability = bits_CAP_DOORS_GROUP;
+
+	MonsterInit();
+}
+
+void CNazzFiregunZombie::Precache()
+{
+	int i;
+
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC 
+	else
+		PRECACHE_MODEL("models/newNpc/firegun_zombie.mdl");
+
+	for (i = 0; i < ARRAYSIZE(pAttackHitSounds); i++)
+		PRECACHE_SOUND((char*)pAttackHitSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAttackMissSounds); i++)
+		PRECACHE_SOUND((char*)pAttackMissSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAttackSounds); i++)
+		PRECACHE_SOUND((char*)pAttackSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pIdleSounds); i++)
+		PRECACHE_SOUND((char*)pIdleSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAlertSounds); i++)
+		PRECACHE_SOUND((char*)pAlertSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pPainSounds); i++)
+		PRECACHE_SOUND((char*)pPainSounds[i]);
+}

@@ -90,6 +90,17 @@ DLL_DECALLIST gDecals[] = {
 	{ "{smscorch3", 0 },	// DECAL_SMALLSCORCH3,	// Small scorch mark
 	{ "{mommablob", 0 },	// DECAL_MOMMABIRTH		// BM Birth spray
 	{ "{mommablob", 0 },	// DECAL_MOMMASPLAT		// BM Mortar spray?? need decal
+	//бла бла бла
+	{ "{bigblood1", 0 },
+    { "{bigblood2", 0 },
+    { "{spr_splt1", 0 },
+    { "{spr_splt2", 0 },
+    { "{spr_splt3", 0 },
+    { "{alienheadshot1", 0 },
+    { "{alienheadshot2", 0 },
+    { "{humanheadshot1", 0 },
+    { "{humanheadshot2", 0 },
+
 };
 
 /*
@@ -563,6 +574,19 @@ void CWorld :: Precache( void )
 	PRECACHE_SOUND("items/water_splash/water_splash2.wav");
 	PRECACHE_SOUND("items/water_splash/water_splash3.wav");
 
+	PRECACHE_SOUND("common/headshot1.wav");
+	PRECACHE_SOUND("common/headshot2.wav");
+	PRECACHE_SOUND("common/bodysplat2.wav");
+	PRECACHE_SOUND("common/bodysplat3.wav");
+	PRECACHE_SOUND("common/bodysplat4.wav");
+	PRECACHE_SOUND("common/bodysplat5.wav");
+	PRECACHE_SOUND("debris/flesh1.wav");
+	PRECACHE_SOUND("debris/flesh2.wav");
+	PRECACHE_SOUND("debris/flesh3.wav");
+	PRECACHE_SOUND("debris/flesh4.wav");
+	PRECACHE_SOUND("debris/flesh5.wav");
+	PRECACHE_SOUND("debris/flesh6.wav");
+	PRECACHE_SOUND("debris/flesh7.wav");
 //
 // Setup light animation tables. 'a' is total darkness, 'z' is maxbright.
 //

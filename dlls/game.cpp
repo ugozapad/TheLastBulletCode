@@ -306,6 +306,16 @@ cvar_t	sk_plr_MP44AMM_bullet1 = { "sk_plr_MP44AMM_bullet1", "0" };
 cvar_t	sk_plr_MP44AMM_bullet2 = { "sk_plr_MP44AMM_bullet2", "0" };
 cvar_t	sk_plr_MP44AMM_bullet3 = { "sk_plr_MP44AMM_bullet3", "0" };
 
+////// ppsh Round
+//cvar_t	sk_plr_PPSHAMMO_bullet1 = { "sk_plr_PPSHAMMO_bullet1", "0" };
+//cvar_t	sk_plr_PPSHAMMO_bullet2 = { "sk_plr_PPSHAMMO_bullet2", "0" };
+//cvar_t	sk_plr_PPSHAMMO_bullet3 = { "sk_plr_PPSHAMMO_bullet3", "0" };
+//
+////// tommy Round
+//cvar_t	sk_plr_TOMMYAMMO_bullet1 = { "sk_plr_TOMMYAMMO_bullet1", "0" };
+//cvar_t	sk_plr_TOMMYAMMO_bullet2 = { "sk_plr_TOMMYAMMO_bullet2", "0" };
+//cvar_t	sk_plr_TOMMYAMMO_bullet3 = { "sk_plr_TOMMYAMMO_bullet3", "0" };
+
 // k43 Round
 cvar_t	sk_plr_K43_bullet1 = { "sk_plr_K43_bullet1", "0" };
 cvar_t	sk_plr_K43_bullet2 = { "sk_plr_K43_bullet2", "0" };
@@ -770,6 +780,17 @@ void GameDLLInit( void )
 	CVAR_REGISTER ( &sk_plr_MP44AMM_bullet1 );// {"sk_plr_MP44AMM_bullet1","0"};
 	CVAR_REGISTER ( &sk_plr_MP44AMM_bullet2 );// {"sk_plr_MP44AMM_bullet2","0"};
 	CVAR_REGISTER ( &sk_plr_MP44AMM_bullet3 );// {"sk_plr_MP44AMM_bullet3","0"};
+
+	//////ppsh//
+	//CVAR_REGISTER(&sk_plr_PPSHAMMO_bullet1);// {"sk_plr_PPSH_bullett1","0"};
+	//CVAR_REGISTER(&sk_plr_PPSHAMMO_bullet2);// {"sk_plr_PPSH_bullett2","0"};
+	//CVAR_REGISTER(&sk_plr_PPSHAMMO_bullet3);// {"sk_plr_PPSH_bullet3","0"};
+	////
+	////// tommy//
+	//CVAR_REGISTER(&sk_plr_TOMMYAMMO_bullet1);// {"sk_plr_TOMMY_bullet1","0"};
+	//CVAR_REGISTER(&sk_plr_TOMMYAMMO_bullet2);// {"sk_plr_TOMMY_bullet2","0"};
+	//CVAR_REGISTER(&sk_plr_TOMMYAMMO_bullet3);// {"sk_plr_TOMMY_bullet3","0"};
+
 
 	//k43
 	CVAR_REGISTER ( &sk_plr_K43_bullet1 );// {"sk_plr_K43_bullet1","0"};

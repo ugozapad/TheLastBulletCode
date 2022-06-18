@@ -142,9 +142,37 @@ void AddMultiDamage( entvars_t *pevInflictor, CBaseEntity *pEntity, float flDama
 SpawnBlood
 ================
 */
+//void SpawnBlood(Vector vecSpot, int bloodColor, float flDamage)
+//{
+//	UTIL_BloodDrips( vecSpot, g_vecAttackDir, bloodColor, (int)flDamage );
+//}
+
 void SpawnBlood(Vector vecSpot, int bloodColor, float flDamage)
+
 {
-	UTIL_BloodDrips( vecSpot, g_vecAttackDir, bloodColor, (int)flDamage );
+	
+	UTIL_BloodDrips(vecSpot, g_vecAttackDir, bloodColor, (int)flDamage);
+	
+
+		
+		if (bloodColor == BLOOD_COLOR_RED)
+			
+		{
+			
+				UTIL_BloodStream(vecSpot, UTIL_RandomBloodVector(), 71, RANDOM_LONG(100, 250));
+			
+		}
+	
+		else
+			
+		{
+			
+				UTIL_BloodStream(vecSpot, UTIL_RandomBloodVector(), bloodColor, RANDOM_LONG(100, 250));
+			
+		}
+	
+
+		
 }
 
 
@@ -179,6 +207,8 @@ void DecalGunshot( TraceResult *pTrace, int iBulletType )
 		case BULLET_PLAYER_357:
 		case BULLET_PLAYER_MP44AMM:
 		case BULLET_PLAYER_K43:
+		//case BULLET_PLAYER_PPSHAMMO:
+		//case BULLET_PLAYER_TOMMYAMMO:
 		default:
 			// smoke and decal
 			UTIL_GunshotDecalTrace( pTrace, DamageDecal( pEntity, DMG_BULLET ) );
@@ -340,10 +370,20 @@ void W_Precache(void)
 	// sten_weapon
 	UTIL_PrecacheOtherWeapon("weapon_sten");
 
+	//Тут добавляете прекеш своего оружия
+		// PPSH_weapon
+		UTIL_PrecacheOtherWeapon("weapon_ppsh");
+		//UTIL_PrecacheOtherWeapon("ammo_ppsh");
+
+	//// Тут добавляете прекеш своего оружия
+	//	// tompson_weapon
+		UTIL_PrecacheOtherWeapon("weapon_tommy");
+		//UTIL_PrecacheOtherWeapon("ammo_tommy");
+
 	// knife
 	UTIL_PrecacheOtherWeapon("weapon_knife");//Прикрепляем нож к игре
 
-	//mp44
+	//mp44/
 	//UTIL_PrecacheOtherWeapon("weapon_mp44");
 
 #if !defined( OEM_BUILD ) && !defined( HLDEMO_BUILD )
