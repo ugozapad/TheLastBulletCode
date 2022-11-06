@@ -124,18 +124,27 @@ void CSniperrifle::Holster(int skiplocal /* = 0 */)
 
 void CSniperrifle::SecondaryAttack(void)
 {
-    if (m_pPlayer->pev->fov != 0)
+    if (m_pPlayer->pev->fov == 0)
     {
-        m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 0; // 0 means reset to default fov
+        m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 15; // 0 means reset to default fov
         m_fInZoom = 0;
 #ifndef CLIENT_DLL
         UTIL_ScreenFade(m_pPlayer, Vector(0, 0, 0), 0.5, 0.25, 255, FFADE_IN);
 #endif
         EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sniper_zoom.wav", RANDOM_FLOAT(0.95, 1.0), ATTN_NORM, 0, 93 + RANDOM_LONG(0, 0xF));
     }
-    else if (m_pPlayer->pev->fov != 15)
+    else if (m_pPlayer->pev->fov == 15)
     {
-        m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 15;
+        m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 10;
+        m_fInZoom = 1;
+#ifndef CLIENT_DLL
+        UTIL_ScreenFade(m_pPlayer, Vector(0, 0, 0), 0.5, 0.25, 255, FFADE_IN);
+#endif
+        EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sniper_zoom.wav", RANDOM_FLOAT(0.95, 1.0), ATTN_NORM, 0, 93 + RANDOM_LONG(0, 0xF));
+    }
+    else if (m_pPlayer->pev->fov == 10)
+    {
+        m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 0;
         m_fInZoom = 1;
 #ifndef CLIENT_DLL
         UTIL_ScreenFade(m_pPlayer, Vector(0, 0, 0), 0.5, 0.25, 255, FFADE_IN);
