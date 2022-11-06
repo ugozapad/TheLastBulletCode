@@ -193,6 +193,9 @@ int gmsgStatusValue = 0;
 int gmsgZoom = 0;
 
 
+int gmsgImpact = 0;
+
+
 
 void LinkUserMessages( void )
 {
@@ -243,6 +246,8 @@ void LinkUserMessages( void )
 	gmsgStatusValue = REG_USER_MSG("StatusValue", 3); 
 	gmsgZoom = REG_USER_MSG("ZoomHud", 1);
 
+
+	gmsgImpact = REG_USER_MSG("Impact", -1);
 }
 
 LINK_ENTITY_TO_CLASS( player, CBasePlayer );
@@ -1142,11 +1147,13 @@ void CBasePlayer::TabulateAmmo()
 	ammo_rockets = AmmoInventory( GetAmmoIndex( "rockets" ) );
 	ammo_uranium = AmmoInventory( GetAmmoIndex( "uranium" ) );
 	ammo_hornets = AmmoInventory( GetAmmoIndex( "Hornets" ) );
+	ammo_plasmo = AmmoInventory(GetAmmoIndex("plasmo"));
 	ammo_338 = AmmoInventory(GetAmmoIndex("338"));
 	ammo_mp44 = AmmoInventory(GetAmmoIndex("mp44"));
 	ammo_wrifle = AmmoInventory(GetAmmoIndex("k43"));
 	ammo_ppsh = AmmoInventory(GetAmmoIndex("ppsh"));
 	ammo_tommy = AmmoInventory(GetAmmoIndex("tommy"));
+	ammo_pm = AmmoInventory(GetAmmoIndex("makarov"));
 }
 
 
@@ -3560,6 +3567,9 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 		GiveNamedItem( "ammo_ARgrenades" );
 		GiveNamedItem( "weapon_handgrenade" );
 		GiveNamedItem( "weapon_tripmine" );
+		GiveNamedItem("ammo_plasmo");
+		GiveNamedItem("weapon_plasmorifle");
+		
 #ifndef OEM_BUILD
 		GiveNamedItem( "weapon_357" );
 		GiveNamedItem( "ammo_357" );

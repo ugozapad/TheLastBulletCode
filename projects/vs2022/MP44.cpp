@@ -194,7 +194,8 @@ void CMP44::Reload(void)
 {
 	if (m_pPlayer->ammo_mp44 <= 0)
 		return;
-
+	if (m_iClip == 45)
+		return;
 	/*int iResult;*/
 
 

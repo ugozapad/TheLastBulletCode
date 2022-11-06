@@ -182,6 +182,7 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\cl_dlls\$(TargetName
     <ClCompile Include="..\..\dlls\handgrenade.cpp" />
     <ClCompile Include="..\..\dlls\hornetgun.cpp" />
     <ClCompile Include="..\..\dlls\mp5.cpp" />
+    <ClCompile Include="..\..\dlls\plasmarifle.cpp" />
     <ClCompile Include="..\..\dlls\python.cpp" />
     <ClCompile Include="..\..\dlls\rifle.cpp" />
     <ClCompile Include="..\..\dlls\rpg.cpp" />
@@ -203,10 +204,14 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\cl_dlls\$(TargetName
     <ClCompile Include="..\..\pm_shared\pm_math.c" />
     <ClCompile Include="..\..\pm_shared\pm_shared.c" />
     <ClCompile Include="..\..\public\interface.cpp" />
+    <ClCompile Include="Colt_Maria.cpp" />
+    <ClCompile Include="EnergoGun.cpp" />
     <ClCompile Include="K43_Rifle.cpp" />
     <ClCompile Include="Knife.cpp" />
+    <ClCompile Include="teterev.cpp" />
     <ClCompile Include="MP44.cpp" />
     <ClCompile Include="ppsh_weapons.cpp" />
+    <ClCompile Include="rain.cpp" />
     <ClCompile Include="Sten.cpp" />
     <ClCompile Include="TommyGun.cpp" />
   </ItemGroup>
@@ -251,6 +256,7 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\cl_dlls\$(TargetName
     <ClInclude Include="..\..\pm_shared\pm_materials.h" />
     <ClInclude Include="..\..\pm_shared\pm_movevars.h" />
     <ClInclude Include="..\..\pm_shared\pm_shared.h" />
+    <ClInclude Include="rain.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\lib\public\game_controls.lib" />

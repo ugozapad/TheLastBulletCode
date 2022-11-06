@@ -80,6 +80,11 @@ void EV_Mp44(struct event_args_s *args);
 void EV_RifleK43Fire(struct event_args_s* args);
 void EV_PpshFire(struct event_args_s* args);
 void EV_TommyFire(struct event_args_s* args);
+void EV_TeterevFire(struct event_args_s* args);
+void EV_MariaFire(struct event_args_s* args);
+void EV_PlasmaFire(struct event_args_s* args);
+//void EV_MakarovFire2(struct event_args_s* args);
+
 
 void EV_TrainPitchAdjust( struct event_args_s *args );
 }
@@ -491,6 +496,462 @@ void EV_HLDM_FireBullets( int idx, float *forward, float *right, float *up, int 
 }
 
 //======================
+
+//PARTICLES START
+
+//======================
+
+
+
+
+
+void EV_HLDM_Particles(vec_t Pos_X, vec_t Pos_Y, vec_t Pos_Z, float PosNorm_X, float PosNorm_Y, float PosNorm_Z, int DoPuff, int Material)
+
+{
+	
+		pmtrace_t tr;
+	
+		pmtrace_t * pTrace = &tr;
+	
+
+		
+		pTrace->endpos.x = Pos_X;
+	
+		pTrace->endpos.y = Pos_Y;
+	
+		pTrace->endpos.z = Pos_Z;
+	
+
+		
+		pTrace->plane.normal.x = PosNorm_X;
+	
+		pTrace->plane.normal.y = PosNorm_Y;
+	
+		pTrace->plane.normal.z = PosNorm_Z;
+	
+
+		
+		vec3_t angles, forward, right, up;
+	
+
+		
+		VectorAngles(pTrace->plane.normal, angles);
+	
+		AngleVectors(angles, forward, up, right);
+	
+		forward.z = -forward.z;
+	
+
+		
+		bool fDoPuffs = false;
+	
+		bool fDoSparks = false;
+	
+		bool fDoMuzzle = false;
+	
+		bool fDoParticles = false;
+	
+		int a, r, g, b;
+	
+		int m_iParticle;
+	
+		float scale;
+	
+
+		
+		if (Material == 0)//concrete, tile
+			
+		{
+			
+				switch (gEngfuncs.pfnRandomLong(0, 5))
+					
+				{
+					
+				case 0: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_concrete01.spr"); break;
+					
+				case 1: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_concrete02.spr"); break;
+					
+				case 2: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_concrete03.spr"); break;
+					
+				case 3: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_concrete04.spr"); break;
+					
+				case 4: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_concrete05.spr"); break;
+					
+				case 5: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_concrete06.spr"); break;
+					
+				}
+			
+				fDoSparks = (gEngfuncs.pfnRandomLong(1, 2) == 1);
+			
+				fDoPuffs = true;
+			
+				fDoMuzzle = false;
+			
+				fDoParticles = true;
+			
+				a = 96;
+			
+				r = 128;
+			
+				g = 128;
+			
+				b = 128;
+			
+				scale = 0.03;
+			
+		}
+	
+		if (Material == 1)//metal, vent, grate
+			
+		{
+			
+				switch (gEngfuncs.pfnRandomLong(0, 5))
+					
+				{
+					
+				case 0: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_metal01.spr"); break;
+					
+				case 1: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_metal02.spr"); break;
+					
+				case 2: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_metal03.spr"); break;
+					
+				case 3: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_metal04.spr"); break;
+					
+				case 4: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_metal05.spr"); break;
+					
+				case 5: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_metal06.spr"); break;
+					
+				}
+			
+				fDoSparks = (gEngfuncs.pfnRandomLong(1, 2) == 1);
+			
+				fDoPuffs = false;
+			
+				fDoMuzzle = true;
+			
+				fDoParticles = (gEngfuncs.pfnRandomLong(1, 2) == 1);
+			
+				scale = 0.03;
+			
+		}
+	
+		if (Material == 2)//wood
+			
+		{
+			
+				switch (gEngfuncs.pfnRandomLong(0, 5))
+					
+				{
+					
+				case 0: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_wood01.spr"); break;
+					
+				case 1: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_wood02.spr"); break;
+					
+				case 2: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_wood03.spr"); break;
+					
+				case 3: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_wood04.spr"); break;
+					
+				case 4: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_wood05.spr"); break;
+					
+				case 5: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_wood06.spr"); break;
+					
+				}
+			
+				fDoPuffs = true;
+			
+				fDoSparks = false;
+			
+				fDoMuzzle = false;
+			
+				fDoParticles = true;
+			
+				a = 128;
+			
+				r = 97;
+			
+				g = 86;
+			
+				b = 53;
+			
+				scale = 0.06;
+			
+		}
+	
+		if (Material == 3)//dirt
+			
+		{
+			
+				switch (gEngfuncs.pfnRandomLong(0, 5))
+					
+				{
+					
+				case 0: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_dirt01.spr"); break;
+					
+				case 1: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_dirt02.spr"); break;
+					
+				case 2: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_dirt03.spr"); break;
+					
+				case 3: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_dirt04.spr"); break;
+					
+				case 4: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_dirt05.spr"); break;
+					
+				case 5: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_dirt06.spr"); break;
+					
+				}
+			
+				fDoPuffs = true;
+			
+				fDoSparks = false;
+			
+				fDoMuzzle = false;
+			
+				fDoParticles = true;
+			
+				a = 64;
+			
+				r = 128;
+			
+				g = 128;
+			
+				b = 128;
+			
+				scale = 0.03;
+			
+		}
+	
+		if (Material == 4)//glass
+		
+		{
+			
+				switch (gEngfuncs.pfnRandomLong(0, 5))
+					
+				{
+					
+				case 0: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_glass01.spr"); break;
+				
+				case 1: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_glass02.spr"); break;
+					
+				case 2: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_glass03.spr"); break;
+					
+				case 3: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_glass04.spr"); break;
+					
+				case 4: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_glass05.spr"); break;
+					
+				case 5: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_glass06.spr"); break;
+				
+				}
+			
+				fDoPuffs = false;
+			
+				fDoSparks = false;
+			
+				fDoMuzzle = false;
+			
+				fDoParticles = (gEngfuncs.pfnRandomLong(1, 2) == 1);
+			
+				scale = 0.03;
+			
+		}
+	
+		if (Material == 5)//computer
+			
+		{
+			
+				switch (gEngfuncs.pfnRandomLong(0, 4))
+					
+				{
+					
+				case 0: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_computer01.spr"); break;
+					
+				case 1: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_computer02.spr"); break;
+					
+				case 2: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_computer03.spr"); break;
+					
+				case 3: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_computer04.spr"); break;
+					
+				case 4: m_iParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/debris_computer05.spr"); break;
+					
+				}
+			
+				fDoPuffs = false;
+			
+				fDoSparks = (gEngfuncs.pfnRandomLong(1, 2) == 1);
+			
+				fDoMuzzle = false;
+			
+				fDoParticles = (gEngfuncs.pfnRandomLong(1, 2) == 1);
+			
+				scale = 0.03;
+			
+		}
+	
+		if (DoPuff != 0)
+			
+		{
+			
+				if (fDoPuffs)
+					
+				{ // get sprite index
+				
+						int  iWallsmoke = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/debris/smokepuff.spr");
+					
+
+						
+						// create sprite
+						
+						TEMPENTITY * pTemp = gEngfuncs.pEfxAPI->R_TempSprite(pTrace->endpos,
+							
+							forward * gEngfuncs.pfnRandomFloat(10, 30) + right * gEngfuncs.pfnRandomFloat(-6, 6) + up * gEngfuncs.pfnRandomFloat(0, 6),
+							
+							0.7, iWallsmoke, kRenderTransAdd, kRenderFxNone, 1.0, 0.3, FTENT_SPRANIMATE | FTENT_FADEOUT | FTENT_COLLIDEKILL);
+					
+
+						
+						if (pTemp)
+							
+						{// sprite created successfully, adjust some things
+							
+								pTemp->fadeSpeed = 3.0;
+							
+								pTemp->entity.curstate.framerate = 25.0;
+							
+								pTemp->entity.curstate.renderamt = a;
+							
+								pTemp->entity.curstate.rendercolor.r = r;
+							
+								pTemp->entity.curstate.rendercolor.g = g;
+							
+								pTemp->entity.curstate.rendercolor.b = b;
+							
+						}
+					
+				}
+			
+
+			
+				int iRand = gEngfuncs.pfnRandomLong(0, 0x7FFF);
+			
+				if (iRand < (0x7fff / 2))// not every bullet makes a sound.
+					
+				{
+					
+						switch (iRand % 5)
+							
+						{
+							
+						case 0:	gEngfuncs.pEventAPI->EV_PlaySound(-1, pTrace->endpos, 0, "ricochet/ric1.wav", 1.0, ATTN_NORM, 0, PITCH_NORM); break;
+							
+						case 1:	gEngfuncs.pEventAPI->EV_PlaySound(-1, pTrace->endpos, 0, "ricochet/ric2.wav", 1.0, ATTN_NORM, 0, PITCH_NORM); break;
+							
+						case 2:	gEngfuncs.pEventAPI->EV_PlaySound(-1, pTrace->endpos, 0, "ricochet/ric3.wav", 1.0, ATTN_NORM, 0, PITCH_NORM); break;
+							
+						case 3:	gEngfuncs.pEventAPI->EV_PlaySound(-1, pTrace->endpos, 0, "ricochet/ric4.wav", 1.0, ATTN_NORM, 0, PITCH_NORM); break;
+							
+						case 4:	gEngfuncs.pEventAPI->EV_PlaySound(-1, pTrace->endpos, 0, "ricochet/ric5.wav", 1.0, ATTN_NORM, 0, PITCH_NORM); break;
+							
+						}
+					
+				}
+			
+		}
+	
+
+		
+		if (fDoSparks)
+			
+		{ // make some sparks
+			
+				gEngfuncs.pEfxAPI->R_SparkShower(pTrace->endpos);
+			
+		}
+	
+
+		
+		if (fDoMuzzle)
+			
+		{
+			
+				dlight_t * dl = gEngfuncs.pEfxAPI->CL_AllocDlight(0);
+			
+				dl->origin = pTrace->endpos;
+			
+				dl->color.r = 255; // red
+			
+				dl->color.g = 255; // green
+			
+				dl->color.b = 128; // blue
+			
+				dl->radius = 100;
+			
+				dl->die = gEngfuncs.GetClientTime() + 0.01;
+			
+
+				
+				gEngfuncs.pEfxAPI->R_MuzzleFlash(pTrace->endpos, 11);
+			
+		}
+	
+
+		
+		float NumParticles = gEngfuncs.pfnRandomFloat(2, 5);
+	
+		int Options = FTENT_SLOWGRAVITY | FTENT_COLLIDEKILL | FTENT_ROTATE;
+	
+
+		
+		if (fDoParticles)
+			
+		{//make much particles! (this is my own idea, i think...)
+			
+				if (NumParticles >= 2)
+					
+				{
+					
+						gEngfuncs.pEfxAPI->R_TempSprite(pTrace->endpos, forward * gEngfuncs.pfnRandomFloat(80, 120) + right * gEngfuncs.pfnRandomFloat(-124, 124) + up * gEngfuncs.pfnRandomFloat(-30, 30), scale, m_iParticle, kRenderTransAlpha, kRenderFxNone, 1.0, 20, Options);
+					
+						gEngfuncs.pEfxAPI->R_TempSprite(pTrace->endpos, forward * gEngfuncs.pfnRandomFloat(80, 120) + right * gEngfuncs.pfnRandomFloat(-124, 124) + up * gEngfuncs.pfnRandomFloat(-30, 30), scale, m_iParticle, kRenderTransAlpha, kRenderFxNone, 1.0, 20, Options);
+					
+				}
+			
+				if (NumParticles >= 3)
+					
+				{
+					
+						gEngfuncs.pEfxAPI->R_TempSprite(pTrace->endpos, forward * gEngfuncs.pfnRandomFloat(80, 120) + right * gEngfuncs.pfnRandomFloat(-124, 124) + up * gEngfuncs.pfnRandomFloat(-30, 30), scale, m_iParticle, kRenderTransAlpha, kRenderFxNone, 1.0, 20, Options);
+					
+				}
+			
+				if (NumParticles >= 4)
+					
+				{
+					
+						gEngfuncs.pEfxAPI->R_TempSprite(pTrace->endpos, forward * gEngfuncs.pfnRandomFloat(80, 120) + right * gEngfuncs.pfnRandomFloat(-124, 124) + up * gEngfuncs.pfnRandomFloat(-30, 30), scale, m_iParticle, kRenderTransAlpha, kRenderFxNone, 1.0, 20, Options);
+					
+				}
+			
+				if (NumParticles == 5)
+					
+				{
+					
+						gEngfuncs.pEfxAPI->R_TempSprite(pTrace->endpos, forward * gEngfuncs.pfnRandomFloat(80, 120) + right * gEngfuncs.pfnRandomFloat(-124, 124) + up * gEngfuncs.pfnRandomFloat(-30, 30), scale, m_iParticle, kRenderTransAlpha, kRenderFxNone, 1.0, 20, Options);
+					
+				}
+			
+		}
+	
+}
+
+
+
+//=======================================
+
+//Particles end
+
+//=======================================
+
+
+
+//======================
 //	    GLOCK START
 //======================
 void EV_FireGlock1( event_args_t *args )
@@ -590,6 +1051,260 @@ void EV_FireGlock2( event_args_t *args )
 //======================
 //	   GLOCK END
 //======================
+
+
+//======================
+//	   TETEREV START
+//======================
+void EV_TeterevFire(event_args_t* args)
+{
+	int idx;
+	vec3_t origin;
+	vec3_t angles;
+	vec3_t velocity;
+	int empty;
+
+	vec3_t ShellVelocity;
+	vec3_t ShellOrigin;
+	int shell;
+	vec3_t vecSrc, vecAiming;
+	vec3_t up, right, forward;
+
+	idx = args->entindex;
+	VectorCopy(args->origin, origin);
+	VectorCopy(args->angles, angles);
+	VectorCopy(args->velocity, velocity);
+
+	empty = args->bparam1;
+	AngleVectors(angles, forward, right, up);
+
+	shell = gEngfuncs.pEventAPI->EV_FindModelIndex("models/shell.mdl");// brass shell
+
+	if (EV_IsLocal(idx))
+	{
+		EV_MuzzleFlash();
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(empty ? GLOCK_SHOOT_EMPTY : GLOCK_SHOOT, 2);
+
+		V_PunchAxis(0, -2.0);
+	}
+
+	EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20, -12, 4);
+
+	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], shell, TE_BOUNCE_SHELL);
+
+	gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/teterev/TT_Shoot.wav", gEngfuncs.pfnRandomFloat(0.92, 1.0), ATTN_NORM, 0, 98 + gEngfuncs.pfnRandomLong(0, 3));
+
+	EV_GetGunPosition(args, vecSrc, origin);
+
+	// mazor begin
+	EV_HLDM_MuzzleFlash(vecSrc, 1.0 + gEngfuncs.pfnRandomFloat(-0.2, 0.2));
+	// mazor end
+
+	VectorCopy(forward, vecAiming);
+
+	EV_HLDM_FireBullets(idx, forward, right, up, 1, vecSrc, vecAiming, 8192, BULLET_PLAYER_9MM, 0, 0, args->fparam1, args->fparam2);
+}
+
+//void EV_MakarovFire2(event_args_t* args)
+//{
+//	int idx;
+//	vec3_t origin;
+//	vec3_t angles;
+//	vec3_t velocity;
+//
+//	vec3_t ShellVelocity;
+//	vec3_t ShellOrigin;
+//	int shell;
+//	vec3_t vecSrc, vecAiming;
+//	vec3_t vecSpread;
+//	vec3_t up, right, forward;
+//
+//	idx = args->entindex;
+//	VectorCopy(args->origin, origin);
+//	VectorCopy(args->angles, angles);
+//	VectorCopy(args->velocity, velocity);
+//
+//	AngleVectors(angles, forward, right, up);
+//
+//	shell = gEngfuncs.pEventAPI->EV_FindModelIndex("models/shell.mdl");// brass shell
+//
+//	if (EV_IsLocal(idx))
+//	{
+//		// Add muzzle flash to current weapon model
+//		EV_MuzzleFlash();
+//		gEngfuncs.pEventAPI->EV_WeaponAnimation(GLOCK_SHOOT, 2);
+//
+//		V_PunchAxis(0, -2.0);
+//	}
+//
+//	EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20, -12, 4);
+//
+//	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], shell, TE_BOUNCE_SHELL);
+//
+//	gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/makarov/PM_Shoot.wav", gEngfuncs.pfnRandomFloat(0.92, 1.0), ATTN_NORM, 0, 98 + gEngfuncs.pfnRandomLong(0, 3));
+//
+//	EV_GetGunPosition(args, vecSrc, origin);
+//
+//	VectorCopy(forward, vecAiming);
+//
+//	EV_HLDM_FireBullets(idx, forward, right, up, 1, vecSrc, vecAiming, 8192, BULLET_PLAYER_9MM, 0, &tracerCount[idx - 1], args->fparam1, args->fparam2);
+//
+//}
+//======================
+//	  TETEREV END
+//======================
+
+//======================
+// PLASMARIFLE START
+//======================
+enum plasmarifle_e
+{
+	PLASMARIFLE_IDLE,
+	PLASMARIFLE_IDLE2,
+	PLASMARIFLE_FIDGET,
+	PLASMARIFLE_SPINUP,
+	PLASMARIFLE_SPIN,
+	PLASMARIFLE_FIRE,
+	PLASMARIFLE_FIRE_SOLID,
+	PLASMARIFLE_FIRE_SEC,
+	PLASMARIFLE_FIRE_SEC_SOLID,
+	PLASMARIFLE_RELOAD,
+	PLASMARIFLE_DRAW,
+	PLASMARIFLE_HOLSTER
+};
+
+void EV_PlasmaFire(event_args_t* args)
+{
+	int idx;
+	vec3_t origin;
+	vec3_t angles;
+	vec3_t velocity;
+	vec3_t up, right, forward;
+
+	idx = args->entindex;
+	VectorCopy(args->origin, origin);
+	VectorCopy(args->angles, angles);
+	VectorCopy(args->velocity, velocity);
+
+	AngleVectors(angles, forward, right, up);
+
+	if (EV_IsLocal(idx))
+	{
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(PLASMARIFLE_FIRE, 0);
+	}
+
+	int fPrimaryFire = args->bparam2;
+
+	if (fPrimaryFire)
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/plasmarifle_fire.wav", 1, ATTN_NORM, 0, 100);
+}
+//======================
+// PLASMARIFLE END
+//======================
+// 
+//======================
+//	   Maria_Colt Start
+//======================
+void EV_MariaFire(event_args_t* args)
+{
+	int idx;
+	vec3_t origin;
+	vec3_t angles;
+	vec3_t velocity;
+	int empty;
+
+	vec3_t ShellVelocity;
+	vec3_t ShellOrigin;
+	int shell;
+	vec3_t vecSrc, vecAiming;
+	vec3_t up, right, forward;
+
+	idx = args->entindex;
+	VectorCopy(args->origin, origin);
+	VectorCopy(args->angles, angles);
+	VectorCopy(args->velocity, velocity);
+
+	empty = args->bparam1;
+	AngleVectors(angles, forward, right, up);
+
+	shell = gEngfuncs.pEventAPI->EV_FindModelIndex("models/shell.mdl");// brass shell
+
+	if (EV_IsLocal(idx))
+	{
+		EV_MuzzleFlash();
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(empty ? GLOCK_SHOOT_EMPTY : GLOCK_SHOOT, 2);
+
+		V_PunchAxis(0, -2.0);
+	}
+
+	EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20, -12, 4);
+
+	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], shell, TE_BOUNCE_SHELL);
+
+	gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/colt/colt_shoot.wav", gEngfuncs.pfnRandomFloat(0.92, 1.0), ATTN_NORM, 0, 98 + gEngfuncs.pfnRandomLong(0, 3));
+
+	EV_GetGunPosition(args, vecSrc, origin);
+
+	// mazor begin
+	EV_HLDM_MuzzleFlash(vecSrc, 1.0 + gEngfuncs.pfnRandomFloat(-0.2, 0.2));
+	// mazor end
+
+	VectorCopy(forward, vecAiming);
+
+	EV_HLDM_FireBullets(idx, forward, right, up, 1, vecSrc, vecAiming, 8192, BULLET_PLAYER_9MM, 0, 0, args->fparam1, args->fparam2);
+}
+
+//void EV_MakarovFire2(event_args_t* args)
+//{
+//	int idx;
+//	vec3_t origin;
+//	vec3_t angles;
+//	vec3_t velocity;
+//
+//	vec3_t ShellVelocity;
+//	vec3_t ShellOrigin;
+//	int shell;
+//	vec3_t vecSrc, vecAiming;
+//	vec3_t vecSpread;
+//	vec3_t up, right, forward;
+//
+//	idx = args->entindex;
+//	VectorCopy(args->origin, origin);
+//	VectorCopy(args->angles, angles);
+//	VectorCopy(args->velocity, velocity);
+//
+//	AngleVectors(angles, forward, right, up);
+//
+//	shell = gEngfuncs.pEventAPI->EV_FindModelIndex("models/shell.mdl");// brass shell
+//
+//	if (EV_IsLocal(idx))
+//	{
+//		// Add muzzle flash to current weapon model
+//		EV_MuzzleFlash();
+//		gEngfuncs.pEventAPI->EV_WeaponAnimation(GLOCK_SHOOT, 2);
+//
+//		V_PunchAxis(0, -2.0);
+//	}
+//
+//	EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20, -12, 4);
+//
+//	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], shell, TE_BOUNCE_SHELL);
+//
+//	gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/makarov/PM_Shoot.wav", gEngfuncs.pfnRandomFloat(0.92, 1.0), ATTN_NORM, 0, 98 + gEngfuncs.pfnRandomLong(0, 3));
+//
+//	EV_GetGunPosition(args, vecSrc, origin);
+//
+//	VectorCopy(forward, vecAiming);
+//
+//	EV_HLDM_FireBullets(idx, forward, right, up, 1, vecSrc, vecAiming, 8192, BULLET_PLAYER_9MM, 0, &tracerCount[idx - 1], args->fparam1, args->fparam2);
+//
+//}
+//======================
+//	  Maria_Colt END
+//======================
+
+
+
 
 //======================
 //	  SHOTGUN START
@@ -1803,10 +2518,10 @@ void EV_RifleK43Fire(event_args_t* args)
 	switch (gEngfuncs.pfnRandomLong(0, 1))
 	{
 	case 0:
-		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/k43/k43_fire.wav.wav", gEngfuncs.pfnRandomFloat(0.8, 0.9), ATTN_NORM, 0, PITCH_NORM);
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/k43/k43_fire.wav", gEngfuncs.pfnRandomFloat(0.8, 0.9), ATTN_NORM, 0, PITCH_NORM);
 		break;
 	case 1:
-		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/k43/k43_fire.wav.wav", gEngfuncs.pfnRandomFloat(0.8, 0.9), ATTN_NORM, 0, PITCH_NORM);
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/k43/k43_fire.wav", gEngfuncs.pfnRandomFloat(0.8, 0.9), ATTN_NORM, 0, PITCH_NORM);
 		break;
 	}
 
@@ -1835,7 +2550,7 @@ enum sniperrifle_e {
 	SNIPERRIFLE_FIRE1,
 	SNIPERRIFLE_FIRELASTROUND,
 	SNIPERRIFLE_RELOAD,
-	SNIPERRIFLE_RELOAD2,
+	/*SNIPERRIFLE_RELOAD2,*/
 	SNIPERRIFLE_SLOWIDLEEMPTY,
 	SNIPERRIFLE_HOLSTER,
 };
@@ -1865,12 +2580,12 @@ void EV_FireSniper(event_args_t* args)
 	{
 		// Add muzzle flash to current weapon model
 		EV_MuzzleFlash();
-		gEngfuncs.pEventAPI->EV_WeaponAnimation(empty ? SNIPERRIFLE_FIRELASTROUND : SNIPERRIFLE_FIRE1, 2);
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(empty ? SNIPERRIFLE_FIRELASTROUND : SNIPERRIFLE_FIRE1, 1.5);
 
-		V_PunchAxis(0, -20.0);
+		V_PunchAxis(0, -5.0);
 	}
 
-	gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/sniper_fire1.wav", gEngfuncs.pfnRandomFloat(0.8, 0.9), ATTN_NORM, 0, PITCH_NORM);
+	gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/kar_shoot.wav", gEngfuncs.pfnRandomFloat(0.8, 0.9), ATTN_NORM, 0, PITCH_NORM);
 
 
 	EV_GetGunPosition(args, vecSrc, origin);

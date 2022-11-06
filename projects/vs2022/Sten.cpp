@@ -51,7 +51,7 @@ void CStenGun::Spawn()
 	SET_MODEL(ENT(pev), "models/w_sten.mdl");
 	m_iId = WEAPON_STEN;
 
-	m_iDefaultAmmo = 50;
+	m_iDefaultAmmo = 32;
 
 	FallInit();// get ready to fall down.
 }
@@ -192,6 +192,8 @@ void CStenGun::PrimaryAttack()
 void CStenGun::Reload(void)
 {
 	if (m_pPlayer->ammo_mp5 <= 0)
+		return;
+	if (m_iClip == 32) 
 		return;
 
 	/*int iResult;*/

@@ -413,6 +413,11 @@ cvar_t	sk_hornet_dmg1 = {"sk_hornet_dmg1","0"};
 cvar_t	sk_hornet_dmg2 = {"sk_hornet_dmg2","0"};
 cvar_t	sk_hornet_dmg3 = {"sk_hornet_dmg3","0"};
 
+// plasmo
+cvar_t	sk_plr_plasmo_bullet1 = { "sk_plr_plasmo_bullet1","0" };
+cvar_t	sk_plr_plasmo_bullet2 = { "sk_plr_plasmo_bullet2","0" };
+cvar_t	sk_plr_plasmo_bullet3 = { "sk_plr_plasmo_bullet3","0" };
+
 // HEALTH/CHARGE
 cvar_t	sk_suitcharger1	= { "sk_suitcharger1","0" };
 cvar_t	sk_suitcharger2	= { "sk_suitcharger2","0" };		
@@ -447,6 +452,23 @@ cvar_t	sk_whiskeyhealthkit3 = { "sk_whiskeyhealthkit3", "0" };
 cvar_t	sk_Eathealthkit1 = { "sk_Eathealthkit1", "0" };
 cvar_t	sk_Eathealthkit2 = { "sk_Eathealthkit2", "0" };
 cvar_t	sk_Eathealthkit3 = { "sk_Eathealthkit3", "0" };
+
+//armor new
+cvar_t	sk_ArmorBody1 = { "sk_ArmorBody1", "0" };
+cvar_t	sk_ArmorBody2 = { "sk_ArmorBody2", "0" };
+cvar_t	sk_ArmorBody3 = { "sk_ArmorBody3", "0" };
+
+cvar_t	sk_JacketArmor1 = { "sk_JacketArmor1", "0" };
+cvar_t	sk_JacketArmor2 = { "sk_JacketArmor2", "0" };
+cvar_t	sk_JacketArmor3 = { "sk_JacketArmor3", "0" };
+
+cvar_t	sk_ArmorHelmet1 = { "sk_ArmorHelmet1", "0" };
+cvar_t	sk_ArmorHelmet2 = { "sk_ArmorHelmet2", "0" };
+cvar_t	sk_ArmorHelmet3 = { "sk_ArmorHelmet3", "0" };
+
+cvar_t	sk_DowaHelmet1 = { "sk_DowaHelmet1", "0" };
+cvar_t	sk_DowaHelmet2 = { "sk_DowaHelmet2", "0" };
+cvar_t	sk_DowaHelmet3 = { "sk_DowaHelmet3", "0" };
 
 // monster damage adjusters
 cvar_t	sk_monster_head1	= { "sk_monster_head1","2" };
@@ -889,6 +911,11 @@ void GameDLLInit( void )
 	CVAR_REGISTER ( &sk_hornet_dmg2 );// {"sk_hornet_dmg2","0"};
 	CVAR_REGISTER ( &sk_hornet_dmg3 );// {"sk_hornet_dmg3","0"};
 
+	// plasmo
+	CVAR_REGISTER(&sk_plr_plasmo_bullet1);// {"sk_hornet_dmg1","0"};
+	CVAR_REGISTER(&sk_plr_plasmo_bullet2);// {"sk_hornet_dmg2","0"};
+	CVAR_REGISTER(&sk_plr_plasmo_bullet3);// {"sk_hornet_dmg3","0"};
+
 	// HEALTH/SUIT CHARGE DISTRIBUTION
 	CVAR_REGISTER ( &sk_suitcharger1 );
 	CVAR_REGISTER ( &sk_suitcharger2 );
@@ -921,6 +948,22 @@ void GameDLLInit( void )
 	CVAR_REGISTER ( &sk_scientist_heal1 );
 	CVAR_REGISTER ( &sk_scientist_heal2 );
 	CVAR_REGISTER ( &sk_scientist_heal3 );
+
+	CVAR_REGISTER(&sk_ArmorBody1); //бронежелет
+	CVAR_REGISTER(&sk_ArmorBody2);
+	CVAR_REGISTER(&sk_ArmorBody3);
+	
+	CVAR_REGISTER(&sk_JacketArmor1); //джакет
+	CVAR_REGISTER(&sk_JacketArmor2);
+	CVAR_REGISTER(&sk_JacketArmor3);
+
+	CVAR_REGISTER(&sk_ArmorHelmet1); //шлем
+	CVAR_REGISTER(&sk_ArmorHelmet2);
+	CVAR_REGISTER(&sk_ArmorHelmet3);
+
+	CVAR_REGISTER(&sk_DowaHelmet1); //шлем довакина
+	CVAR_REGISTER(&sk_DowaHelmet2);
+	CVAR_REGISTER(&sk_DowaHelmet3);
 
 // monster damage adjusters
 	CVAR_REGISTER ( &sk_monster_head1 );

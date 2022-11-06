@@ -23,6 +23,7 @@
 #include	"cbase.h"
 #include	"monsters.h"
 #include	"schedule.h"
+#include <explode.h>
 
 
 //=========================================================
@@ -422,6 +423,7 @@ class CNazzZombie : public CZombie
 public:
 	void Spawn(void);
 	void Precache(void);
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
 };
 
 LINK_ENTITY_TO_CLASS(monster_nazzzombie, CNazzZombie);
@@ -476,6 +478,21 @@ void CNazzZombie::Precache()
 		PRECACHE_SOUND((char*)pPainSounds[i]);
 }
 
+void CNazzZombie::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
+{
+	// check for Torch fuel tank hit
+	if (ptr->iHitgroup == 9)
+	{
+		//Make sure it kills this grunt
+		bitsDamageType = DMG_ALWAYSGIB | DMG_BLAST;
+		flDamage = pev->health;
+		ExplosionCreate(ptr->vecEndPos, pev->angles, edict(), 100, true);
+	}
+	CZombie::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
+}
+
+
+
 ///Еще один зомби нацист! Но на этот раз он с балломном и тоже делает бум!
 
 class CNazzFiregunZombie : public CZombie
@@ -483,6 +500,8 @@ class CNazzFiregunZombie : public CZombie
 public:
 	void Spawn(void);
 	void Precache(void);
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
+	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType);
 };
 
 LINK_ENTITY_TO_CLASS(monster_firegunnazzombie, CNazzFiregunZombie);
@@ -535,4 +554,35 @@ void CNazzFiregunZombie::Precache()
 
 	for (i = 0; i < ARRAYSIZE(pPainSounds); i++)
 		PRECACHE_SOUND((char*)pPainSounds[i]);
+}
+
+void CNazzFiregunZombie::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
+{
+	// check for Torch fuel tank hit
+	if (ptr->iHitgroup == 8)
+	{
+		//Make sure it kills this grunt
+		bitsDamageType = DMG_ALWAYSGIB | DMG_BLAST;
+		flDamage = pev->health;
+		ExplosionCreate(ptr->vecEndPos, pev->angles, edict(), 100, true);
+	}
+	CZombie::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
+}
+
+int CNazzFiregunZombie::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
+{
+	// Take 30% damage from bullets
+	if (bitsDamageType == DMG_BULLET)
+	{
+		Vector vecDir = pev->origin - (pevInflictor->absmin + pevInflictor->absmax) * 0.5;
+		vecDir = vecDir.Normalize();
+		float flForce = DamageForce(flDamage);
+		pev->velocity = pev->velocity + vecDir * flForce;
+		flDamage *= 0.3;
+	}
+
+	// HACK HACK -- until we fix this.
+	if (IsAlive())
+		PainSound();
+	return CZombie::TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }

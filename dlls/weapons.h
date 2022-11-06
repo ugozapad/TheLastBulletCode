@@ -86,6 +86,9 @@ public:
 #define	WEAPON_K43RIFLE		21
 #define	WEAPON_PPSH		22
 #define	WEAPON_TOMMY		23
+#define	WEAPON_TETEREV		24
+#define	WEAPON_MARIA		25
+#define	WEAPON_PLASMARIFLE		26
 
 #define WEAPON_ALLWEAPONS		(~(1<<WEAPON_SUIT))
 
@@ -114,7 +117,7 @@ public:
 #define TRIPMINE_WEIGHT		-10
 #define SNIPERRIFLE_WEIGHT  10
 #define VENOM_WEIGHT 15
-
+#define PLASMARIFLE_WEIGHT 20
 
 // weapon clip/carry ammo capacities
 #define URANIUM_MAX_CARRY		100
@@ -130,6 +133,8 @@ public:
 #define HORNET_MAX_CARRY		60
 #define M203_GRENADE_MAX_CARRY	10
 #define _338_MAX_CARRY 200
+#define PLASMARIFLE_MAX_CARRY 200
+
 
 // the maximum amount of ammo each weapon's clip can hold
 #define WEAPON_NOCLIP			-1
@@ -150,6 +155,7 @@ public:
 #define SNARK_MAX_CLIP			WEAPON_NOCLIP
 #define SNIPERRIFLE_MAX_CLIP	10
 #define VENOM_MAX_CLIP          100
+#define PLASMARIFLE_MAX_CLIP 60
 
 
 
@@ -172,6 +178,10 @@ public:
 #define HIVEHAND_DEFAULT_GIVE		60
 #define SNIPERRIFLE_DEFAULT_GIVE	10
 #define VENOM_DEFAULT_GIVE			100
+#define TETEREV_DEFAULT_GIVE		12
+#define MARIA_DEFAULT_GIVE		7
+#define PLASMARIFLE_DEFAULT_GIVE		60 //это тоже плазмо
+#define AMMO_PLASMORIFLE_GIVE 30
 
 
 // The amount of ammo given to a player by an ammo item.
@@ -407,6 +417,11 @@ extern DLL_GLOBAL	short	g_sModelIndexWExplosion;// holds the index for the under
 extern DLL_GLOBAL	short	g_sModelIndexBubbles;// holds the index for the bubbles model
 extern DLL_GLOBAL	short	g_sModelIndexBloodDrop;// holds the sprite index for blood drops
 extern DLL_GLOBAL	short	g_sModelIndexBloodSpray;// holds the sprite index for blood spray (bigger)
+extern DLL_GLOBAL short g_sModelIndexPlasma1;
+extern DLL_GLOBAL short g_sModelIndexPlasma2;
+extern DLL_GLOBAL short g_sModelIndexPlasma3;
+
+
 
 extern void ClearMultiDamage(void);
 extern void ApplyMultiDamage(entvars_t* pevInflictor, entvars_t* pevAttacker );
@@ -524,6 +539,112 @@ private:
 	unsigned short m_usFireGlock2;
 };
 
+//teterev
+class CTeterev : public CBasePlayerWeapon
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	int iItemSlot(void) { return 2; }
+	int GetItemInfo(ItemInfo* p);
+
+	void PrimaryAttack(void);
+	//void SecondaryAttack( void );
+	void TeterevFireAttack(float flSpread, float flCycleTime, BOOL fUseAutoAim);
+	BOOL Deploy(void);
+	void Reload(void);
+	/*void SpawnClip(void);*/
+	void WeaponIdle(void);
+
+	virtual BOOL UseDecrement(void)
+	{
+#if defined( CLIENT_WEAPONS )
+		return TRUE;
+#else
+		return FALSE;
+#endif
+	}
+
+private:
+	int m_iShell;
+
+
+	unsigned short m_usTeterevFire;
+	/*unsigned short m_usMakarovFire2;*/
+};
+
+//Colt_maria
+class CMaria : public CBasePlayerWeapon
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	int iItemSlot(void) { return 2; }
+	int GetItemInfo(ItemInfo* p);
+
+	void PrimaryAttack(void);
+	//void SecondaryAttack( void );
+	void MariaFireAttack(float flSpread, float flCycleTime, BOOL fUseAutoAim);
+	BOOL Deploy(void);
+	void Reload(void);
+	/*void SpawnClip(void);*/
+	void WeaponIdle(void);
+
+	virtual BOOL UseDecrement(void)
+	{
+#if defined( CLIENT_WEAPONS )
+		return TRUE;
+#else
+		return FALSE;
+#endif
+	}
+
+private:
+	int m_iShell;
+
+
+	unsigned short m_usMariaFire;
+	/*unsigned short m_usMakarovFire2;*/
+};
+
+//EnergoGun
+class CPlasmarifle : public CBasePlayerWeapon
+{
+public:
+
+#ifndef CLIENT_DLL
+	int Save(CSave& save);
+	int Restore(CRestore& restore);
+	static TYPEDESCRIPTION m_SaveData[];
+#endif
+
+	void Spawn(void);
+	void Precache(void);
+	int iItemSlot() { return 7; }
+	int GetItemInfo(ItemInfo* p);
+	int AddToPlayer(CBasePlayer* pPlayer);
+
+	void PrimaryAttack(void);
+	BOOL Deploy();
+	void Holster(void);
+	void Reload(void);
+	void WeaponIdle(void);
+	float m_flSoundDelay;
+	float m_flNextReload;
+
+	virtual BOOL UseDecrement(void)
+	{
+#if defined( CLIENT_WEAPONS )
+		return TRUE;
+#else
+		return FALSE;
+#endif
+	}
+	int m_iPlasmaSprite;
+	int m_iMazzlePlasma;
+private:
+	unsigned short m_usPlasmaFire;
+};
 
 class CCrowbar : public CBasePlayerWeapon
 {
@@ -1055,7 +1176,7 @@ public:
 	int GetItemInfo(ItemInfo* p);
 	int AddToPlayer(CBasePlayer* pPlayer);
 	void PrimaryAttack(void);
-	//void SecondaryAttack(void);
+	void SecondaryAttack(void);
 	BOOL Deploy(void);
 	void Holster(int skiplocal = 0);
 	void Reload(void);

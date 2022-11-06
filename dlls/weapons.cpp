@@ -30,6 +30,7 @@
 #include "soundent.h"
 #include "decals.h"
 #include "gamerules.h"
+#include "plasmarifle_weapon.h"
 
 extern CGraph	WorldGraph;
 extern int gEvilImpulse101;
@@ -46,6 +47,9 @@ DLL_GLOBAL	short	g_sModelIndexWExplosion;// holds the index for the underwater e
 DLL_GLOBAL	short	g_sModelIndexBubbles;// holds the index for the bubbles model
 DLL_GLOBAL	short	g_sModelIndexBloodDrop;// holds the sprite index for the initial blood
 DLL_GLOBAL	short	g_sModelIndexBloodSpray;// holds the sprite index for splattered blood
+DLL_GLOBAL short g_sModelIndexPlasma1; // holds the index for the plasma explosion 1
+DLL_GLOBAL short g_sModelIndexPlasma2; // holds the index for the plasma explosion 2
+DLL_GLOBAL short g_sModelIndexPlasma3; // holds the index for the plasma explosion 3
 
 ItemInfo CBasePlayerItem::ItemInfoArray[MAX_WEAPONS];
 AmmoInfo CBasePlayerItem::AmmoInfoArray[MAX_AMMO_SLOTS];
@@ -373,13 +377,22 @@ void W_Precache(void)
 	//Тут добавляете прекеш своего оружия
 		// PPSH_weapon
 		UTIL_PrecacheOtherWeapon("weapon_ppsh");
-		//UTIL_PrecacheOtherWeapon("ammo_ppsh");
+		//UTIL_PrecacheOther("ammo_ppsh");
 
 	//// Тут добавляете прекеш своего оружия
 	//	// tompson_weapon
 		UTIL_PrecacheOtherWeapon("weapon_tommy");
-		//UTIL_PrecacheOtherWeapon("ammo_tommy");
+		//UTIL_PrecacheOther("ammo_tommy");
 
+		////colt_mariaov
+		UTIL_PrecacheOtherWeapon("weapon_maria");
+
+		////energo_gun
+		UTIL_PrecacheOtherWeapon("weapon_plasmarifle");
+		UTIL_PrecacheOther("ammo_plasmo");
+////teterev
+		UTIL_PrecacheOtherWeapon("weapon_teterev");
+		UTIL_PrecacheOther("ammo_pm");
 	// knife
 	UTIL_PrecacheOtherWeapon("weapon_knife");//Прикрепляем нож к игре
 
@@ -487,6 +500,16 @@ void W_Precache(void)
 	PRECACHE_SOUND ("weapons/bullet_hit2.wav");	// hit by bullet
 	
 	PRECACHE_SOUND ("items/weapondrop1.wav");// weapon falls to the ground
+
+//звуки плазмы
+	// Used by plasma grenades.
+	PRECACHE_MODEL("models/plasmanull.mdl");
+	g_sModelIndexPlasma1 = PRECACHE_MODEL("sprites/plasmabomb.spr");
+	g_sModelIndexPlasma2 = PRECACHE_MODEL("sprites/plasmabomb.spr");
+	g_sModelIndexPlasma3 = PRECACHE_MODEL("sprites/tsplasma.spr");
+
+	PRECACHE_SOUND("weapons/plasmagun_exp.wav");//explosion aftermaths
+
 
 }
 
@@ -1682,3 +1705,10 @@ TYPEDESCRIPTION	CSatchel::m_SaveData[] =
 	DEFINE_FIELD( CSatchel, m_chargeReady, FIELD_INTEGER ),
 };
 IMPLEMENT_SAVERESTORE( CSatchel, CBasePlayerWeapon );
+
+TYPEDESCRIPTION CPlasmarifle::m_SaveData[] =
+{
+DEFINE_FIELD(CPlasmarifle, m_iPlasmaSprite, FIELD_INTEGER),
+};
+IMPLEMENT_SAVERESTORE(CPlasmarifle, CBasePlayerWeapon)
+

@@ -286,7 +286,7 @@ void CHGrunt :: GibMonster ( void )
 		CBaseEntity *pGun;
 		if (FBitSet( pev->weapons, HGRUNT_SHOTGUN ))
 		{
-			pGun = DropItem( "weapon_sniperrifle", vecGunPos, vecGunAngles );
+			pGun = DropItem( "weapon_wrifle", vecGunPos, vecGunAngles );
 		}
 		else
 		{
@@ -859,7 +859,7 @@ void CHGrunt :: HandleAnimEvent( MonsterEvent_t *pEvent )
 			// now spawn a gun.
 			if (FBitSet( pev->weapons, HGRUNT_SHOTGUN ))
 			{
-				 DropItem( "weapon_sniperrifle", vecGunPos, vecGunAngles );
+				 DropItem( "weapon_wrifle", vecGunPos, vecGunAngles );
 			}
 			else
 			{
@@ -930,7 +930,7 @@ void CHGrunt :: HandleAnimEvent( MonsterEvent_t *pEvent )
 			{
 				crossbow( );
 
-				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/xbow_fire1.wav", 1, ATTN_NORM );
+				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/k43/k43_fire.wav", 1, ATTN_NORM );
 			}
 		
 			CSoundEnt::InsertSound ( bits_SOUND_COMBAT, pev->origin, 384, 0.3 );
@@ -2404,7 +2404,7 @@ void CHGruntRepel::Spawn( void )
 
 void CHGruntRepel::Precache( void )
 {
-	UTIL_PrecacheOther( "monster_human_grunt" );
+	UTIL_PrecacheOther( "monster_human_NazzMp44grunt" );
 	m_iSpriteTexture = PRECACHE_MODEL( "sprites/rope.spr" );
 }
 
@@ -2417,7 +2417,7 @@ void CHGruntRepel::RepelUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE
 		return NULL;
 	*/
 
-	CBaseEntity *pEntity = Create( "monster_human_grunt", pev->origin, pev->angles );
+	CBaseEntity *pEntity = Create( "monster_human_NazzMp44grunt", pev->origin, pev->angles );
 	CBaseMonster *pGrunt = pEntity->MyMonsterPointer( );
 	pGrunt->pev->movetype = MOVETYPE_FLY;
 	pGrunt->pev->velocity = Vector( 0, 0, RANDOM_FLOAT( -196, -128 ) );
@@ -2823,7 +2823,7 @@ void CSupGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 		{
 			crossbow();
 
-			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/xbow_fire1.wav", 1, ATTN_NORM);
+			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/k43/k43_fire", 1, ATTN_NORM);
 		}
 
 		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, 384, 0.3);
@@ -3162,7 +3162,7 @@ void CBioGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 		{
 			crossbow();
 
-			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/xbow_fire1.wav", 1, ATTN_NORM);
+			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/k43/k43_fire.wav", 1, ATTN_NORM);
 		}
 
 		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, 384, 0.3);
@@ -3327,6 +3327,7 @@ void CNazzGrunt::Precache()
 	PRECACHE_SOUND("weapons/glauncher.wav");
 
 	PRECACHE_SOUND("weapons/sbarrel1.wav");
+	PRECACHE_SOUND("weapons/mp44/mp44_shoot.wav");
 
 	PRECACHE_SOUND("zombie/claw_miss2.wav");// because we use the basemonster SWIPE animation event
 
@@ -3498,7 +3499,7 @@ void CNazzGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 		{
 			crossbow();
 
-			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/xbow_fire1.wav", 1, ATTN_NORM);
+			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/k43/k43_fire.wav", 1, ATTN_NORM);
 		}
 
 		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, 384, 0.3);
@@ -3541,6 +3542,64 @@ void CNazzGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 	}
 }
 
+
+////==============
+////Rebel nazz. Он был за коментен,но почему?
+////================
+//class CNazzRepel : public CHGruntRepel
+//{
+//public:
+//	void Spawn(void);
+//	void Precache(void);
+//	void EXPORT RepelUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
+//	int m_iSpriteTexture;	// Don't save, precache
+//};
+//
+//LINK_ENTITY_TO_CLASS(monster_gruntnazz_repel, CNazzRepel);
+//
+//void CNazzRepel::Spawn(void)
+//{
+//	Precache();
+//	pev->solid = SOLID_NOT;
+//
+//	SetUse(&CNazzRepel::RepelUse);
+//}
+//
+//void CNazzRepel::Precache(void)
+//{
+//	UTIL_PrecacheOther("monster_gruntnazz_repel");
+//	m_iSpriteTexture = PRECACHE_MODEL("sprites/rope.spr");
+//}
+//
+//void CNazzRepel::RepelUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
+//{
+//	TraceResult tr;
+//	UTIL_TraceLine(pev->origin, pev->origin + Vector(0, 0, -4096.0), dont_ignore_monsters, ENT(pev), &tr);
+//	/*
+//	if ( tr.pHit && Instance( tr.pHit )->pev->solid != SOLID_BSP)
+//		return NULL;
+//	*/
+//
+//	CBaseEntity* pEntity = Create("monster_human_NazzMp44grunt", pev->origin, pev->angles);
+//	CBaseMonster* pGrunt = pEntity->MyMonsterPointer();
+//	pGrunt->pev->movetype = MOVETYPE_FLY;
+//	pGrunt->pev->velocity = Vector(0, 0, RANDOM_FLOAT(-196, -128));
+//	pGrunt->SetActivity(ACT_GLIDE);
+//	// UNDONE: position?
+//	pGrunt->m_vecLastPosition = tr.vecEndPos;
+//
+//	CBeam* pBeam = CBeam::BeamCreate("sprites/rope.spr", 10);
+//	pBeam->PointEntInit(pev->origin + Vector(0, 0, 112), pGrunt->entindex());
+//	pBeam->SetFlags(BEAM_FSOLID);
+//	pBeam->SetColor(255, 255, 255);
+//	pBeam->SetThink(&CBeam::SUB_Remove);
+//	pBeam->pev->nextthink = gpGlobals->time + -4096.0 * tr.flFraction / pGrunt->pev->velocity.z + 0.5;
+//
+//	UTIL_Remove(this);
+//}
+
+
+
 ////alpha_super_grunt(Axiles)////
 ///начало кода суперсолдата_Ахилэс///
 
@@ -3553,6 +3612,7 @@ public:
 	void Shoot(void);
 	void HandleAnimEvent(MonsterEvent_t* pEvent);
 	void GibMonster(void);
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType);
 };
 
 
@@ -3698,6 +3758,80 @@ void CAlphaSupGrunt::Shoot(void)
 	SetBlending(0, angDir.x);
 }
 
+//трасе атака для ахиллеса(броня всего тела)
+
+void CAlphaSupGrunt::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
+{
+	if (ptr->iHitgroup == 3 && (bitsDamageType & (DMG_BULLET | DMG_SLASH | DMG_CLUB)))
+	{
+		// hit armor
+		if (pev->dmgtime != gpGlobals->time || (RANDOM_LONG(0, 10) < 1))
+		{
+			UTIL_Ricochet(ptr->vecEndPos, RANDOM_FLOAT(1, 2));
+			pev->dmgtime = gpGlobals->time;
+		}
+
+		if (RANDOM_LONG(0, 1) == 0)
+		{
+			Vector vecTracerDir = vecDir;
+
+			vecTracerDir.x += RANDOM_FLOAT(-0.3, 0.3);
+			vecTracerDir.y += RANDOM_FLOAT(-0.3, 0.3);
+			vecTracerDir.z += RANDOM_FLOAT(-0.3, 0.3);
+
+			vecTracerDir = vecTracerDir * -512;
+
+			MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, ptr->vecEndPos);
+			WRITE_BYTE(TE_TRACER);
+			WRITE_COORD(ptr->vecEndPos.x);
+			WRITE_COORD(ptr->vecEndPos.y);
+			WRITE_COORD(ptr->vecEndPos.z);
+
+			WRITE_COORD(vecTracerDir.x);
+			WRITE_COORD(vecTracerDir.y);
+			WRITE_COORD(vecTracerDir.z);
+			MESSAGE_END();
+		}
+
+		flDamage = 0.001;
+	}
+	else
+	{
+		SpawnBlood(ptr->vecEndPos, BloodColor(), flDamage);// a little surface blood.
+		TraceBleed(flDamage, vecDir, ptr, bitsDamageType);
+	}
+
+	AddMultiDamage(pevAttacker, this, flDamage, bitsDamageType);
+}
+
+
+
+
+
+
+
+//void CAlphaSupGrunt::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
+//{
+//	// check for helmet shot
+//	if (ptr->iHitgroup == 3)
+//	
+//	{
+//		// make sure we're wearing one
+//		if (GetBodygroup(1) == HEAD_GRUNT && (bitsDamageType & (DMG_BULLET | DMG_SLASH | DMG_BLAST | DMG_CLUB)))
+//		{
+//			// absorb damage
+//			flDamage -= 20;
+//			if (flDamage <= 0)
+//			{
+//				UTIL_Ricochet(ptr->vecEndPos, 1.0);
+//				flDamage = 0.01;
+//			}
+//		}
+//		// it's head shot anyways
+//		ptr->iHitgroup = HITGROUP_STOMACH;
+//	}
+//	CHGrunt::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
+//}
 
 
 void CAlphaSupGrunt::GibMonster(void)
@@ -3869,7 +4003,7 @@ void CAlphaSupGrunt::HandleAnimEvent(MonsterEvent_t* pEvent)
 		{
 			crossbow();
 
-			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/xbow_fire1.wav", 1, ATTN_NORM);
+			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/k43/k43_fire.wav", 1, ATTN_NORM);
 		}
 
 		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, 384, 0.3);
@@ -3915,3 +4049,4 @@ void CAlphaSupGrunt::HandleAnimEvent(MonsterEvent_t* pEvent)
 ////
 //конец кода супер-солдата
 ///
+

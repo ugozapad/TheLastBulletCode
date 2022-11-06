@@ -597,6 +597,8 @@ public:
 	int		m_Teamplay;
 	int		m_iRes;
 	cvar_t  *m_pCvarStealMouse;
+	//cvar_t* m_pCvarDraw;
+	//cvar_t* RainInfo; // rain tutorial
 	cvar_t	*m_pCvarDraw;
 
 	int m_iFontHeight;
@@ -666,6 +668,8 @@ public:
 	int _cdecl MsgFunc_SetFOV(const char *pszName,  int iSize, void *pbuf);
 	int  _cdecl MsgFunc_Concuss( const char *pszName, int iSize, void *pbuf );
 	int _cdecl MsgFunc_WaterSplash(const char* pszName, int iSize, void* pbuf);
+	int _cdecl MsgFunc_Impact(const char* pszName, int iSize, void* pbuf);
+
 
 
 	// Screen information

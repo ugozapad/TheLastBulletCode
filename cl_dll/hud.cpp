@@ -134,6 +134,13 @@ int __MsgFunc_WaterSplash(const char* pszName, int iSize, void* pbuf)
 	return 1;
 }
 
+int __MsgFunc_Impact(const char* pszName, int iSize, void* pbuf)
+{
+	gHUD.MsgFunc_Impact(pszName, iSize, pbuf);
+	return 1;
+}
+
+
 // TFFree Command Menu
 void __CmdFunc_OpenCommandMenu(void)
 {
@@ -292,9 +299,10 @@ int __MsgFunc_AllowSpec(const char *pszName, int iSize, void *pbuf)
 // This is called every time the DLL is loaded
 void CHud :: Init( void )
 {
-
+	
 	cl_rollangle = gEngfuncs.pfnRegisterVariable("cl_rollangle", "0.65", FCVAR_CLIENTDLL | FCVAR_ARCHIVE);
 	cl_rollspeed = gEngfuncs.pfnRegisterVariable("cl_rollspeed", "300", FCVAR_CLIENTDLL | FCVAR_ARCHIVE);
+	//RainInfo = gEngfuncs.pfnRegisterVariable("cl_raininfo", "0", 0);	// rain tutorial
 
 	HOOK_MESSAGE( Logo );
 	HOOK_MESSAGE( ResetHUD );
@@ -329,6 +337,9 @@ void CHud :: Init( void )
 	
 	HOOK_MESSAGE( SpecFade );
 	HOOK_MESSAGE( ResetFade );
+
+	HOOK_MESSAGE(Impact);
+
 
 	// VGUI Menus
 	HOOK_MESSAGE( VGUIMenu );

@@ -365,6 +365,8 @@ public:
 	int ammo_wrifle;
 	int ammo_ppsh;
 	int ammo_tommy;
+	int ammo_pm;
+	int ammo_plasmo;
 	
 	
 	//Special stuff for grenades and satchels.

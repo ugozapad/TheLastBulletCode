@@ -91,7 +91,7 @@ int CShotgun::AddToPlayer(CBasePlayer* pPlayer)
 	return FALSE;
 }
 
-
+//шотган пернесен на 4 слотв игре но 3 слот в коде, так как вся эта ахинея считается с 0.
 int CShotgun::GetItemInfo(ItemInfo* p)
 {
 	p->pszName = STRING(pev->classname);
@@ -100,8 +100,8 @@ int CShotgun::GetItemInfo(ItemInfo* p)
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = SHOTGUN_MAX_CLIP;
-	p->iSlot = 2;
-	p->iPosition = 1;
+	p->iSlot = 3;
+	p->iPosition = 4;
 	p->iFlags = 0;
 	p->iId = m_iId = WEAPON_SHOTGUN;
 	p->iWeight = SHOTGUN_WEIGHT;

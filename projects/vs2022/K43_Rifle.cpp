@@ -41,12 +41,12 @@ int CWrifle::GetItemInfo(ItemInfo* p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "k43";
-	p->iMaxAmmo1 = 120;
+	p->iMaxAmmo1 = 70;
 	p->pszAmmo2 = "NULL";
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = 10;
-	p->iSlot = 1;
-	p->iPosition = 3;
+	p->iSlot = 3;
+	p->iPosition = 6;
 	p->iFlags = 0;
 	p->iId = m_iId = WEAPON_K43RIFLE;
 	p->iWeight = MP5_WEIGHT;
@@ -218,7 +218,7 @@ void CWrifle::PrimaryAttack()
 
 void CWrifle::Reload(void)
 {
-	if (m_pPlayer->ammo_357 <= 0)
+	if (m_pPlayer->ammo_wrifle <= 0)
 		return;
 
 	if (m_pPlayer->pev->fov != 0)

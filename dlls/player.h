@@ -342,4 +342,7 @@ public:
 extern int	gmsgHudText;
 extern BOOL gInitHUD;
 
+extern int gmsgImpact;
+
+
 #endif // PLAYER_H

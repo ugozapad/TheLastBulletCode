@@ -113,6 +113,7 @@ struct skilldata_t
 	float plrDmgK43;
 	float plrDmgPPSHAMMO;
 	float plrDmgTOMMYAMMO;
+	float plrDmgPlasma;
 
 // weapons shared by monsters
 	float monDmg9MM;
@@ -129,6 +130,11 @@ struct skilldata_t
 	float cacaohealth;
 	float whiskeyHealth;
 	float EatHealthKit;
+	float ArmorBody; //бронежелет
+	float JacketArmor; //куртка
+	float ArmorHelmet;// немецкий шлем
+	float DowaHelmet;//  шлем довакина
+	
 
 // monster damage adj
 	float monHead;

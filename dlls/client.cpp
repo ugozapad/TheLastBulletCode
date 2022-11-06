@@ -1748,6 +1748,7 @@ void UpdateClientData ( const edict_t *ent, int sendweapons, struct clientdata_s
 			cd->vuser3.x = pl->ammo_wrifle;
 			cd->vuser3.y = pl->ammo_ppsh;
 			cd->vuser3.z = pl->ammo_tommy;
+			cd->vuser4.x = pl->ammo_pm; //патроны макарыча
 
 			if ( pl->m_pActiveItem )
 			{
@@ -1770,6 +1771,10 @@ void UpdateClientData ( const edict_t *ent, int sendweapons, struct clientdata_s
 					{
 						cd->vuser2.y = ( ( CRpg * )pl->m_pActiveItem)->m_fSpotActive;
 						cd->vuser2.z = ( ( CRpg * )pl->m_pActiveItem)->m_cActiveRockets;
+					}
+					else if (pl->m_pActiveItem->m_iId == WEAPON_PLASMARIFLE)
+					{
+						cd->vuser2.y = pl->ammo_plasmo;
 					}
 				}
 			}

@@ -281,6 +281,10 @@ void CGameRules::RefreshSkillData ( void )
 	// Rifle
 	gSkillData.plrDmgSniper = GetSkillCvar("sk_plr_snpr_bullet");
 
+	//plasmo
+	gSkillData.plrDmgPlasma = GetSkillCvar("sk_plr_plasmo_bullet");
+
+
 	// MONSTER WEAPONS
 	gSkillData.monDmg12MM = GetSkillCvar( "sk_12mm_bullet");
 	gSkillData.monDmgMP5 = GetSkillCvar ("sk_9mmAR_bullet" );
@@ -309,6 +313,12 @@ void CGameRules::RefreshSkillData ( void )
 	gSkillData.cacaohealth = GetSkillCvar("sk_cacaohealthkit");
 	gSkillData.whiskeyHealth = GetSkillCvar("sk_whiskeyhealthkit");
 	gSkillData.EatHealthKit = GetSkillCvar("sk_Eathealthkit");
+	
+	//new Armor
+	gSkillData.ArmorBody = GetSkillCvar("sk_ArmorBody");
+	gSkillData.JacketArmor = GetSkillCvar("sk_JacketArmor");
+	gSkillData.ArmorHelmet = GetSkillCvar("sk_ArmorHelmet");
+	gSkillData.DowaHelmet = GetSkillCvar("sk_DowaHelmet");
 
 
 	// monster damage adj

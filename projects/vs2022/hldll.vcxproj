@@ -179,6 +179,8 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\dlls\$(TargetName).p
     <ClCompile Include="..\..\dlls\osprey.cpp" />
     <ClCompile Include="..\..\dlls\pathcorner.cpp" />
     <ClCompile Include="..\..\dlls\plane.cpp" />
+    <ClCompile Include="..\..\dlls\plasma.cpp" />
+    <ClCompile Include="..\..\dlls\plasmarifle.cpp" />
     <ClCompile Include="..\..\dlls\plats.cpp" />
     <ClCompile Include="..\..\dlls\player.cpp" />
     <ClCompile Include="..\..\dlls\python.cpp" />
@@ -219,10 +221,13 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\dlls\$(TargetName).p
     <ClCompile Include="..\..\pm_shared\pm_shared.c" />
     <ClCompile Include="BadBarney.cpp" />
     <ClCompile Include="BonusWhiskey.cpp" />
+    <ClCompile Include="Colt_Maria.cpp" />
     <ClCompile Include="DrinkMed.cpp" />
     <ClCompile Include="EeatHelthyKit.cpp" />
+    <ClCompile Include="EnergoGun.cpp" />
     <ClCompile Include="K43_Rifle.cpp" />
     <ClCompile Include="Knife.cpp" />
+    <ClCompile Include="teterev.cpp" />
     <ClCompile Include="MP44.cpp" />
     <ClCompile Include="ppsh_weapons.cpp" />
     <ClCompile Include="Sten.cpp" />
@@ -252,6 +257,8 @@ copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\dlls\$(TargetName).p
     <ClInclude Include="..\..\dlls\monsters.h" />
     <ClInclude Include="..\..\dlls\nodes.h" />
     <ClInclude Include="..\..\dlls\plane.h" />
+    <ClInclude Include="..\..\dlls\plasma.h" />
+    <ClInclude Include="..\..\dlls\plasmarifle_weapon.h" />
     <ClInclude Include="..\..\dlls\player.h" />
     <ClInclude Include="..\..\dlls\saverestore.h" />
     <ClInclude Include="..\..\dlls\schedule.h" />

@@ -99,8 +99,8 @@ int CVenom::GetItemInfo(ItemInfo* p)
 	p->pszAmmo2 = "ARgrenades";
 	p->iMaxAmmo2 = M203_GRENADE_MAX_CARRY;
 	p->iMaxClip = VENOM_MAX_CLIP;
-	p->iSlot = 3;
-	p->iPosition = 4;
+	p->iSlot = 4;
+	p->iPosition = 6;
 	p->iFlags = 0;
 	p->iId = m_iId = WEAPON_VENOM;
 	p->iWeight = VENOM_WEIGHT;

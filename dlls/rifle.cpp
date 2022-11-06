@@ -38,7 +38,7 @@ enum sniperrifle_e {
     SNIPERRIFLE_FIRE1,
     SNIPERRIFLE_FIRELASTROUND,
     SNIPERRIFLE_RELOAD,
-    SNIPERRIFLE_RELOAD2,
+    //SNIPERRIFLE_RELOAD2,
     SNIPERRIFLE_SLOWIDLEEMPTY,
     SNIPERRIFLE_HOLSTER,
 };
@@ -49,13 +49,13 @@ int CSniperrifle::GetItemInfo(ItemInfo* p)
 {
     p->pszName = STRING(pev->classname);
     p->pszAmmo1 = "k43";
-    p->iMaxAmmo1 = 120;
+    p->iMaxAmmo1 = 70;
     p->pszAmmo2 = NULL;
     p->iMaxAmmo2 = -1;
-    p->iMaxClip = 10;
+    p->iMaxClip = 5;
     p->iFlags = 0;
-    p->iSlot = 2;
-    p->iPosition = 3;
+    p->iSlot = 3;
+    p->iPosition = 5;
     p->iId = m_iId = WEAPON_SNIPERRIFLE;
     p->iWeight = SNIPERRIFLE_WEIGHT;
 
@@ -80,7 +80,7 @@ void CSniperrifle::Spawn()
     m_iId = WEAPON_SNIPERRIFLE;
     SET_MODEL(ENT(pev), "models/w_sniper.mdl");
 
-    m_iDefaultAmmo = SNIPERRIFLE_DEFAULT_GIVE;
+    m_iDefaultAmmo = 5;
 
     FallInit();// get ready to fall down.
 }
@@ -96,7 +96,7 @@ void CSniperrifle::Precache(void)
     PRECACHE_SOUND("items/9mmclip1.wav");
 
     PRECACHE_SOUND("weapons/sniper_miss.wav");
-    PRECACHE_SOUND("weapons/sniper_fire1.wav");
+    PRECACHE_SOUND("weapons/kar_shoot.wav");
     PRECACHE_SOUND("weapons/sniper_zoom.wav");
     
 
@@ -122,33 +122,33 @@ void CSniperrifle::Holster(int skiplocal /* = 0 */)
     SendWeaponAnim(SNIPERRIFLE_HOLSTER);
 }
 
-//void CSniperrifle::SecondaryAttack(void)
-//{
-//    if (m_pPlayer->pev->fov != 0)
-//    {
-//        m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 0; // 0 means reset to default fov
-//        m_fInZoom = 0;
-//#ifndef CLIENT_DLL
-//        UTIL_ScreenFade(m_pPlayer, Vector(0, 0, 0), 0.5, 0.25, 255, FFADE_IN);
-//#endif
-//        EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sniper_zoom.wav", RANDOM_FLOAT(0.95, 1.0), ATTN_NORM, 0, 93 + RANDOM_LONG(0, 0xF));
-//    }
-//    else if (m_pPlayer->pev->fov != 15)
-//    {
-//        m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 15;
-//        m_fInZoom = 1;
-//#ifndef CLIENT_DLL
-//        UTIL_ScreenFade(m_pPlayer, Vector(0, 0, 0), 0.5, 0.25, 255, FFADE_IN);
-//#endif
-//        EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sniper_zoom.wav", RANDOM_FLOAT(0.95, 1.0), ATTN_NORM, 0, 93 + RANDOM_LONG(0, 0xF));
-//    }
-//    pev->nextthink = UTIL_WeaponTimeBase() + 0.1;
-//    m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0;
-//}
+void CSniperrifle::SecondaryAttack(void)
+{
+    if (m_pPlayer->pev->fov != 0)
+    {
+        m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 0; // 0 means reset to default fov
+        m_fInZoom = 0;
+#ifndef CLIENT_DLL
+        UTIL_ScreenFade(m_pPlayer, Vector(0, 0, 0), 0.5, 0.25, 255, FFADE_IN);
+#endif
+        EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sniper_zoom.wav", RANDOM_FLOAT(0.95, 1.0), ATTN_NORM, 0, 93 + RANDOM_LONG(0, 0xF));
+    }
+    else if (m_pPlayer->pev->fov != 15)
+    {
+        m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 15;
+        m_fInZoom = 1;
+#ifndef CLIENT_DLL
+        UTIL_ScreenFade(m_pPlayer, Vector(0, 0, 0), 0.5, 0.25, 255, FFADE_IN);
+#endif
+        EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sniper_zoom.wav", RANDOM_FLOAT(0.95, 1.0), ATTN_NORM, 0, 93 + RANDOM_LONG(0, 0xF));
+    }
+    pev->nextthink = UTIL_WeaponTimeBase() + 0.1;
+    m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0;
+}
 
 void CSniperrifle::PrimaryAttack(void)
 {
-    Shoot(0.0001, 1.5, TRUE);
+    Shoot(0.0020, 1.5, TRUE);
 }
 
 void CSniperrifle::Shoot(float flSpread, float flCycleTime, BOOL fUseAutoAim)
@@ -210,7 +210,7 @@ void CSniperrifle::Shoot(float flSpread, float flCycleTime, BOOL fUseAutoAim)
         // HEV suit - indicate out of ammo condition
         m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 
-    m_flTimeWeaponIdle = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15);
+  //  m_flTimeWeaponIdle = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15);
 }
 
 void CSniperrifle::Reload(void)
@@ -229,10 +229,10 @@ void CSniperrifle::Reload(void)
         m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 0; // 0 means reset to default fov
     }
 
-    if (m_iClip == 0)
-        DefaultReload(10, SNIPERRIFLE_RELOAD, 3.9);
-    else
-        DefaultReload(10, SNIPERRIFLE_RELOAD2, 3.9);
+    /*if (m_iClip == 0)*/
+        DefaultReload(5, SNIPERRIFLE_RELOAD, 5.6);
+    //else
+    //    DefaultReload(5, SNIPERRIFLE_RELOAD2, 3);
 
 }
 
