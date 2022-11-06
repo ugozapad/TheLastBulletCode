@@ -128,7 +128,7 @@ void CSniperrifle::SecondaryAttack(void)
     if (m_pPlayer->pev->fov == 0)
     {
         m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 15; // 0 means reset to default fov
-        m_fInZoom = 0;
+        m_fInZoom = 1;
 #ifndef CLIENT_DLL
         UTIL_ScreenFade(m_pPlayer, Vector(0, 0, 0), 0.5, 0.25, 255, FFADE_IN);
 #endif
@@ -146,7 +146,7 @@ void CSniperrifle::SecondaryAttack(void)
     else if (m_pPlayer->pev->fov == 10)
     {
         m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 0;
-        m_fInZoom = 1;
+        m_fInZoom = 0;
 #ifndef CLIENT_DLL
         UTIL_ScreenFade(m_pPlayer, Vector(0, 0, 0), 0.5, 0.25, 255, FFADE_IN);
 #endif

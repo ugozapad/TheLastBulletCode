@@ -564,11 +564,7 @@ public:
 	void DrawQuad(float xmin, float ymin, float xmax, float ymax);
 	int m_iHudMode;
 private:
-	HSPRITE m_hBottom_Left;
-	HSPRITE m_hBottom_Right;
-	HSPRITE m_hTop_Left;
-	HSPRITE m_hTop_Right;
-	HSPRITE m_hBlack;
+	HSPRITE m_hScope;
 };
 
 class CHud

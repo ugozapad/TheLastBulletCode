@@ -45,11 +45,7 @@ int CHudZoom::Init()
 
 int CHudZoom::VidInit()
 {
-	m_hBottom_Left = SPR_Load("sprites/weapon_sniperrifle/sniper_bottom_left.spr");
-	m_hBottom_Right = SPR_Load("sprites/weapon_sniperrifle/sniper_bottom_right.spr");
-	m_hTop_Left = SPR_Load("sprites/weapon_sniperrifle/sniper_top_left.spr");
-	m_hTop_Right = SPR_Load("sprites/weapon_sniperrifle/sniper_top_right.spr");
-	m_hBlack = SPR_Load("sprites/weapon_sniperrifle/sniper_black.spr");
+	m_hScope = SPR_Load("sprites/scope_98k.spr");
 	m_iHudMode = 0;
 	return 1;
 }
@@ -63,7 +59,7 @@ int CHudZoom::MsgFunc_ZoomHUD(const char* pszName, int iSize, void* pbuf)
 
 int CHudZoom::Draw(float flTime)
 {
-	if (!IEngineStudio.IsHardware() || !m_hBottom_Left || !m_hBottom_Right || !m_hTop_Left || !m_hTop_Right) return 0;
+	if (!IEngineStudio.IsHardware() || !m_hScope) return 0;
 
 	if (!m_iHudMode) return 0;//draw scope
 
@@ -71,7 +67,7 @@ int CHudZoom::Draw(float flTime)
 	gEngfuncs.pTriAPI->Brightness(1.0);
 	gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
 	gEngfuncs.pTriAPI->CullFace(TRI_NONE);
-	float left = (ScreenWidth - ScreenHeight) / 2;
+	/*float left = (ScreenWidth - ScreenHeight) / 2;
 	float right = left + ScreenHeight;
 	float centerx = ScreenWidth / 2;
 	float centery = ScreenHeight / 2;
@@ -105,6 +101,26 @@ int CHudZoom::Draw(float flTime)
 	gEngfuncs.pTriAPI->SpriteTexture((struct model_s*)gEngfuncs.GetSpritePointer(m_hBlack), 0);
 	gEngfuncs.pTriAPI->Begin(TRI_QUADS);
 	DrawQuad((right - 1), 0, ScreenWidth, ScreenHeight);
+	gEngfuncs.pTriAPI->End();*/
+
+	gEngfuncs.pTriAPI->SpriteTexture((struct model_s*)gEngfuncs.GetSpritePointer(m_hScope), 0);
+	gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+	DrawQuad(0, 0, ScreenWidth / 2, ScreenHeight / 2);
+	gEngfuncs.pTriAPI->End();
+
+	gEngfuncs.pTriAPI->SpriteTexture((struct model_s*)gEngfuncs.GetSpritePointer(m_hScope), 1);
+	gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+	DrawQuad(ScreenWidth / 2, 0, ScreenWidth, ScreenHeight / 2);
+	gEngfuncs.pTriAPI->End();
+	
+	gEngfuncs.pTriAPI->SpriteTexture((struct model_s*)gEngfuncs.GetSpritePointer(m_hScope), 2);
+	gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+	DrawQuad(ScreenWidth / 2, ScreenHeight / 2, ScreenWidth , ScreenHeight );
+	gEngfuncs.pTriAPI->End();
+
+	gEngfuncs.pTriAPI->SpriteTexture((struct model_s*)gEngfuncs.GetSpritePointer(m_hScope), 3);
+	gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+	DrawQuad(0, ScreenHeight / 2, ScreenWidth / 2, ScreenHeight );
 	gEngfuncs.pTriAPI->End();
 
 	return 1;

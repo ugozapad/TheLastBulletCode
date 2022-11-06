@@ -541,6 +541,7 @@ void CHud :: VidInit( void )
 	m_AmmoSecondary.VidInit();
 	m_TextMessage.VidInit();
 	m_StatusIcons.VidInit();
+	m_Zoom.VidInit();
 	GetClientVoiceMgr()->VidInit();
 }
 
