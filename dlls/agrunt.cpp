@@ -77,6 +77,7 @@ public:
 	int  Classify ( void );
 	int  ISoundMask ( void );
 	void HandleAnimEvent( MonsterEvent_t *pEvent );
+	void Shoot(void);
 	void SetObjectCollisionBox( void )
 	{
 		pev->absmin = pev->origin + Vector( -32, -32, 0 );
@@ -121,6 +122,7 @@ public:
 	float	m_flNextSpeakTime;
 	float	m_flNextWordTime;
 	int		m_iLastWord;
+	int		m_iBrassShell;
 };
 LINK_ENTITY_TO_CLASS( monster_alien_grunt, CAGrunt );
 
@@ -151,9 +153,9 @@ const char *CAGrunt::pAttackMissSounds[] =
 
 const char *CAGrunt::pAttackSounds[] =
 {
-	"agrunt/ag_attack1.wav",
-	"agrunt/ag_attack2.wav",
-	"agrunt/ag_attack3.wav",
+	"agrunt/sgrunt_fire1.wav",
+	"agrunt/sgrunt_fire2.wav",
+	//"agrunt/sgrunt_fire3.wav",
 };
 
 const char *CAGrunt::pDieSounds[] =
@@ -165,27 +167,27 @@ const char *CAGrunt::pDieSounds[] =
 
 const char *CAGrunt::pPainSounds[] =
 {
-	"agrunt/ag_pain1.wav",
-	"agrunt/ag_pain2.wav",
-	"agrunt/ag_pain3.wav",
-	"agrunt/ag_pain4.wav",
-	"agrunt/ag_pain5.wav",
+	"agrunt/destroyYou.wav",
+	//"agrunt/ag_pain2.wav",
+	//"agrunt/ag_pain3.wav",
+	"agrunt/laughter.wav",
+	//"agrunt/Icrashyou.wav",
 };
 
 const char *CAGrunt::pIdleSounds[] =
 {
-	"agrunt/ag_idle1.wav",
-	"agrunt/ag_idle2.wav",
-	"agrunt/ag_idle3.wav",
-	"agrunt/ag_idle4.wav",
+	"agrunt/IamDeath.wav",
+	//"agrunt/IamSuperhuman.wav",
+	"agrunt/EatYourHeart.wav",
+	//"agrunt/IamDeath.wav",//IamDeath
 };
 
 const char *CAGrunt::pAlertSounds[] =
 {
-	"agrunt/ag_alert1.wav",
-	"agrunt/ag_alert3.wav",
-	"agrunt/ag_alert4.wav",
-	"agrunt/ag_alert5.wav",
+	//"agrunt/dontworry.wav",
+	//"agrunt/EatYourHeart.wav",
+	"agrunt/laughter.wav",
+	//"agrunt/strangeevolution.wav",
 };
 
 //=========================================================
@@ -249,9 +251,10 @@ void CAGrunt :: TraceAttack( entvars_t *pevAttacker, float flDamage, Vector vecD
 			MESSAGE_END();
 		}
 
-		flDamage -= 20;
-		if (flDamage <= 0)
-			flDamage = 0.1;// don't hurt the monster much, but allow bits_COND_LIGHT_DAMAGE to be generated
+		flDamage = 0.05;
+		//flDamage -= 20;
+		//if (flDamage <= 0)
+		//	flDamage = 0.1;// don't hurt the monster much, but allow bits_COND_LIGHT_DAMAGE to be generated
 	}
 	else
 	{
@@ -423,89 +426,33 @@ void CAGrunt :: HandleAnimEvent( MonsterEvent_t *pEvent )
 	case AGRUNT_AE_HORNET3:
 	case AGRUNT_AE_HORNET4:
 	case AGRUNT_AE_HORNET5:
-		{
-			// m_vecEnemyLKP should be center of enemy body
-			Vector vecArmPos, vecArmDir;
-			Vector vecDirToEnemy;
-			Vector angDir;
-
-			if (HasConditions( bits_COND_SEE_ENEMY))
-			{
-				vecDirToEnemy = ( ( m_vecEnemyLKP ) - pev->origin );
-				angDir = UTIL_VecToAngles( vecDirToEnemy );
-				vecDirToEnemy = vecDirToEnemy.Normalize();
-			}
-			else
-			{
-				angDir = pev->angles;
-				UTIL_MakeAimVectors( angDir );
-				vecDirToEnemy = gpGlobals->v_forward;
-			}
-
-			pev->effects = EF_MUZZLEFLASH;
-
-			// make angles +-180
-			if (angDir.x > 180)
-			{
-				angDir.x = angDir.x - 360;
-			}
-
-			SetBlending( 0, angDir.x );
-			GetAttachment( 0, vecArmPos, vecArmDir );
-
-			vecArmPos = vecArmPos + vecDirToEnemy * 32;
-			MESSAGE_BEGIN( MSG_PVS, SVC_TEMPENTITY, vecArmPos );
-				WRITE_BYTE( TE_SPRITE );
-				WRITE_COORD( vecArmPos.x );	// pos
-				WRITE_COORD( vecArmPos.y );	
-				WRITE_COORD( vecArmPos.z );	
-				WRITE_SHORT( iAgruntMuzzleFlash );		// model
-				WRITE_BYTE( 6 );				// size * 10
-				WRITE_BYTE( 128 );			// brightness
-			MESSAGE_END();
-
-			CBaseEntity *pHornet = CBaseEntity::Create( "hornet", vecArmPos, UTIL_VecToAngles( vecDirToEnemy ), edict() );
-			UTIL_MakeVectors ( pHornet->pev->angles );
-			pHornet->pev->velocity = gpGlobals->v_forward * 300;
-			
-			
-			
-			switch ( RANDOM_LONG ( 0 , 2 ) )
-			{
-				case 0:	EMIT_SOUND_DYN ( ENT(pev), CHAN_WEAPON, "agrunt/ag_fire1.wav", 1.0, ATTN_NORM, 0, 100 );	break;
-				case 1:	EMIT_SOUND_DYN ( ENT(pev), CHAN_WEAPON, "agrunt/ag_fire2.wav", 1.0, ATTN_NORM, 0, 100 );	break;
-				case 2:	EMIT_SOUND_DYN ( ENT(pev), CHAN_WEAPON, "agrunt/ag_fire3.wav", 1.0, ATTN_NORM, 0, 100 );	break;
-			}
-
-			CBaseMonster *pHornetMonster = pHornet->MyMonsterPointer();
-
-			if ( pHornetMonster )
-			{
-				pHornetMonster->m_hEnemy = m_hEnemy;
-			}
-		}
+		Shoot();
 		break;
 
 	case AGRUNT_AE_LEFT_FOOT:
+		UTIL_ScreenShake(pev->origin, 4.0, 3.0, 1.0, 750);
 		switch (RANDOM_LONG(0,1))
 		{
 		// left foot
 		case 0:	EMIT_SOUND_DYN ( ENT(pev), CHAN_BODY, "player/pl_ladder2.wav", 1, ATTN_NORM, 0, 70 );	break;
 		case 1:	EMIT_SOUND_DYN ( ENT(pev), CHAN_BODY, "player/pl_ladder4.wav", 1, ATTN_NORM, 0, 70 );	break;
+		UTIL_ScreenShake(pev->origin, 4.0, 3.0, 1.0, 750);
 		}
 		break;
 	case AGRUNT_AE_RIGHT_FOOT:
 		// right foot
+		UTIL_ScreenShake(pev->origin, 4.0, 3.0, 1.0, 750);
 		switch (RANDOM_LONG(0,1))
 		{
 		case 0:	EMIT_SOUND_DYN ( ENT(pev), CHAN_BODY, "player/pl_ladder1.wav", 1, ATTN_NORM, 0, 70 );	break;
 		case 1:	EMIT_SOUND_DYN ( ENT(pev), CHAN_BODY, "player/pl_ladder3.wav", 1, ATTN_NORM, 0 ,70);	break;
+			
 		}
 		break;
 
 	case AGRUNT_AE_LEFT_PUNCH:
 		{
-			CBaseEntity *pHurt = CheckTraceHullAttack( AGRUNT_MELEE_DIST, gSkillData.agruntDmgPunch, DMG_CLUB );
+			CBaseEntity *pHurt = CheckTraceHullAttack( AGRUNT_MELEE_DIST, gSkillData.agruntDmgPunch, DMG_CLUB ); //agrunt
 			
 			if ( pHurt )
 			{
@@ -530,6 +477,8 @@ void CAGrunt :: HandleAnimEvent( MonsterEvent_t *pEvent )
 				// Play a random attack miss sound
 				EMIT_SOUND_DYN ( ENT(pev), CHAN_WEAPON, pAttackMissSounds[ RANDOM_LONG(0,ARRAYSIZE(pAttackMissSounds)-1) ], 1.0, ATTN_NORM, 0, 100 + RANDOM_LONG(-5,5) );
 			}
+
+
 		}
 		break;
 
@@ -566,7 +515,37 @@ void CAGrunt :: HandleAnimEvent( MonsterEvent_t *pEvent )
 	default:
 		CSquadMonster::HandleAnimEvent( pEvent );
 		break;
+
+	
 	}
+}
+
+//================
+//agrunt shoot
+//================
+
+void CAGrunt::Shoot(void)
+{
+	if (m_hEnemy == NULL)
+	{
+		return;
+	}
+
+	Vector vecShootOrigin = GetGunPosition();
+	Vector vecShootDir = ShootAtEnemy(vecShootOrigin);
+
+	UTIL_MakeVectors(pev->angles);
+
+	Vector vecShellVelocity = gpGlobals->v_right * RANDOM_FLOAT(40, 90) + gpGlobals->v_up * RANDOM_FLOAT(75, 200) + gpGlobals->v_forward * RANDOM_FLOAT(-40, 40);
+	EjectBrass(vecShootOrigin - vecShootDir * 24, vecShellVelocity, pev->angles.y, m_iBrassShell, TE_BOUNCE_SHELL);
+	FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_10DEGREES, 2048, BULLET_MONSTER_MP5); // shoot +-5 degrees
+
+	pev->effects |= EF_MUZZLEFLASH;
+
+	m_cAmmoLoaded--;// take away a bullet!
+
+	Vector angDir = UTIL_VecToAngles(vecShootDir);
+	SetBlending(0, angDir.x);
 }
 
 //=========================================================
@@ -593,6 +572,7 @@ void CAGrunt :: Spawn()
 
 	m_flNextSpeakTime	= m_flNextWordTime = gpGlobals->time + 10 + RANDOM_LONG(0, 10);
 
+	m_iBrassShell = PRECACHE_MODEL("models/shell.mdl");// brass shell
 
 	MonsterInit();
 }
@@ -807,44 +787,44 @@ Schedule_t	slAGruntTakeCoverFromEnemy[] =
 	},
 };
 
-//=========================================================
-// Victory dance!
-//=========================================================
-Task_t	tlAGruntVictoryDance[] =
-{
-	{ TASK_STOP_MOVING,						(float)0					},
-	{ TASK_SET_FAIL_SCHEDULE,				(float)SCHED_AGRUNT_THREAT_DISPLAY	},
-	{ TASK_WAIT,							(float)0.2					},
-	{ TASK_AGRUNT_GET_PATH_TO_ENEMY_CORPSE,	(float)0					},
-	{ TASK_WALK_PATH,						(float)0					},
-	{ TASK_WAIT_FOR_MOVEMENT,				(float)0					},
-	{ TASK_FACE_ENEMY,						(float)0					},
-	{ TASK_PLAY_SEQUENCE,					(float)ACT_CROUCH			},
-	{ TASK_PLAY_SEQUENCE,					(float)ACT_VICTORY_DANCE	},
-	{ TASK_PLAY_SEQUENCE,					(float)ACT_VICTORY_DANCE	},
-	{ TASK_PLAY_SEQUENCE,					(float)ACT_STAND			},
-	{ TASK_PLAY_SEQUENCE,					(float)ACT_THREAT_DISPLAY	},
-	{ TASK_PLAY_SEQUENCE,					(float)ACT_CROUCH			},
-	{ TASK_PLAY_SEQUENCE,					(float)ACT_VICTORY_DANCE	},
-	{ TASK_PLAY_SEQUENCE,					(float)ACT_VICTORY_DANCE	},
-	{ TASK_PLAY_SEQUENCE,					(float)ACT_VICTORY_DANCE	},
-	{ TASK_PLAY_SEQUENCE,					(float)ACT_VICTORY_DANCE	},
-	{ TASK_PLAY_SEQUENCE,					(float)ACT_VICTORY_DANCE	},
-	{ TASK_PLAY_SEQUENCE,					(float)ACT_STAND			},
-};
-
-Schedule_t	slAGruntVictoryDance[] =
-{
-	{ 
-		tlAGruntVictoryDance,
-		ARRAYSIZE ( tlAGruntVictoryDance ), 
-		bits_COND_NEW_ENEMY		|
-		bits_COND_LIGHT_DAMAGE	|
-		bits_COND_HEAVY_DAMAGE,
-		0,
-		"AGruntVictoryDance"
-	},
-};
+////=========================================================
+//// Victory dance!//фрагмент победного поедания
+////=========================================================
+//Task_t	tlAGruntVictoryDance[] =
+//{
+//	{ TASK_STOP_MOVING,						(float)0					},
+//	{ TASK_SET_FAIL_SCHEDULE,				(float)SCHED_AGRUNT_THREAT_DISPLAY	},
+//	{ TASK_WAIT,							(float)0.2					},
+//	{ TASK_AGRUNT_GET_PATH_TO_ENEMY_CORPSE,	(float)0					},
+//	{ TASK_WALK_PATH,						(float)0					},
+//	{ TASK_WAIT_FOR_MOVEMENT,				(float)0					},
+//	{ TASK_FACE_ENEMY,						(float)0					},
+//	{ TASK_PLAY_SEQUENCE,					(float)ACT_CROUCH			},
+//	{ TASK_PLAY_SEQUENCE,					(float)ACT_VICTORY_DANCE	},
+//	{ TASK_PLAY_SEQUENCE,					(float)ACT_VICTORY_DANCE	},
+//	{ TASK_PLAY_SEQUENCE,					(float)ACT_STAND			},
+//	{ TASK_PLAY_SEQUENCE,					(float)ACT_THREAT_DISPLAY	},
+//	{ TASK_PLAY_SEQUENCE,					(float)ACT_CROUCH			},
+//	{ TASK_PLAY_SEQUENCE,					(float)ACT_VICTORY_DANCE	},
+//	{ TASK_PLAY_SEQUENCE,					(float)ACT_VICTORY_DANCE	},
+//	{ TASK_PLAY_SEQUENCE,					(float)ACT_VICTORY_DANCE	},
+//	{ TASK_PLAY_SEQUENCE,					(float)ACT_VICTORY_DANCE	},
+//	{ TASK_PLAY_SEQUENCE,					(float)ACT_VICTORY_DANCE	},
+//	{ TASK_PLAY_SEQUENCE,					(float)ACT_STAND			},
+//};
+//
+//Schedule_t	slAGruntVictoryDance[] =
+//{
+//	{ 
+//		tlAGruntVictoryDance,
+//		ARRAYSIZE ( tlAGruntVictoryDance ), 
+//		bits_COND_NEW_ENEMY		|
+//		bits_COND_LIGHT_DAMAGE	|
+//		bits_COND_HEAVY_DAMAGE,
+//		0,
+//		"AGruntVictoryDance"
+//	},
+//};
 
 //=========================================================
 //=========================================================
@@ -880,7 +860,7 @@ DEFINE_CUSTOM_SCHEDULES( CAGrunt )
 	slAGruntRangeAttack1,
 	slAGruntHiddenRangeAttack,
 	slAGruntTakeCoverFromEnemy,
-	slAGruntVictoryDance,
+	//slAGruntVictoryDance, //победная анимации поедания.
 	slAGruntThreatDisplay,
 };
 
@@ -1158,10 +1138,10 @@ Schedule_t* CAGrunt :: GetScheduleOfType ( int Type )
 	case SCHED_STANDOFF:
 		return &slAGruntStandoff[ 0 ];
 		break;
-
-	case SCHED_VICTORY_DANCE:
+		//это тоже часть победы
+	/*case SCHED_VICTORY_DANCE:
 		return &slAGruntVictoryDance[ 0 ];
-		break;
+		break;*/
 
 	case SCHED_FAIL:
 		// no fail schedule specified, so pick a good generic one.
@@ -1184,3 +1164,591 @@ Schedule_t* CAGrunt :: GetScheduleOfType ( int Type )
 	return CSquadMonster :: GetScheduleOfType( Type );
 }
 
+class CSGrunt : public CAGrunt
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	void Shoot(void);
+
+};
+
+LINK_ENTITY_TO_CLASS(monster_super_grunt, CSGrunt);
+
+//=========================================================
+// Spawn
+//=========================================================
+void CSGrunt::Spawn()
+{
+	Precache();
+
+	SET_MODEL(ENT(pev), "models/newNPC/sgrunt.mdl");
+	UTIL_SetSize(pev, Vector(-32, -32, 0), Vector(32, 32, 64));
+
+	pev->solid = SOLID_SLIDEBOX;
+	pev->movetype = MOVETYPE_STEP;
+	m_bloodColor = BLOOD_COLOR_GREEN;
+	pev->effects = 0;
+	pev->health = gSkillData.supergruntHealth;
+	m_flFieldOfView = 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
+	m_MonsterState = MONSTERSTATE_NONE;
+	m_afCapability = 0;
+	m_afCapability |= bits_CAP_SQUAD;
+
+	m_HackedGunPos = Vector(24, 64, 48);
+
+	m_flNextSpeakTime = m_flNextWordTime = gpGlobals->time + 10 + RANDOM_LONG(0, 10);
+
+	m_iBrassShell = PRECACHE_MODEL("models/shell.mdl");// brass shell
+
+	MonsterInit();
+}
+
+//=========================================================
+// Precache - precaches all resources this monster needs
+//=========================================================
+void CSGrunt::Precache()
+{
+	int i;
+
+	PRECACHE_MODEL("models/newNPC/sgrunt.mdl");
+
+	for (i = 0; i < ARRAYSIZE(pAttackHitSounds); i++)
+		PRECACHE_SOUND((char*)pAttackHitSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAttackMissSounds); i++)
+		PRECACHE_SOUND((char*)pAttackMissSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pIdleSounds); i++)
+		PRECACHE_SOUND((char*)pIdleSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pDieSounds); i++)
+		PRECACHE_SOUND((char*)pDieSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pPainSounds); i++)
+		PRECACHE_SOUND((char*)pPainSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAttackSounds); i++)
+		PRECACHE_SOUND((char*)pAttackSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAlertSounds); i++)
+		PRECACHE_SOUND((char*)pAlertSounds[i]);
+
+
+	PRECACHE_SOUND("hassault/hw_shoot1.wav");
+
+	iAgruntMuzzleFlash = PRECACHE_MODEL("sprites/muz4.spr");
+
+	UTIL_PrecacheOther("hornet");
+}
+
+void CSGrunt::Shoot(void)
+{
+	if (m_hEnemy == NULL)
+	{
+		return;
+	}
+
+	Vector vecShootOrigin = GetGunPosition();
+	Vector vecShootDir = ShootAtEnemy(vecShootOrigin);
+
+	UTIL_MakeVectors(pev->angles);
+
+	Vector vecShellVelocity = gpGlobals->v_right * RANDOM_FLOAT(40, 90) + gpGlobals->v_up * RANDOM_FLOAT(75, 200) + gpGlobals->v_forward * RANDOM_FLOAT(-40, 40);
+	EjectBrass(vecShootOrigin - vecShootDir * 24, vecShellVelocity, pev->angles.y, m_iBrassShell, TE_BOUNCE_SHELL);
+	FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_10DEGREES, 2048, BULLET_MONSTER_MP5); // shoot +-5 degrees
+
+	pev->effects |= EF_MUZZLEFLASH;
+
+	m_cAmmoLoaded--;// take away a bullet!
+
+	Vector angDir = UTIL_VecToAngles(vecShootDir);
+	SetBlending(0, angDir.x);
+}
+
+//Super_grunt_rocket_arm, вариант врага с ракетницей.
+class CSGruntRocket : public CAGrunt
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	void HandleAnimEvent(MonsterEvent_t* pEvent);
+	void Shoot(void);
+
+};
+
+LINK_ENTITY_TO_CLASS(monster_sgrunt_rocket, CSGruntRocket);
+
+//=========================================================
+// Spawn
+//=========================================================
+void CSGruntRocket::Spawn()
+{
+	Precache();
+
+	SET_MODEL(ENT(pev), "models/newNPC/sgruntrocket.mdl");
+	UTIL_SetSize(pev, Vector(-32, -32, 0), Vector(32, 32, 64));
+
+	pev->solid = SOLID_SLIDEBOX;
+	pev->movetype = MOVETYPE_STEP;
+	m_bloodColor = BLOOD_COLOR_GREEN;
+	pev->effects = 0;
+	pev->health = gSkillData.agruntHealth;
+	m_flFieldOfView = 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
+	m_MonsterState = MONSTERSTATE_NONE;
+	m_afCapability = 0;
+	m_afCapability |= bits_CAP_SQUAD;
+
+	m_HackedGunPos = Vector(24, 64, 48);
+
+	m_flNextSpeakTime = m_flNextWordTime = gpGlobals->time + 10 + RANDOM_LONG(0, 10);
+
+	m_iBrassShell = PRECACHE_MODEL("models/shell.mdl");// brass shell
+
+	MonsterInit();
+}
+
+//=========================================================
+// Precache - precaches all resources this monster needs
+//=========================================================
+void CSGruntRocket::Precache()
+{
+	int i;
+
+	PRECACHE_MODEL("models/newNPC/sgruntrocket.mdl");
+
+	for (i = 0; i < ARRAYSIZE(pAttackHitSounds); i++)
+		PRECACHE_SOUND((char*)pAttackHitSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAttackMissSounds); i++)
+		PRECACHE_SOUND((char*)pAttackMissSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pIdleSounds); i++)
+		PRECACHE_SOUND((char*)pIdleSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pDieSounds); i++)
+		PRECACHE_SOUND((char*)pDieSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pPainSounds); i++)
+		PRECACHE_SOUND((char*)pPainSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAttackSounds); i++)
+		PRECACHE_SOUND((char*)pAttackSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAlertSounds); i++)
+		PRECACHE_SOUND((char*)pAlertSounds[i]);
+
+
+	PRECACHE_SOUND("hassault/hw_shoot1.wav");
+
+	iAgruntMuzzleFlash = PRECACHE_MODEL("sprites/muz4.spr");
+
+	UTIL_PrecacheOther("rpg_rocket");
+}
+
+void CSGruntRocket::HandleAnimEvent(MonsterEvent_t* pEvent)
+
+{
+	switch (pEvent->event)
+	{
+	case AGRUNT_AE_HORNET1:
+	case AGRUNT_AE_HORNET2:
+	case AGRUNT_AE_HORNET3:
+	case AGRUNT_AE_HORNET4:
+	case AGRUNT_AE_HORNET5:
+	{
+		// m_vecEnemyLKP should be center of enemy body
+		Vector vecArmPos, vecArmDir;
+		Vector vecDirToEnemy;
+		Vector angDir;
+
+		if (HasConditions(bits_COND_SEE_ENEMY))
+		{
+			vecDirToEnemy = ((m_vecEnemyLKP)-pev->origin);
+			angDir = UTIL_VecToAngles(vecDirToEnemy);
+			vecDirToEnemy = vecDirToEnemy.Normalize();
+		}
+		else
+		{
+			angDir = pev->angles;
+			UTIL_MakeAimVectors(angDir);
+			vecDirToEnemy = gpGlobals->v_forward;
+		}
+
+		pev->effects = EF_MUZZLEFLASH;
+
+		// make angles +-180
+		if (angDir.x > 180)
+		{
+			angDir.x = angDir.x - 360;
+		}
+
+		SetBlending(0, angDir.x);
+		GetAttachment(0, vecArmPos, vecArmDir);
+
+		vecArmPos = vecArmPos + vecDirToEnemy * 32;
+		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecArmPos);
+		WRITE_BYTE(TE_SPRITE);
+		WRITE_COORD(vecArmPos.x);	// pos
+		WRITE_COORD(vecArmPos.y);
+		WRITE_COORD(vecArmPos.z);
+		WRITE_SHORT(iAgruntMuzzleFlash);		// model
+		WRITE_BYTE(6);				// size * 10
+		WRITE_BYTE(128);			// brightness
+		MESSAGE_END();
+
+		CBaseEntity* pHornet = CBaseEntity::Create("rpg_rocket", vecArmPos, UTIL_VecToAngles(vecDirToEnemy), edict());
+		UTIL_MakeVectors(vecDirToEnemy);
+		/*UTIL_MakeVectors(pHornet->pev->angles);*/
+		pHornet->pev->velocity = gpGlobals->v_forward * 300;
+		//
+		//CBaseEntity* pRocket = CBaseEntity::Create("hornet", vecArmPos, UTIL_VecToAngles(vecDirToEnemy), edict());
+
+		//UTIL_MakeVectors(pRocket->pev->v_angle);// RpgRocket::Create stomps on globals, so remake.
+		//pRocket->pev->velocity = gpGlobals->v_forward * 300;
+
+
+
+
+		switch (RANDOM_LONG(0, 2))
+		{
+		case 0:	EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "agrunt/ag_fire1.wav", 1.0, ATTN_NORM, 0, 100);	break;
+		case 1:	EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "agrunt/ag_fire2.wav", 1.0, ATTN_NORM, 0, 100);	break;
+		case 2:	EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "agrunt/ag_fire3.wav", 1.0, ATTN_NORM, 0, 100);	break;
+		}
+
+		CBaseMonster* pHornetMonster = pHornet->MyMonsterPointer();
+
+		if (pHornetMonster)
+		{
+			pHornetMonster->m_hEnemy = m_hEnemy;
+		}
+	}
+	break;
+
+	case AGRUNT_AE_LEFT_FOOT:
+		switch (RANDOM_LONG(0, 1))
+		{
+			// left foot
+		case 0:	EMIT_SOUND_DYN(ENT(pev), CHAN_BODY, "player/pl_ladder2.wav", 1, ATTN_NORM, 0, 70);	break;
+		case 1:	EMIT_SOUND_DYN(ENT(pev), CHAN_BODY, "player/pl_ladder4.wav", 1, ATTN_NORM, 0, 70);	break;
+		}
+		break;
+	case AGRUNT_AE_RIGHT_FOOT:
+		// right foot
+		switch (RANDOM_LONG(0, 1))
+		{
+		case 0:	EMIT_SOUND_DYN(ENT(pev), CHAN_BODY, "player/pl_ladder1.wav", 1, ATTN_NORM, 0, 70);	break;
+		case 1:	EMIT_SOUND_DYN(ENT(pev), CHAN_BODY, "player/pl_ladder3.wav", 1, ATTN_NORM, 0, 70);	break;
+		}
+		break;
+
+	case AGRUNT_AE_LEFT_PUNCH:
+	{
+		CBaseEntity* pHurt = CheckTraceHullAttack(AGRUNT_MELEE_DIST, gSkillData.agruntDmgPunch, DMG_CLUB);
+
+		if (pHurt)
+		{
+			pHurt->pev->punchangle.y = -25;
+			pHurt->pev->punchangle.x = 8;
+
+			// OK to use gpGlobals without calling MakeVectors, cause CheckTraceHullAttack called it above.
+			if (pHurt->IsPlayer())
+			{
+				// this is a player. Knock him around.
+				pHurt->pev->velocity = pHurt->pev->velocity + gpGlobals->v_right * 250;
+			}
+
+			EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, pAttackHitSounds[RANDOM_LONG(0, ARRAYSIZE(pAttackHitSounds) - 1)], 1.0, ATTN_NORM, 0, 100 + RANDOM_LONG(-5, 5));
+
+			Vector vecArmPos, vecArmAng;
+			GetAttachment(0, vecArmPos, vecArmAng);
+			SpawnBlood(vecArmPos, pHurt->BloodColor(), 25);// a little surface blood.
+		}
+		else
+		{
+			// Play a random attack miss sound
+			EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, pAttackMissSounds[RANDOM_LONG(0, ARRAYSIZE(pAttackMissSounds) - 1)], 1.0, ATTN_NORM, 0, 100 + RANDOM_LONG(-5, 5));
+		}
+	}
+	break;
+
+	case AGRUNT_AE_RIGHT_PUNCH:
+	{
+		CBaseEntity* pHurt = CheckTraceHullAttack(AGRUNT_MELEE_DIST, gSkillData.agruntDmgPunch, DMG_CLUB);
+
+		if (pHurt)
+		{
+			pHurt->pev->punchangle.y = 25;
+			pHurt->pev->punchangle.x = 8;
+
+			// OK to use gpGlobals without calling MakeVectors, cause CheckTraceHullAttack called it above.
+			if (pHurt->IsPlayer())
+			{
+				// this is a player. Knock him around.
+				pHurt->pev->velocity = pHurt->pev->velocity + gpGlobals->v_right * -250;
+			}
+
+			EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, pAttackHitSounds[RANDOM_LONG(0, ARRAYSIZE(pAttackHitSounds) - 1)], 1.0, ATTN_NORM, 0, 100 + RANDOM_LONG(-5, 5));
+
+			Vector vecArmPos, vecArmAng;
+			GetAttachment(0, vecArmPos, vecArmAng);
+			SpawnBlood(vecArmPos, pHurt->BloodColor(), 25);// a little surface blood.
+		}
+		else
+		{
+			// Play a random attack miss sound
+			EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, pAttackMissSounds[RANDOM_LONG(0, ARRAYSIZE(pAttackMissSounds) - 1)], 1.0, ATTN_NORM, 0, 100 + RANDOM_LONG(-5, 5));
+		}
+	}
+	break;
+
+	default:
+		CSquadMonster::HandleAnimEvent(pEvent);
+		break;
+	}
+}
+
+
+
+
+//================
+//agrunt shoot
+//================
+
+
+//void CSGruntRocket::Shoot(void)
+//{
+//	if (m_hEnemy == NULL)
+//	{
+//		return;
+//	}
+//
+//	Vector vecShootOrigin = GetGunPosition();
+//	Vector vecShootDir = ShootAtEnemy(vecShootOrigin);
+//
+//	UTIL_MakeVectors(pev->angles);
+//
+//	Vector vecShellVelocity = gpGlobals->v_right * RANDOM_FLOAT(40, 90) + gpGlobals->v_up * RANDOM_FLOAT(75, 200) + gpGlobals->v_forward * RANDOM_FLOAT(-40, 40);
+//	EjectBrass(vecShootOrigin - vecShootDir * 24, vecShellVelocity, pev->angles.y, m_iBrassShell, TE_BOUNCE_SHELL);
+//	FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_10DEGREES, 2048, BULLET_MONSTER_MP5); // shoot +-5 degrees
+//
+//	pev->effects |= EF_MUZZLEFLASH;
+//
+//	m_cAmmoLoaded--;// take away a bullet!
+//
+//	Vector angDir = UTIL_VecToAngles(vecShootDir);
+//	SetBlending(0, angDir.x);
+//
+//}
+
+
+//boss
+class CSGruntBoss : public CAGrunt
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	void HandleAnimEvent(MonsterEvent_t* pEvent);
+	void Shoot(void);
+
+
+};
+
+LINK_ENTITY_TO_CLASS(monster_sgrunt_boss, CSGruntBoss);
+
+//=========================================================
+// Spawn
+//=========================================================
+void CSGruntBoss::Spawn()
+{
+	Precache();
+
+	SET_MODEL(ENT(pev), "models/newNPC/sgruntAchilles.mdl");
+	UTIL_SetSize(pev, Vector(-32, -32, 0), Vector(32, 32, 64));
+
+	pev->solid = SOLID_SLIDEBOX;
+	pev->movetype = MOVETYPE_STEP;
+	m_bloodColor = BLOOD_COLOR_GREEN;
+	pev->effects = 0;
+	pev->health = gSkillData.bosssgruntHealth; //healty_boss
+	m_flFieldOfView = 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
+	m_MonsterState = MONSTERSTATE_NONE;
+	m_afCapability = 0;
+	m_afCapability |= bits_CAP_SQUAD;
+
+	m_HackedGunPos = Vector(24, 64, 48);
+
+	m_flNextSpeakTime = m_flNextWordTime = gpGlobals->time + 10 + RANDOM_LONG(0, 10);
+
+	m_iBrassShell = PRECACHE_MODEL("models/shell.mdl");// brass shell
+
+	MonsterInit();
+}
+
+//=========================================================
+// Precache - precaches all resources this monster needs
+//=========================================================
+void CSGruntBoss::Precache()
+{
+	int i;
+
+	PRECACHE_MODEL("models/newNPC/sgruntAchilles.mdl");
+
+	for (i = 0; i < ARRAYSIZE(pAttackHitSounds); i++)
+		PRECACHE_SOUND((char*)pAttackHitSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAttackMissSounds); i++)
+		PRECACHE_SOUND((char*)pAttackMissSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pIdleSounds); i++)
+		PRECACHE_SOUND((char*)pIdleSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pDieSounds); i++)
+		PRECACHE_SOUND((char*)pDieSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pPainSounds); i++)
+		PRECACHE_SOUND((char*)pPainSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAttackSounds); i++)
+		PRECACHE_SOUND((char*)pAttackSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAlertSounds); i++)
+		PRECACHE_SOUND((char*)pAlertSounds[i]);
+
+
+	PRECACHE_SOUND("weapons/sgrunt_fire.wav");
+
+	iAgruntMuzzleFlash = PRECACHE_MODEL("sprites/muz4.spr");
+
+	UTIL_PrecacheOther("hornet"); //а тут не надо было менять на патрошки пулемета венома(карнажа)
+}
+
+void CSGruntBoss::HandleAnimEvent(MonsterEvent_t* pEvent)
+{
+	switch (pEvent->event)
+	{
+	case AGRUNT_AE_HORNET1:
+	case AGRUNT_AE_HORNET2:
+	case AGRUNT_AE_HORNET3:
+	case AGRUNT_AE_HORNET4:
+	case AGRUNT_AE_HORNET5:
+		Shoot();
+		break;
+
+	case AGRUNT_AE_LEFT_FOOT:
+		UTIL_ScreenShake(pev->origin, 4.0, 3.0, 1.0, 750);
+		switch (RANDOM_LONG(0, 1))
+		{
+			// left foot
+		case 0:	EMIT_SOUND_DYN(ENT(pev), CHAN_BODY, "player/pl_ladder2.wav", 1, ATTN_NORM, 0, 70);	break;
+		case 1:	EMIT_SOUND_DYN(ENT(pev), CHAN_BODY, "player/pl_ladder4.wav", 1, ATTN_NORM, 0, 70);	break;
+			UTIL_ScreenShake(pev->origin, 4.0, 3.0, 1.0, 750);
+		}
+		break;
+	case AGRUNT_AE_RIGHT_FOOT:
+		// right foot
+		UTIL_ScreenShake(pev->origin, 4.0, 3.0, 1.0, 750);
+		switch (RANDOM_LONG(0, 1))
+		{
+		case 0:	EMIT_SOUND_DYN(ENT(pev), CHAN_BODY, "player/pl_ladder1.wav", 1, ATTN_NORM, 0, 70);	break;
+		case 1:	EMIT_SOUND_DYN(ENT(pev), CHAN_BODY, "player/pl_ladder3.wav", 1, ATTN_NORM, 0, 70);	break;
+
+		}
+		break;
+
+	case AGRUNT_AE_LEFT_PUNCH:
+	{
+		CBaseEntity* pHurt = CheckTraceHullAttack(AGRUNT_MELEE_DIST, gSkillData.agruntDmgPunch, DMG_CLUB); //agrunt
+
+		if (pHurt)
+		{
+			pHurt->pev->punchangle.y = -25;
+			pHurt->pev->punchangle.x = 8;
+
+			// OK to use gpGlobals without calling MakeVectors, cause CheckTraceHullAttack called it above.
+			if (pHurt->IsPlayer())
+			{
+				// this is a player. Knock him around.
+				pHurt->pev->velocity = pHurt->pev->velocity + gpGlobals->v_right * 450 + Vector(0, 0, 550);
+			}
+
+			EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, pAttackHitSounds[RANDOM_LONG(0, ARRAYSIZE(pAttackHitSounds) - 1)], 1.0, ATTN_NORM, 0, 100 + RANDOM_LONG(-5, 5));
+
+			Vector vecArmPos, vecArmAng;
+			GetAttachment(0, vecArmPos, vecArmAng);
+			SpawnBlood(vecArmPos, pHurt->BloodColor(), 25);// a little surface blood.
+		}
+		else
+		{
+			// Play a random attack miss sound
+			EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, pAttackMissSounds[RANDOM_LONG(0, ARRAYSIZE(pAttackMissSounds) - 1)], 1.0, ATTN_NORM, 0, 100 + RANDOM_LONG(-5, 5));
+		}
+
+
+	}
+	break;
+
+	case AGRUNT_AE_RIGHT_PUNCH:
+	{
+		CBaseEntity* pHurt = CheckTraceHullAttack(AGRUNT_MELEE_DIST, gSkillData.agruntDmgPunch, DMG_CLUB);
+
+		if (pHurt)
+		{
+			pHurt->pev->punchangle.y = 25;
+			pHurt->pev->punchangle.x = 8;
+
+			// OK to use gpGlobals without calling MakeVectors, cause CheckTraceHullAttack called it above.
+			if (pHurt->IsPlayer())
+			{
+				// this is a player. Knock him around.
+				pHurt->pev->velocity = pHurt->pev->velocity + gpGlobals->v_right * -450 + Vector(0, 0, 550);;
+			}
+
+			EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, pAttackHitSounds[RANDOM_LONG(0, ARRAYSIZE(pAttackHitSounds) - 1)], 1.0, ATTN_NORM, 0, 100 + RANDOM_LONG(-5, 5));
+
+			Vector vecArmPos, vecArmAng;
+			GetAttachment(0, vecArmPos, vecArmAng);
+			SpawnBlood(vecArmPos, pHurt->BloodColor(), 25);// a little surface blood.
+		}
+		else
+		{
+			// Play a random attack miss sound
+			EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, pAttackMissSounds[RANDOM_LONG(0, ARRAYSIZE(pAttackMissSounds) - 1)], 1.0, ATTN_NORM, 0, 100 + RANDOM_LONG(-5, 5));
+		}
+	}
+	break;
+
+	default:
+		CSquadMonster::HandleAnimEvent(pEvent);
+		break;
+
+
+	}
+}
+
+
+void CSGruntBoss::Shoot(void)
+{
+	if (m_hEnemy == NULL)
+	{
+		return;
+	}
+
+	Vector vecShootOrigin = GetGunPosition();
+	Vector vecShootDir = ShootAtEnemy(vecShootOrigin);
+
+	UTIL_MakeVectors(pev->angles);
+
+	Vector vecShellVelocity = gpGlobals->v_right * RANDOM_FLOAT(40, 90) + gpGlobals->v_up * RANDOM_FLOAT(75, 200) + gpGlobals->v_forward * RANDOM_FLOAT(-40, 40);
+	EjectBrass(vecShootOrigin - vecShootDir * 24, vecShellVelocity, pev->angles.y, m_iBrassShell, TE_BOUNCE_SHELL);
+	FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_10DEGREES, 2048, BULLET_MONSTER_MP5); // shoot +-5 degrees
+
+	pev->effects |= EF_MUZZLEFLASH;
+
+	m_cAmmoLoaded--;// take away a bullet!
+
+	Vector angDir = UTIL_VecToAngles(vecShootDir);
+	SetBlending(0, angDir.x);
+
+}

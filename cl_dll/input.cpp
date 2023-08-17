@@ -474,13 +474,25 @@ void IN_JumpDown (void)
 
 }
 void IN_JumpUp (void) {KeyUp(&in_jump);}
+//void IN_DuckDown(void)
+//{
+//	KeyDown(&in_duck);
+//	gHUD.m_Spectator.HandleButtonsDown( IN_DUCK );
+//
+//}
+//void IN_DuckUp(void) {KeyUp(&in_duck);}
+extern bool InDuck;
 void IN_DuckDown(void)
 {
-	KeyDown(&in_duck);
-	gHUD.m_Spectator.HandleButtonsDown( IN_DUCK );
-
+		InDuck = true;
+		KeyDown(&in_duck);
+		gHUD.m_Spectator.HandleButtonsDown(IN_DUCK);
 }
-void IN_DuckUp(void) {KeyUp(&in_duck);}
+void IN_DuckUp(void)
+{
+	InDuck = false;
+	KeyUp(&in_duck);
+}
 void IN_ReloadDown(void) {KeyDown(&in_reload);}
 void IN_ReloadUp(void) {KeyUp(&in_reload);}
 void IN_Alt1Down(void) {KeyDown(&in_alt1);}

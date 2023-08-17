@@ -30,6 +30,7 @@
 #include "soundent.h"
 #include "decals.h"
 #include "gamerules.h"
+#include "plasmarifle_weapon.h"
 
 extern CGraph	WorldGraph;
 extern int gEvilImpulse101;
@@ -46,6 +47,9 @@ DLL_GLOBAL	short	g_sModelIndexWExplosion;// holds the index for the underwater e
 DLL_GLOBAL	short	g_sModelIndexBubbles;// holds the index for the bubbles model
 DLL_GLOBAL	short	g_sModelIndexBloodDrop;// holds the sprite index for the initial blood
 DLL_GLOBAL	short	g_sModelIndexBloodSpray;// holds the sprite index for splattered blood
+DLL_GLOBAL short g_sModelIndexPlasma1; // holds the index for the plasma explosion 1
+DLL_GLOBAL short g_sModelIndexPlasma2; // holds the index for the plasma explosion 2
+DLL_GLOBAL short g_sModelIndexPlasma3; // holds the index for the plasma explosion 3
 
 ItemInfo CBasePlayerItem::ItemInfoArray[MAX_WEAPONS];
 AmmoInfo CBasePlayerItem::AmmoInfoArray[MAX_AMMO_SLOTS];
@@ -142,9 +146,37 @@ void AddMultiDamage( entvars_t *pevInflictor, CBaseEntity *pEntity, float flDama
 SpawnBlood
 ================
 */
+//void SpawnBlood(Vector vecSpot, int bloodColor, float flDamage)
+//{
+//	UTIL_BloodDrips( vecSpot, g_vecAttackDir, bloodColor, (int)flDamage );
+//}
+
 void SpawnBlood(Vector vecSpot, int bloodColor, float flDamage)
+
 {
-	UTIL_BloodDrips( vecSpot, g_vecAttackDir, bloodColor, (int)flDamage );
+	
+	UTIL_BloodDrips(vecSpot, g_vecAttackDir, bloodColor, (int)flDamage);
+	
+
+		
+		if (bloodColor == BLOOD_COLOR_RED)
+			
+		{
+			
+				UTIL_BloodStream(vecSpot, UTIL_RandomBloodVector(), 71, RANDOM_LONG(100, 250));
+			
+		}
+	
+		else
+			
+		{
+			
+				UTIL_BloodStream(vecSpot, UTIL_RandomBloodVector(), bloodColor, RANDOM_LONG(100, 250));
+			
+		}
+	
+
+		
 }
 
 
@@ -178,6 +210,9 @@ void DecalGunshot( TraceResult *pTrace, int iBulletType )
 		case BULLET_PLAYER_BUCKSHOT:
 		case BULLET_PLAYER_357:
 		case BULLET_PLAYER_MP44AMM:
+		case BULLET_PLAYER_K43:
+		case BULLET_PLAYER_PPSHAMMO:
+		case BULLET_PLAYER_TOMMYAMMO:
 		default:
 			// smoke and decal
 			UTIL_GunshotDecalTrace( pTrace, DamageDecal( pEntity, DMG_BULLET ) );
@@ -339,10 +374,29 @@ void W_Precache(void)
 	// sten_weapon
 	UTIL_PrecacheOtherWeapon("weapon_sten");
 
+	//“ут добавл€ете прекеш своего оружи€
+		// PPSH_weapon
+		UTIL_PrecacheOtherWeapon("weapon_ppsh");
+		//UTIL_PrecacheOther("ammo_ppsh");
+
+	//// “ут добавл€ете прекеш своего оружи€
+	//	// tompson_weapon
+		UTIL_PrecacheOtherWeapon("weapon_tommy");
+		//UTIL_PrecacheOther("ammo_tommy");
+
+		////colt_mariaov
+		UTIL_PrecacheOtherWeapon("weapon_maria");
+
+		////energo_gun
+		UTIL_PrecacheOtherWeapon("weapon_plasmarifle");
+		UTIL_PrecacheOther("ammo_plasmo");
+////teterev
+		UTIL_PrecacheOtherWeapon("weapon_teterev");
+		UTIL_PrecacheOther("ammo_pm");
 	// knife
 	UTIL_PrecacheOtherWeapon("weapon_knife");//ѕрикрепл€ем нож к игре
 
-	//mp44
+	//mp44/
 	//UTIL_PrecacheOtherWeapon("weapon_mp44");
 
 #if !defined( OEM_BUILD ) && !defined( HLDEMO_BUILD )
@@ -384,6 +438,10 @@ void W_Precache(void)
 	// mp44
 	UTIL_PrecacheOtherWeapon("weapon_mp44");
 	UTIL_PrecacheOther("ammo_mp44");
+
+	// rifle_k43
+	UTIL_PrecacheOtherWeapon("weapon_wrifle");
+	UTIL_PrecacheOther("ammo_wrifle");
 
 	// Venom
 	UTIL_PrecacheOtherWeapon("weapon_venom");
@@ -443,6 +501,16 @@ void W_Precache(void)
 	
 	PRECACHE_SOUND ("items/weapondrop1.wav");// weapon falls to the ground
 
+//звуки плазмы
+	// Used by plasma grenades.
+	PRECACHE_MODEL("models/plasmanull.mdl");
+	g_sModelIndexPlasma1 = PRECACHE_MODEL("sprites/plasmabomb.spr");
+	g_sModelIndexPlasma2 = PRECACHE_MODEL("sprites/plasmabomb.spr");
+	g_sModelIndexPlasma3 = PRECACHE_MODEL("sprites/tsplasma.spr");
+
+	PRECACHE_SOUND("weapons/plasmagun_exp.wav");//explosion aftermaths
+
+
 }
 
 
@@ -500,7 +568,7 @@ void CBasePlayerItem :: FallInit( void )
 	UTIL_SetOrigin( pev, pev->origin );
 	UTIL_SetSize(pev, Vector( 0, 0, 0), Vector(0, 0, 0) );//pointsize until it lands on the ground.
 	
-	SetTouch( &CBasePlayerItem::DefaultTouch );
+	SetTouch( &CBasePlayerItem::DefaultTouch ); //коментим чтоб юзабельность не была как обычно
 	SetThink( &CBasePlayerItem::FallThink );
 
 	pev->nextthink = gpGlobals->time + 0.1;
@@ -551,7 +619,7 @@ void CBasePlayerItem::Materialize( void )
 	pev->solid = SOLID_TRIGGER;
 
 	UTIL_SetOrigin( pev, pev->origin );// link into world.
-	SetTouch (&CBasePlayerItem::DefaultTouch);
+	SetTouch (&CBasePlayerItem::DefaultTouch); //коментим чтоб юзабельность не была как обычно
 	SetThink (NULL);
 
 }
@@ -589,6 +657,24 @@ void CBasePlayerItem :: CheckRespawn ( void )
 		break;
 	}
 }
+
+//строка на use итем(брон€ хилки, но еще там пару строк в самом item.cpp)
+//void CBasePlayerItem::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
+//{
+//	CBasePlayer* pPlayer = (CBasePlayer*)pActivator;
+//	if (!g_pGameRules->CanHavePlayerItem(pPlayer, this))
+//	{
+//		if (gEvilImpulse101)
+//			UTIL_Remove(this);
+//
+//		return;
+//	}
+//
+//	if (pPlayer->AddPlayerItem(this))
+//	{
+//		AttachToPlayer(pPlayer);
+//	}
+//}
 
 //=========================================================
 // Respawn- this item is already in the world, but it is
@@ -1087,6 +1173,24 @@ void CBasePlayerWeapon::Holster( int skiplocal /* = 0 */ )
 	m_pPlayer->pev->weaponmodel = 0;
 }
 
+//тыканье на ≈ пушки
+//void CBasePlayerWeapon::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
+//{
+//	CBasePlayer* pPlayer = (CBasePlayer*)pActivator;
+//	if (!g_pGameRules->CanHavePlayerItem(pPlayer, this))
+//	{
+//		if (gEvilImpulse101)
+//			UTIL_Remove(this);
+//
+//		return;
+//	}
+//
+//	if (pPlayer->AddPlayerItem(this))
+//	{
+//		AttachToPlayer(pPlayer);
+//	}
+//}
+
 void CBasePlayerAmmo::Spawn( void )
 {
 	pev->movetype = MOVETYPE_TOSS;
@@ -1096,6 +1200,17 @@ void CBasePlayerAmmo::Spawn( void )
 
 	SetTouch( &CBasePlayerAmmo::DefaultTouch );
 }
+//тыканье на ≈ патрохи
+//void CBasePlayerAmmo::Use(CBaseEntity* pActivator, CBaseEntity* pCaller,
+//	USE_TYPE useType, float value)
+//{
+//	if (AddAmmo(pActivator))
+//	{
+//		SetTouch(NULL);
+//		SetThink(&CBaseEntity::SUB_Remove);
+//		pev->nextthink = gpGlobals->time + 0.1;
+//	}
+//}
 
 CBaseEntity* CBasePlayerAmmo::Respawn( void )
 {
@@ -1120,7 +1235,7 @@ void CBasePlayerAmmo::Materialize( void )
 		pev->effects |= EF_MUZZLEFLASH;
 	}
 
-	SetTouch( &CBasePlayerAmmo::DefaultTouch );
+	SetTouch( &CBasePlayerAmmo::DefaultTouch ); //комментируем обычный подбор
 }
 
 void CBasePlayerAmmo :: DefaultTouch( CBaseEntity *pOther )
@@ -1151,6 +1266,8 @@ void CBasePlayerAmmo :: DefaultTouch( CBaseEntity *pOther )
 		pev->nextthink = gpGlobals->time + .1;
 	}
 }
+
+
 
 //=========================================================
 // called by the new item with the existing item as parameter
@@ -1637,4 +1754,10 @@ TYPEDESCRIPTION	CSatchel::m_SaveData[] =
 	DEFINE_FIELD( CSatchel, m_chargeReady, FIELD_INTEGER ),
 };
 IMPLEMENT_SAVERESTORE( CSatchel, CBasePlayerWeapon );
+
+TYPEDESCRIPTION CPlasmarifle::m_SaveData[] =
+{
+DEFINE_FIELD(CPlasmarifle, m_iPlasmaSprite, FIELD_INTEGER),
+};
+IMPLEMENT_SAVERESTORE(CPlasmarifle, CBasePlayerWeapon)
 

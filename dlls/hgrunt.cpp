@@ -286,7 +286,7 @@ void CHGrunt :: GibMonster ( void )
 		CBaseEntity *pGun;
 		if (FBitSet( pev->weapons, HGRUNT_SHOTGUN ))
 		{
-			pGun = DropItem( "weapon_crossbow", vecGunPos, vecGunAngles );
+			pGun = DropItem( "weapon_wrifle", vecGunPos, vecGunAngles );
 		}
 		else
 		{
@@ -631,9 +631,21 @@ void CHGrunt :: TraceAttack( entvars_t *pevAttacker, float flDamage, Vector vecD
 //=========================================================
 int CHGrunt :: TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType )
 {
+	if (bitsDamageType & (DMG_BULLET | DMG_BLAST))
+	{
+		Vector vecDir = pev->origin - (pevInflictor->absmin + pevInflictor->absmax) * 0.5;
+		vecDir = vecDir.Normalize();
+		float flForce = DamageForce(flDamage);
+		pev->velocity = pev->velocity + vecDir * flForce;
+	}
+
 	Forget( bits_MEMORY_INCOVER );
 
+
+
 	return CSquadMonster :: TakeDamage ( pevInflictor, pevAttacker, flDamage, bitsDamageType );
+
+
 }
 
 //=========================================================
@@ -808,6 +820,8 @@ void CHGrunt :: Shoot ( void )
 	SetBlending( 0, angDir.x );
 }
 
+
+
 //=========================================================
 // Shoot
 //=========================================================
@@ -859,7 +873,7 @@ void CHGrunt :: HandleAnimEvent( MonsterEvent_t *pEvent )
 			// now spawn a gun.
 			if (FBitSet( pev->weapons, HGRUNT_SHOTGUN ))
 			{
-				 DropItem( "weapon_crossbow", vecGunPos, vecGunAngles );
+				 DropItem( "weapon_wrifle", vecGunPos, vecGunAngles );
 			}
 			else
 			{
@@ -930,7 +944,7 @@ void CHGrunt :: HandleAnimEvent( MonsterEvent_t *pEvent )
 			{
 				crossbow( );
 
-				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/xbow_fire1.wav", 1, ATTN_NORM );
+				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/k43/k43_fire.wav", 1, ATTN_NORM );
 			}
 		
 			CSoundEnt::InsertSound ( bits_SOUND_COMBAT, pev->origin, 384, 0.3 );
@@ -2404,7 +2418,7 @@ void CHGruntRepel::Spawn( void )
 
 void CHGruntRepel::Precache( void )
 {
-	UTIL_PrecacheOther( "monster_human_grunt" );
+	UTIL_PrecacheOther( "monster_human_NazzMp44grunt" );
 	m_iSpriteTexture = PRECACHE_MODEL( "sprites/rope.spr" );
 }
 
@@ -2417,7 +2431,7 @@ void CHGruntRepel::RepelUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE
 		return NULL;
 	*/
 
-	CBaseEntity *pEntity = Create( "monster_human_grunt", pev->origin, pev->angles );
+	CBaseEntity *pEntity = Create( "monster_human_NazzMp44grunt", pev->origin, pev->angles );
 	CBaseMonster *pGrunt = pEntity->MyMonsterPointer( );
 	pGrunt->pev->movetype = MOVETYPE_FLY;
 	pGrunt->pev->velocity = Vector( 0, 0, RANDOM_FLOAT( -196, -128 ) );
@@ -2534,298 +2548,346 @@ void CDeadHGrunt :: Spawn( void )
 	MonsterInitDead();
 }
 
-////superAssHolledNazziMen
-
-class CSupGrunt : public CHGrunt
-{
-public:
-	void Spawn(void);
-	void Precache(void);
-	void Shoot(void);
-	void HandleAnimEvent(MonsterEvent_t *pEvent);
-};
+////superAssHolledNazziMen///Далее,этот супергрант будет переделан под пришельческих солдафонов,расы кхэрлэк.//
+//А альфа-солдат,может лучше вырезать либо еще чего. ////
+///начало кода супер-солдата///
 
 
+//class CSupGrunt : public CHGrunt
+//{
+//public:
+//	void Spawn(void);
+//	void Precache(void);
+//	void Shoot(void);
+//	void HandleAnimEvent(MonsterEvent_t *pEvent);
+//	void GibMonster(void);
+//};
+//
+//
+//
+/////
+/////бла бла бла спавн///
+/////
+//LINK_ENTITY_TO_CLASS(monster_human_supgrunt, CSupGrunt)
+//
+//void CSupGrunt::Spawn()
+//{
+//	Precache();
+//
+//	if (pev->model)
+//		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC 
+//	else
+//		SET_MODEL(ENT(pev), "models/newNpc/nazisupersoldier.mdl");
+//	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
+//
+//	pev->solid = SOLID_SLIDEBOX;
+//	pev->movetype = MOVETYPE_STEP;
+//	m_bloodColor = BLOOD_COLOR_RED;
+//	pev->effects = 0;
+//	if (!pev->health) pev->health = 100;
+//	m_flFieldOfView = 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
+//	m_MonsterState = MONSTERSTATE_NONE;
+//	m_flNextGrenadeCheck = gpGlobals->time + 1;
+//	m_flNextPainTime = gpGlobals->time;
+//	m_iSentence = HGRUNT_SENT_NONE;
+//
+//	m_afCapability = bits_CAP_SQUAD | bits_CAP_TURN_HEAD | bits_CAP_DOORS_GROUP;
+//
+//	m_fEnemyEluded = FALSE;
+//	m_fFirstEncounter = TRUE;// this is true when the grunt spawns, because he hasn't encountered an enemy yet.
+//
+//	m_HackedGunPos = Vector(0, 0, 55);
+//
+//	if (pev->weapons == 0)
+//	{
+//		// initialize to original values
+//		pev->weapons = HGRUNT_9MMAR | HGRUNT_HANDGRENADE;
+//		// pev->weapons = HGRUNT_SHOTGUN;
+//		// pev->weapons = HGRUNT_9MMAR | HGRUNT_GRENADELAUNCHER;
+//	}
+//
+//	if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
+//	{
+//		SetBodygroup(GUN_GROUP, GUN_SHOTGUN);
+//		m_cClipSize = 8;
+//	}
+//	else
+//	{
+//		m_cClipSize = GRUNT_CLIP_SIZE;
+//	}
+//	m_cAmmoLoaded = m_cClipSize;
+//
+//	if (RANDOM_LONG(0, 99) < 80)
+//		pev->skin = 0;	// light skin
+//	else
+//		pev->skin = 1;	// dark skin
+//
+//	if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
+//	{
+//		SetBodygroup(HEAD_GROUP, HEAD_SHOTGUN);
+//	}
+//	else if (FBitSet(pev->weapons, HGRUNT_GRENADELAUNCHER))
+//	{
+//		SetBodygroup(HEAD_GROUP, HEAD_M203);
+//		pev->skin = 1; // alway dark skin
+//	}
+//
+//	CTalkMonster::g_talkWaitTime = 0;
+//
+//	MonsterInit();
+//}
+//
+////=========================================================
+//// Precache - precaches all resources this monster needs
+////=========================================================
+//void CSupGrunt::Precache()
+//{
+//	if (pev->model)
+//		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC 
+//	else
+//		PRECACHE_MODEL("models/newNpc/nazisupersoldier.mdl");
+//
+//	PRECACHE_SOUND("hgrunt/gr_mgun1.wav");
+//	PRECACHE_SOUND("hgrunt/gr_mgun2.wav");
+//
+//	PRECACHE_SOUND("hgrunt/gr_die1.wav");
+//	PRECACHE_SOUND("hgrunt/gr_die2.wav");
+//	PRECACHE_SOUND("hgrunt/gr_die3.wav");
+//
+//	PRECACHE_SOUND("hgrunt/gr_pain1.wav");
+//	PRECACHE_SOUND("hgrunt/gr_pain2.wav");
+//	PRECACHE_SOUND("hgrunt/gr_pain3.wav");
+//	PRECACHE_SOUND("hgrunt/gr_pain4.wav");
+//	PRECACHE_SOUND("hgrunt/gr_pain5.wav");
+//
+//	PRECACHE_SOUND("hgrunt/gr_reload1.wav");
+//
+//	PRECACHE_SOUND("weapons/glauncher.wav");
+//
+//	PRECACHE_SOUND("weapons/sbarrel1.wav");
+//
+//	PRECACHE_SOUND("zombie/claw_miss2.wav");// because we use the basemonster SWIPE animation event
+//	UTIL_PrecacheOther("ammo_venomclip");
+//
+//	// get voice pitch
+//	if (RANDOM_LONG(0, 1))
+//		m_voicePitch = 109 + RANDOM_LONG(0, 7);
+//	else
+//		m_voicePitch = 100;
+//
+//	m_iBrassShell = PRECACHE_MODEL("models/shell.mdl");// brass shell
+//	m_iShotgunShell = PRECACHE_MODEL("models/shotgunshell.mdl");
+//}
+//
+////=========================================================
+//// Shoot
+////=========================================================
+//void CSupGrunt::Shoot(void)
+//{
+//	if (m_hEnemy == NULL)
+//	{
+//		return;
+//	}
+//
+//	Vector vecShootOrigin = GetGunPosition();
+//	Vector vecShootDir = ShootAtEnemy(vecShootOrigin);
+//
+//	UTIL_MakeVectors(pev->angles);
+//
+//	Vector	vecShellVelocity = gpGlobals->v_right * RANDOM_FLOAT(40, 90) + gpGlobals->v_up * RANDOM_FLOAT(75, 200) + gpGlobals->v_forward * RANDOM_FLOAT(-40, 40);
+//	EjectBrass(vecShootOrigin - vecShootDir * 24, vecShellVelocity, pev->angles.y, m_iBrassShell, TE_BOUNCE_SHELL);
+//	FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_10DEGREES, 2048, BULLET_PLAYER_338); // shoot +-5 degrees
+//
+//	pev->effects |= EF_MUZZLEFLASH;
+//
+//	m_cAmmoLoaded--;// take away a bullet!
+//
+//	Vector angDir = UTIL_VecToAngles(vecShootDir);
+//	SetBlending(0, angDir.x);
+//}
+//
+//
+//
+//void CSupGrunt::GibMonster(void)
+//{
+//	Vector	vecGunPos;
+//	Vector	vecGunAngles;
+//
+//	if (GetBodygroup(2) != 2)
+//	{// throw a gun if the grunt has one
+//		GetAttachment(0, vecGunPos, vecGunAngles);
+//
+//		CBaseEntity* pGun;
+//		if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
+//		{
+//			pGun = DropItem("weapon_sniperrifle", vecGunPos, vecGunAngles);
+//		}
+//		else
+//		{
+//			pGun = DropItem("weapon_venom", vecGunPos, vecGunAngles);
+//		}
+//		if (pGun)
+//		{
+//			pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
+//			pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
+//		}
+//
+//		if (FBitSet(pev->weapons, HGRUNT_GRENADELAUNCHER))
+//		{
+//			pGun = DropItem("ammo_ARgrenades", vecGunPos, vecGunAngles);
+//			if (pGun)
+//			{
+//				pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
+//				pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
+//			}
+//		}
+//	}
+//
+//	CBaseMonster::GibMonster();
+//}
+//
+//
+//
+/////weapon_venom
+//
+//void CSupGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
+//{
+//	Vector	vecShootDir;
+//	Vector	vecShootOrigin;
+//
+//	switch (pEvent->event)
+//	{
+//	case HGRUNT_AE_DROP_GUN:
+//	{
+//		Vector	vecGunPos;
+//		Vector	vecGunAngles;
+//
+//		GetAttachment(0, vecGunPos, vecGunAngles);
+//
+//		// switch to body group with no gun.
+//		SetBodygroup(GUN_GROUP, GUN_NONE);
+//
+//		// now spawn a gun.
+//		if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
+//		{
+//			DropItem("weapon_sniperrifle", vecGunPos, vecGunAngles);
+//		}
+//		else
+//		{
+//			DropItem("ammo_venomclip", vecGunPos, vecGunAngles);
+//		}
+//		
+//
+//	}
+//	break;
+//
+//	case HGRUNT_AE_RELOAD:
+//		EMIT_SOUND(ENT(pev), CHAN_WEAPON, "hgrunt/gr_reload1.wav", 1, ATTN_NORM);
+//		m_cAmmoLoaded = m_cClipSize;
+//		ClearConditions(bits_COND_NO_AMMO_LOADED);
+//		break;
+//
+//	case HGRUNT_AE_GREN_TOSS:
+//	{
+//		UTIL_MakeVectors(pev->angles);
+//		// CGrenade::ShootTimed( pev, pev->origin + gpGlobals->v_forward * 34 + Vector (0, 0, 32), m_vecTossVelocity, 3.5 );
+//		CGrenade::ShootTimed(pev, GetGunPosition(), m_vecTossVelocity, 3.5);
+//
+//		m_fThrowGrenade = FALSE;
+//		m_flNextGrenadeCheck = gpGlobals->time + 6;// wait six seconds before even looking again to see if a grenade can be thrown.
+//		// !!!LATER - when in a group, only try to throw grenade if ordered.
+//	}
+//	break;
+//
+//	case HGRUNT_AE_GREN_LAUNCH:
+//	{
+//		EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/glauncher.wav", 0.8, ATTN_NORM);
+//		CGrenade::ShootContact(pev, GetGunPosition(), m_vecTossVelocity);
+//		m_fThrowGrenade = FALSE;
+//		if (g_iSkillLevel == SKILL_HARD)
+//			m_flNextGrenadeCheck = gpGlobals->time + RANDOM_FLOAT(2, 5);// wait a random amount of time before shooting again
+//		else
+//			m_flNextGrenadeCheck = gpGlobals->time + 6;// wait six seconds before even looking again to see if a grenade can be thrown.
+//	}
+//	break;
+//
+//	case HGRUNT_AE_GREN_DROP:
+//	{
+//		UTIL_MakeVectors(pev->angles);
+//		CGrenade::ShootTimed(pev, pev->origin + gpGlobals->v_forward * 17 - gpGlobals->v_right * 27 + gpGlobals->v_up * 6, g_vecZero, 3);
+//	}
+//	break;
+//
+//	case HGRUNT_AE_BURST1:
+//	{
+//		if (FBitSet(pev->weapons, HGRUNT_9MMAR))
+//		{
+//			Shoot();
+//
+//			// the first round of the three round burst plays the sound and puts a sound in the world sound list.
+//			if (RANDOM_LONG(0, 1))
+//			{
+//				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/venom/hks1.wav", 1, ATTN_NORM);
+//			}
+//			else
+//			{
+//				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/venom/hks2.wav", 1, ATTN_NORM);
+//			}
+//		}
+//		else
+//		{
+//			crossbow();
+//
+//			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/k43/k43_fire", 1, ATTN_NORM);
+//		}
+//
+//		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, 384, 0.3);
+//	}
+//	break;
+//
+//	case HGRUNT_AE_BURST2:
+//	case HGRUNT_AE_BURST3:
+//		Shoot();
+//		break;
+//
+//	case HGRUNT_AE_KICK:
+//	{
+//		CBaseEntity *pHurt = Kick();
+//
+//		if (pHurt)
+//		{
+//			// SOUND HERE!
+//			UTIL_MakeVectors(pev->angles);
+//			pHurt->pev->punchangle.x = 15;
+//			pHurt->pev->velocity = pHurt->pev->velocity + gpGlobals->v_forward * 100 + gpGlobals->v_up * 50;
+//			pHurt->TakeDamage(pev, pev, gSkillData.hgruntDmgKick, DMG_CLUB);
+//		}
+//	}
+//	break;
+//
+//	case HGRUNT_AE_CAUGHT_ENEMY:
+//	{
+//		if (FOkToSpeak())
+//		{
+//			SENTENCEG_PlayRndSz(ENT(pev), "HG_ALERT", HGRUNT_SENTENCE_VOLUME, GRUNT_ATTN, 0, m_voicePitch);
+//			JustSpoke();
+//		}
+//
+//	}
+//
+//	default:
+//		CSquadMonster::HandleAnimEvent(pEvent);
+//		break;
+//	}
+//}
+//
+//////
+////конец кода супер-солдата
+/////
 
-///
-///бла бла бла спавн///
-///
-LINK_ENTITY_TO_CLASS(monster_human_supgrunt, CSupGrunt)
-
-void CSupGrunt::Spawn()
-{
-	Precache();
-
-	if (pev->model)
-		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC 
-	else
-		SET_MODEL(ENT(pev), "models/newNpc/nazisupersoldier.mdl");
-	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
-
-	pev->solid = SOLID_SLIDEBOX;
-	pev->movetype = MOVETYPE_STEP;
-	m_bloodColor = BLOOD_COLOR_RED;
-	pev->effects = 0;
-	if (!pev->health) pev->health = 100;
-	m_flFieldOfView = 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
-	m_MonsterState = MONSTERSTATE_NONE;
-	m_flNextGrenadeCheck = gpGlobals->time + 1;
-	m_flNextPainTime = gpGlobals->time;
-	m_iSentence = HGRUNT_SENT_NONE;
-
-	m_afCapability = bits_CAP_SQUAD | bits_CAP_TURN_HEAD | bits_CAP_DOORS_GROUP;
-
-	m_fEnemyEluded = FALSE;
-	m_fFirstEncounter = TRUE;// this is true when the grunt spawns, because he hasn't encountered an enemy yet.
-
-	m_HackedGunPos = Vector(0, 0, 55);
-
-	if (pev->weapons == 0)
-	{
-		// initialize to original values
-		pev->weapons = HGRUNT_9MMAR | HGRUNT_HANDGRENADE;
-		// pev->weapons = HGRUNT_SHOTGUN;
-		// pev->weapons = HGRUNT_9MMAR | HGRUNT_GRENADELAUNCHER;
-	}
-
-	if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
-	{
-		SetBodygroup(GUN_GROUP, GUN_SHOTGUN);
-		m_cClipSize = 8;
-	}
-	else
-	{
-		m_cClipSize = GRUNT_CLIP_SIZE;
-	}
-	m_cAmmoLoaded = m_cClipSize;
-
-	if (RANDOM_LONG(0, 99) < 80)
-		pev->skin = 0;	// light skin
-	else
-		pev->skin = 1;	// dark skin
-
-	if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
-	{
-		SetBodygroup(HEAD_GROUP, HEAD_SHOTGUN);
-	}
-	else if (FBitSet(pev->weapons, HGRUNT_GRENADELAUNCHER))
-	{
-		SetBodygroup(HEAD_GROUP, HEAD_M203);
-		pev->skin = 1; // alway dark skin
-	}
-
-	CTalkMonster::g_talkWaitTime = 0;
-
-	MonsterInit();
-}
-
-//=========================================================
-// Precache - precaches all resources this monster needs
-//=========================================================
-void CSupGrunt::Precache()
-{
-	if (pev->model)
-		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC 
-	else
-		PRECACHE_MODEL("models/newNpc/nazisupersoldier.mdl");
-
-	PRECACHE_SOUND("hgrunt/gr_mgun1.wav");
-	PRECACHE_SOUND("hgrunt/gr_mgun2.wav");
-
-	PRECACHE_SOUND("hgrunt/gr_die1.wav");
-	PRECACHE_SOUND("hgrunt/gr_die2.wav");
-	PRECACHE_SOUND("hgrunt/gr_die3.wav");
-
-	PRECACHE_SOUND("hgrunt/gr_pain1.wav");
-	PRECACHE_SOUND("hgrunt/gr_pain2.wav");
-	PRECACHE_SOUND("hgrunt/gr_pain3.wav");
-	PRECACHE_SOUND("hgrunt/gr_pain4.wav");
-	PRECACHE_SOUND("hgrunt/gr_pain5.wav");
-
-	PRECACHE_SOUND("hgrunt/gr_reload1.wav");
-
-	PRECACHE_SOUND("weapons/glauncher.wav");
-
-	PRECACHE_SOUND("weapons/sbarrel1.wav");
-
-	PRECACHE_SOUND("zombie/claw_miss2.wav");// because we use the basemonster SWIPE animation event
-
-	// get voice pitch
-	if (RANDOM_LONG(0, 1))
-		m_voicePitch = 109 + RANDOM_LONG(0, 7);
-	else
-		m_voicePitch = 100;
-
-	m_iBrassShell = PRECACHE_MODEL("models/shell.mdl");// brass shell
-	m_iShotgunShell = PRECACHE_MODEL("models/shotgunshell.mdl");
-}
-
-//=========================================================
-// Shoot
-//=========================================================
-void CSupGrunt::Shoot(void)
-{
-	if (m_hEnemy == NULL)
-	{
-		return;
-	}
-
-	Vector vecShootOrigin = GetGunPosition();
-	Vector vecShootDir = ShootAtEnemy(vecShootOrigin);
-
-	UTIL_MakeVectors(pev->angles);
-
-	Vector	vecShellVelocity = gpGlobals->v_right * RANDOM_FLOAT(40, 90) + gpGlobals->v_up * RANDOM_FLOAT(75, 200) + gpGlobals->v_forward * RANDOM_FLOAT(-40, 40);
-	EjectBrass(vecShootOrigin - vecShootDir * 24, vecShellVelocity, pev->angles.y, m_iBrassShell, TE_BOUNCE_SHELL);
-	FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_10DEGREES, 2048, BULLET_PLAYER_338); // shoot +-5 degrees
-
-	pev->effects |= EF_MUZZLEFLASH;
-
-	m_cAmmoLoaded--;// take away a bullet!
-
-	Vector angDir = UTIL_VecToAngles(vecShootDir);
-	SetBlending(0, angDir.x);
-}
-
-
-
-
-
-
-///weapon_venom
-
-void CSupGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
-{
-	Vector	vecShootDir;
-	Vector	vecShootOrigin;
-
-	switch (pEvent->event)
-	{
-	case HGRUNT_AE_DROP_GUN:
-	{
-		Vector	vecGunPos;
-		Vector	vecGunAngles;
-
-		GetAttachment(0, vecGunPos, vecGunAngles);
-
-		// switch to body group with no gun.
-		SetBodygroup(GUN_GROUP, GUN_NONE);
-
-		// now spawn a gun.
-		if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
-		{
-			DropItem("weapon_crossbow", vecGunPos, vecGunAngles);
-		}
-		else
-		{
-			DropItem("weapon_venom", vecGunPos, vecGunAngles);
-		}
-		
-
-	}
-	break;
-
-	case HGRUNT_AE_RELOAD:
-		EMIT_SOUND(ENT(pev), CHAN_WEAPON, "hgrunt/gr_reload1.wav", 1, ATTN_NORM);
-		m_cAmmoLoaded = m_cClipSize;
-		ClearConditions(bits_COND_NO_AMMO_LOADED);
-		break;
-
-	case HGRUNT_AE_GREN_TOSS:
-	{
-		UTIL_MakeVectors(pev->angles);
-		// CGrenade::ShootTimed( pev, pev->origin + gpGlobals->v_forward * 34 + Vector (0, 0, 32), m_vecTossVelocity, 3.5 );
-		CGrenade::ShootTimed(pev, GetGunPosition(), m_vecTossVelocity, 3.5);
-
-		m_fThrowGrenade = FALSE;
-		m_flNextGrenadeCheck = gpGlobals->time + 6;// wait six seconds before even looking again to see if a grenade can be thrown.
-		// !!!LATER - when in a group, only try to throw grenade if ordered.
-	}
-	break;
-
-	case HGRUNT_AE_GREN_LAUNCH:
-	{
-		EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/glauncher.wav", 0.8, ATTN_NORM);
-		CGrenade::ShootContact(pev, GetGunPosition(), m_vecTossVelocity);
-		m_fThrowGrenade = FALSE;
-		if (g_iSkillLevel == SKILL_HARD)
-			m_flNextGrenadeCheck = gpGlobals->time + RANDOM_FLOAT(2, 5);// wait a random amount of time before shooting again
-		else
-			m_flNextGrenadeCheck = gpGlobals->time + 6;// wait six seconds before even looking again to see if a grenade can be thrown.
-	}
-	break;
-
-	case HGRUNT_AE_GREN_DROP:
-	{
-		UTIL_MakeVectors(pev->angles);
-		CGrenade::ShootTimed(pev, pev->origin + gpGlobals->v_forward * 17 - gpGlobals->v_right * 27 + gpGlobals->v_up * 6, g_vecZero, 3);
-	}
-	break;
-
-	case HGRUNT_AE_BURST1:
-	{
-		if (FBitSet(pev->weapons, HGRUNT_9MMAR))
-		{
-			Shoot();
-
-			// the first round of the three round burst plays the sound and puts a sound in the world sound list.
-			if (RANDOM_LONG(0, 1))
-			{
-				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/venom/hks1.wav", 1, ATTN_NORM);
-			}
-			else
-			{
-				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/venom/hks2.wav", 1, ATTN_NORM);
-			}
-		}
-		else
-		{
-			crossbow();
-
-			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/xbow_fire1.wav", 1, ATTN_NORM);
-		}
-
-		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, 384, 0.3);
-	}
-	break;
-
-	case HGRUNT_AE_BURST2:
-	case HGRUNT_AE_BURST3:
-		Shoot();
-		break;
-
-	case HGRUNT_AE_KICK:
-	{
-		CBaseEntity *pHurt = Kick();
-
-		if (pHurt)
-		{
-			// SOUND HERE!
-			UTIL_MakeVectors(pev->angles);
-			pHurt->pev->punchangle.x = 15;
-			pHurt->pev->velocity = pHurt->pev->velocity + gpGlobals->v_forward * 100 + gpGlobals->v_up * 50;
-			pHurt->TakeDamage(pev, pev, gSkillData.hgruntDmgKick, DMG_CLUB);
-		}
-	}
-	break;
-
-	case HGRUNT_AE_CAUGHT_ENEMY:
-	{
-		if (FOkToSpeak())
-		{
-			SENTENCEG_PlayRndSz(ENT(pev), "HG_ALERT", HGRUNT_SENTENCE_VOLUME, GRUNT_ATTN, 0, m_voicePitch);
-			JustSpoke();
-		}
-
-	}
-
-	default:
-		CSquadMonster::HandleAnimEvent(pEvent);
-		break;
-	}
-}
 
 ///Bio_nazz_grunt
+///начало био-солдата(в гробу я видал переделки. похер вообще. будет н биосолдатаом в коде,но пришельцем в хаммере.
 
 
 
@@ -2836,14 +2898,101 @@ public:
 	void Precache(void);
 	void Shoot(void);
 	void HandleAnimEvent(MonsterEvent_t *pEvent);
+	void GibMonster(void);
+	void IdleSound(void);
+	Schedule_t* GetSchedule(void);
+	static const char* pBioGruntSentences[];
+	void PainSound(void);
+	BOOL FOkToSpeak(void);
+	void JustSpoke(void);
+	void PrescheduleThink(void);
+	void SpeakSentence( void );
+	void StartTask(Task_t* pTask);
+	
+	
 };
 
+const char* CBioGrunt::pBioGruntSentences[] =
+{
+	"SP_GREN", // grenade scared grunt
+	"SP_ALERT", // sees player
+	"SP_MONSTER", // sees monster
+	"SP_COVER", // running to cover
+	"SP_THROW", // about to throw grenade
+	"SP_CHARGE",  // running out to get the enemy
+	"SP_TAUNT", // say rude things
+};
 
+void CBioGrunt::SpeakSentence(void)
+{
+	if (m_iSentence == HGRUNT_SENT_NONE)
+	{
+		// no sentence cued up.
+		return;
+	}
+
+	if (FOkToSpeak())
+	{
+		SENTENCEG_PlayRndSz(ENT(pev), pBioGruntSentences[m_iSentence], HGRUNT_SENTENCE_VOLUME, GRUNT_ATTN, 0, m_voicePitch);
+		JustSpoke();
+	}
+}
+
+//=========================================================
+// start task
+//=========================================================
+void CBioGrunt::StartTask(Task_t* pTask)
+{
+	m_iTaskStatus = TASKSTATUS_RUNNING;
+
+	switch (pTask->iTask)
+	{
+	case TASK_GRUNT_CHECK_FIRE:
+		if (!NoFriendlyFire())
+		{
+			SetConditions(bits_COND_GRUNT_NOFIRE);
+		}
+		TaskComplete();
+		break;
+
+	case TASK_GRUNT_SPEAK_SENTENCE:
+		SpeakSentence();
+		TaskComplete();
+		break;
+
+	case TASK_WALK_PATH:
+	case TASK_RUN_PATH:
+		// grunt no longer assumes he is covered if he moves
+		Forget(bits_MEMORY_INCOVER);
+		CSquadMonster::StartTask(pTask);
+		break;
+
+	case TASK_RELOAD:
+		m_IdealActivity = ACT_RELOAD;
+		break;
+
+	case TASK_GRUNT_FACE_TOSS_DIR:
+		break;
+
+	case TASK_FACE_IDEAL:
+	case TASK_FACE_ENEMY:
+		CSquadMonster::StartTask(pTask);
+		if (pev->movetype == MOVETYPE_FLY)
+		{
+			m_IdealActivity = ACT_GLIDE;
+		}
+		break;
+
+	default:
+		CSquadMonster::StartTask(pTask);
+		break;
+	}
+}
 
 ///
 ///био-нацист спавн///
 ///
-LINK_ENTITY_TO_CLASS(monster_human_biogrunt, CBioGrunt)
+LINK_ENTITY_TO_CLASS(monster_space_aliengrunt, CBioGrunt)
 
 void CBioGrunt::Spawn()
 {
@@ -2852,7 +3001,7 @@ void CBioGrunt::Spawn()
 	if (pev->model)
 		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC 
 	else
-		SET_MODEL(ENT(pev), "models/newNpc/bionazi.mdl");
+		SET_MODEL(ENT(pev), "models/newNpc/spaceagrunt.mdl");
 	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
 
 	pev->solid = SOLID_SLIDEBOX;
@@ -2912,6 +3061,10 @@ void CBioGrunt::Spawn()
 	MonsterInit();
 }
 
+
+
+
+
 //=========================================================
 // Precache - precaches all resources this monster needs
 //=========================================================
@@ -2920,28 +3073,29 @@ void CBioGrunt::Precache()
 	if (pev->model)
 		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC 
 	else
-		PRECACHE_MODEL("models/newNpc/bionazi.mdl");
-
-	PRECACHE_SOUND("hgrunt/gr_mgun1.wav");
-	PRECACHE_SOUND("hgrunt/gr_mgun2.wav");
+		PRECACHE_MODEL("models/newNpc/spaceagrunt.mdl");
+	PRECACHE_SOUND("weapons/railgun.wav");//railgun//hgrunt/gr_mgun1.wav
+	PRECACHE_SOUND("weapons/railgun.wav");
 
 	PRECACHE_SOUND("hgrunt/gr_die1.wav");
 	PRECACHE_SOUND("hgrunt/gr_die2.wav");
 	PRECACHE_SOUND("hgrunt/gr_die3.wav");
 
-	PRECACHE_SOUND("hgrunt/gr_pain1.wav");
-	PRECACHE_SOUND("hgrunt/gr_pain2.wav");
-	PRECACHE_SOUND("hgrunt/gr_pain3.wav");
-	PRECACHE_SOUND("hgrunt/gr_pain4.wav");
-	PRECACHE_SOUND("hgrunt/gr_pain5.wav");
+	PRECACHE_SOUND("spgrunt/gr_pain1.wav");
+	PRECACHE_SOUND("spgrunt/gr_pain2.wav");
+	PRECACHE_SOUND("spgrunt/gr_pain3.wav");
+	PRECACHE_SOUND("spgrunt/gr_pain4.wav");
+	PRECACHE_SOUND("spgrunt/gr_pain5.wav");
 
 	PRECACHE_SOUND("hgrunt/gr_reload1.wav");
 
 	PRECACHE_SOUND("weapons/glauncher.wav");
 
 	PRECACHE_SOUND("weapons/sbarrel1.wav");
+	PRECACHE_SOUND("weapons/mp44/mp44_shoot.wav");
 
 	PRECACHE_SOUND("zombie/claw_miss2.wav");// because we use the basemonster SWIPE animation event
+	UTIL_PrecacheOther("controller_energy_ball");
 
 	// get voice pitch
 	if (RANDOM_LONG(0, 1))
@@ -2949,8 +3103,9 @@ void CBioGrunt::Precache()
 	else
 		m_voicePitch = 100;
 
-	m_iBrassShell = PRECACHE_MODEL("models/shell.mdl");// brass shell
+	m_iBrassShell = PRECACHE_MODEL("models/shell.mdl");// brass shell//123
 	m_iShotgunShell = PRECACHE_MODEL("models/shotgunshell.mdl");
+	UTIL_PrecacheOther ("item_healthkit");
 }
 
 //=========================================================
@@ -2970,7 +3125,7 @@ void CBioGrunt::Shoot(void)
 
 	Vector	vecShellVelocity = gpGlobals->v_right * RANDOM_FLOAT(40, 90) + gpGlobals->v_up * RANDOM_FLOAT(75, 200) + gpGlobals->v_forward * RANDOM_FLOAT(-40, 40);
 	EjectBrass(vecShootOrigin - vecShootDir * 24, vecShellVelocity, pev->angles.y, m_iBrassShell, TE_BOUNCE_SHELL);
-	FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_10DEGREES, 2048, BULLET_PLAYER_MP44AMM); // shoot +-5 degrees
+	FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_10DEGREES, 2048, BULLET_MONSTER_MP5); // shoot +-5 degrees
 
 	pev->effects |= EF_MUZZLEFLASH;
 
@@ -2978,11 +3133,90 @@ void CBioGrunt::Shoot(void)
 
 	Vector angDir = UTIL_VecToAngles(vecShootDir);
 	SetBlending(0, angDir.x);
+
+	CSprite* pMuzzleFlash = CSprite::SpriteCreate("sprites/muzzle_shock.spr", pev->origin, TRUE);
+	if (pMuzzleFlash)
+	{
+		pMuzzleFlash->SetAttachment(edict(), 1);
+		pMuzzleFlash->pev->scale = 0.5;
+		pMuzzleFlash->pev->rendermode = kRenderTransAdd;
+		pMuzzleFlash->pev->renderamt = 255;
+		pMuzzleFlash->AnimateAndDie(25);
+	}
+
+
 }
 
 
 
-///weapon_mp44_bio-grunt(его оружие  в руках)
+
+
+//{
+//	if (m_hEnemy == NULL)
+//	{
+//		return;
+//	}
+//
+//	Vector vecShootOrigin = GetGunPosition();
+//	Vector vecShootDir = ShootAtEnemy(vecShootOrigin);
+//
+//	UTIL_MakeVectors(pev->angles);
+//
+//	Vector	vecShellVelocity = gpGlobals->v_right * RANDOM_FLOAT(40, 90) + gpGlobals->v_up * RANDOM_FLOAT(75, 200) + gpGlobals->v_forward * RANDOM_FLOAT(-40, 40);
+//	EjectBrass(vecShootOrigin - vecShootDir * 24, vecShellVelocity, pev->angles.y, m_iBrassShell, TE_BOUNCE_SHELL);
+//	CBaseMonster* pBall = (CBaseMonster*)Create("controller_energy_ball", vecShootOrigin, pev->angles, edict());
+//	pBall->pev->velocity = vecShootDir * 150;
+//	
+//	//FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_10DEGREES, 2048, BULLET_PLAYER_MP44AMM); // shoot +-5 degrees
+//
+//	pev->effects |= EF_MUZZLEFLASH;
+//
+//	m_cAmmoLoaded--;// take away a bullet!
+//
+//	Vector angDir = UTIL_VecToAngles(vecShootDir);
+//	SetBlending(0, angDir.x);
+//}
+
+void CBioGrunt::GibMonster(void)
+{
+	Vector	vecGunPos;
+	Vector	vecGunAngles;
+
+	if (GetBodygroup(2) != 2)
+	{// throw a gun if the grunt has one
+		GetAttachment(0, vecGunPos, vecGunAngles);
+
+		CBaseEntity* pGun;
+		if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
+		{
+			pGun = DropItem("weapon_sniperrifle", vecGunPos, vecGunAngles);
+		}
+		else
+		{
+			pGun = DropItem("item_healthkit", vecGunPos, vecGunAngles);
+		}
+		if (pGun)
+		{
+			pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
+			pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
+		}
+
+		if (FBitSet(pev->weapons, HGRUNT_GRENADELAUNCHER))
+		{
+			pGun = DropItem("ammo_ARgrenades", vecGunPos, vecGunAngles);
+			if (pGun)
+			{
+				pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
+				pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
+			}
+		}
+	}
+
+	CBaseMonster::GibMonster();
+}
+
+
+///bio-grunt(его оружие  в руках)
 
 void CBioGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 {
@@ -3004,13 +3238,13 @@ void CBioGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 		// now spawn a gun.
 		if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
 		{
-			DropItem("weapon_crossbow", vecGunPos, vecGunAngles);
+			DropItem("weapon_sniperrifle", vecGunPos, vecGunAngles);
 		}
+		
 		else
 		{
-			DropItem("weapon_mp44", vecGunPos, vecGunAngles);
+			DropItem("item_healthkit", vecGunPos, vecGunAngles);
 		}
-
 
 	}
 	break;
@@ -3061,18 +3295,18 @@ void CBioGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 			// the first round of the three round burst plays the sound and puts a sound in the world sound list.
 			if (RANDOM_LONG(0, 1))
 			{
-				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/venom/hks1.wav", 1, ATTN_NORM);
+				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/railgun.wav", 1, ATTN_NORM);
 			}
 			else
 			{
-				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/venom/hks2.wav", 1, ATTN_NORM);
+				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/railgun.wav", 1, ATTN_NORM);
 			}
 		}
 		else
 		{
 			crossbow();
 
-			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/xbow_fire1.wav", 1, ATTN_NORM);
+			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/k43/k43_fire.wav", 1, ATTN_NORM);
 		}
 
 		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, 384, 0.3);
@@ -3103,7 +3337,7 @@ void CBioGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 	{
 		if (FOkToSpeak())
 		{
-			SENTENCEG_PlayRndSz(ENT(pev), "HG_ALERT", HGRUNT_SENTENCE_VOLUME, GRUNT_ATTN, 0, m_voicePitch);
+			SENTENCEG_PlayRndSz(ENT(pev), "SP_ALERT", HGRUNT_SENTENCE_VOLUME, GRUNT_ATTN, 0, m_voicePitch);
 			JustSpoke();
 		}
 
@@ -3115,9 +3349,399 @@ void CBioGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 	}
 }
 
+void CBioGrunt::IdleSound(void)
+{
+	if (FOkToSpeak() && (g_fGruntQuestion || RANDOM_LONG(0, 1)))
+	{
+		if (!g_fGruntQuestion)
+		{
+			// ask question or make statement
+			switch (RANDOM_LONG(0, 2))
+			{
+			case 0: // check in
+				SENTENCEG_PlayRndSz(ENT(pev), "SP_CHECK", HGRUNT_SENTENCE_VOLUME, ATTN_NORM, 0, m_voicePitch);
+				g_fGruntQuestion = 1;
+				break;
+			case 1: // question
+				SENTENCEG_PlayRndSz(ENT(pev), "SP_QUEST", HGRUNT_SENTENCE_VOLUME, ATTN_NORM, 0, m_voicePitch);
+				g_fGruntQuestion = 2;
+				break;
+			case 2: // statement
+				SENTENCEG_PlayRndSz(ENT(pev), "SP_IDLE", HGRUNT_SENTENCE_VOLUME, ATTN_NORM, 0, m_voicePitch);
+				break;
+			}
+		}
+		else
+		{
+			switch (g_fGruntQuestion)
+			{
+			case 1: // check in
+				SENTENCEG_PlayRndSz(ENT(pev), "SP_CLEAR", HGRUNT_SENTENCE_VOLUME, ATTN_NORM, 0, m_voicePitch);
+				break;
+			case 2: // question 
+				SENTENCEG_PlayRndSz(ENT(pev), "SP_ANSWER", HGRUNT_SENTENCE_VOLUME, ATTN_NORM, 0, m_voicePitch);
+				break;
+			}
+			g_fGruntQuestion = 0;
+		}
+		JustSpoke();
+	}
+}
+
+
+//=========================================================
+// Get Schedule!
+//=========================================================
+Schedule_t* CBioGrunt::GetSchedule(void)
+{
+
+	// clear old sentence
+	m_iSentence = HGRUNT_SENT_NONE;
+
+	// flying? If PRONE, barnacle has me. IF not, it's assumed I am rapelling. 
+	if (pev->movetype == MOVETYPE_FLY && m_MonsterState != MONSTERSTATE_PRONE)
+	{
+		if (pev->flags & FL_ONGROUND)
+		{
+			// just landed
+			pev->movetype = MOVETYPE_STEP;
+			return GetScheduleOfType(SCHED_GRUNT_REPEL_LAND);
+		}
+		else
+		{
+			// repel down a rope, 
+			if (m_MonsterState == MONSTERSTATE_COMBAT)
+				return GetScheduleOfType(SCHED_GRUNT_REPEL_ATTACK);
+			else
+				return GetScheduleOfType(SCHED_GRUNT_REPEL);
+		}
+	}
+
+	// grunts place HIGH priority on running away from danger sounds.
+	if (HasConditions(bits_COND_HEAR_SOUND))
+	{
+		CSound* pSound;
+		pSound = PBestSound();
+
+		ASSERT(pSound != NULL);
+		if (pSound)
+		{
+			if (pSound->m_iType & bits_SOUND_DANGER)
+			{
+				// dangerous sound nearby!
+
+				//!!!KELLY - currently, this is the grunt's signal that a grenade has landed nearby,
+				// and the grunt should find cover from the blast
+				// good place for "SHIT!" or some other colorful verbal indicator of dismay.
+				// It's not safe to play a verbal order here "Scatter", etc cause 
+				// this may only affect a single individual in a squad. 
+
+				if (FOkToSpeak())
+				{
+					SENTENCEG_PlayRndSz(ENT(pev), "SP_GREN", HGRUNT_SENTENCE_VOLUME, GRUNT_ATTN, 0, m_voicePitch);
+					JustSpoke();
+				}
+				return GetScheduleOfType(SCHED_TAKE_COVER_FROM_BEST_SOUND);
+			}
+			/*
+			if (!HasConditions( bits_COND_SEE_ENEMY ) && ( pSound->m_iType & (bits_SOUND_PLAYER | bits_SOUND_COMBAT) ))
+			{
+				MakeIdealYaw( pSound->m_vecOrigin );
+			}
+			*/
+		}
+	}
+	switch (m_MonsterState)
+	{
+	case MONSTERSTATE_COMBAT:
+	{
+		// dead enemy
+		if (HasConditions(bits_COND_ENEMY_DEAD))
+		{
+			// call base class, all code to handle dead enemies is centralized there.
+			return CBaseMonster::GetSchedule();
+		}
+
+		// new enemy
+		if (HasConditions(bits_COND_NEW_ENEMY))
+		{
+			if (InSquad())
+			{
+				MySquadLeader()->m_fEnemyEluded = FALSE;
+
+				if (!IsLeader())
+				{
+					return GetScheduleOfType(SCHED_TAKE_COVER_FROM_ENEMY);
+				}
+				else
+				{
+					//!!!KELLY - the leader of a squad of grunts has just seen the player or a 
+					// monster and has made it the squad's enemy. You
+					// can check pev->flags for FL_CLIENT to determine whether this is the player
+					// or a monster. He's going to immediately start
+					// firing, though. If you'd like, we can make an alternate "first sight" 
+					// schedule where the leader plays a handsign anim
+					// that gives us enough time to hear a short sentence or spoken command
+					// before he starts pluggin away.
+					if (FOkToSpeak())// && RANDOM_LONG(0,1))
+					{
+						if ((m_hEnemy != NULL) && m_hEnemy->IsPlayer())
+							// player
+							SENTENCEG_PlayRndSz(ENT(pev), "SP_ALERT", HGRUNT_SENTENCE_VOLUME, GRUNT_ATTN, 0, m_voicePitch);
+						else if ((m_hEnemy != NULL) &&
+							(m_hEnemy->Classify() != CLASS_PLAYER_ALLY) &&
+							(m_hEnemy->Classify() != CLASS_HUMAN_PASSIVE) &&
+							(m_hEnemy->Classify() != CLASS_MACHINE))
+							// monster
+							SENTENCEG_PlayRndSz(ENT(pev), "SP_MONST", HGRUNT_SENTENCE_VOLUME, GRUNT_ATTN, 0, m_voicePitch);
+
+						JustSpoke();
+					}
+
+					if (HasConditions(bits_COND_CAN_RANGE_ATTACK1))
+					{
+						return GetScheduleOfType(SCHED_GRUNT_SUPPRESS);
+					}
+					else
+					{
+						return GetScheduleOfType(SCHED_GRUNT_ESTABLISH_LINE_OF_FIRE);
+					}
+				}
+			}
+		}
+		// no ammo
+		else if (HasConditions(bits_COND_NO_AMMO_LOADED))
+		{
+			//!!!KELLY - this individual just realized he's out of bullet ammo. 
+			// He's going to try to find cover to run to and reload, but rarely, if 
+			// none is available, he'll drop and reload in the open here. 
+			return GetScheduleOfType(SCHED_GRUNT_COVER_AND_RELOAD);
+		}
+
+		// damaged just a little
+		else if (HasConditions(bits_COND_LIGHT_DAMAGE))
+		{
+			// if hurt:
+			// 90% chance of taking cover
+			// 10% chance of flinch.
+			int iPercent = RANDOM_LONG(0, 99);
+
+			if (iPercent <= 90 && m_hEnemy != NULL)
+			{
+				// only try to take cover if we actually have an enemy!
+
+				//!!!KELLY - this grunt was hit and is going to run to cover.
+				if (FOkToSpeak()) // && RANDOM_LONG(0,1))
+				{
+					//SENTENCEG_PlayRndSz( ENT(pev), "SP_COVER", HGRUNT_SENTENCE_VOLUME, GRUNT_ATTN, 0, m_voicePitch);
+					m_iSentence = HGRUNT_SENT_COVER;
+					//JustSpoke();
+				}
+				return GetScheduleOfType(SCHED_TAKE_COVER_FROM_ENEMY);
+			}
+			else
+			{
+				return GetScheduleOfType(SCHED_SMALL_FLINCH);
+			}
+		}
+		// can kick
+		else if (HasConditions(bits_COND_CAN_MELEE_ATTACK1))
+		{
+			return GetScheduleOfType(SCHED_MELEE_ATTACK1);
+		}
+		// can grenade launch
+
+		else if (FBitSet(pev->weapons, HGRUNT_GRENADELAUNCHER) && HasConditions(bits_COND_CAN_RANGE_ATTACK2) && OccupySlot(bits_SLOTS_HGRUNT_GRENADE))
+		{
+			// shoot a grenade if you can
+			return GetScheduleOfType(SCHED_RANGE_ATTACK2);
+		}
+		// can shoot
+		else if (HasConditions(bits_COND_CAN_RANGE_ATTACK1))
+		{
+			if (InSquad())
+			{
+				// if the enemy has eluded the squad and a squad member has just located the enemy
+				// and the enemy does not see the squad member, issue a call to the squad to waste a 
+				// little time and give the player a chance to turn.
+				if (MySquadLeader()->m_fEnemyEluded && !HasConditions(bits_COND_ENEMY_FACING_ME))
+				{
+					MySquadLeader()->m_fEnemyEluded = FALSE;
+					return GetScheduleOfType(SCHED_GRUNT_FOUND_ENEMY);
+				}
+			}
+
+			if (OccupySlot(bits_SLOTS_HGRUNT_ENGAGE))
+			{
+				// try to take an available ENGAGE slot
+				return GetScheduleOfType(SCHED_RANGE_ATTACK1);
+			}
+			else if (HasConditions(bits_COND_CAN_RANGE_ATTACK2) && OccupySlot(bits_SLOTS_HGRUNT_GRENADE))
+			{
+				// throw a grenade if can and no engage slots are available
+				return GetScheduleOfType(SCHED_RANGE_ATTACK2);
+			}
+			else
+			{
+				// hide!
+				return GetScheduleOfType(SCHED_TAKE_COVER_FROM_ENEMY);
+			}
+		}
+		// can't see enemy
+		else if (HasConditions(bits_COND_ENEMY_OCCLUDED))
+		{
+			if (HasConditions(bits_COND_CAN_RANGE_ATTACK2) && OccupySlot(bits_SLOTS_HGRUNT_GRENADE))
+			{
+				//!!!KELLY - this grunt is about to throw or fire a grenade at the player. Great place for "fire in the hole"  "frag out" etc
+				if (FOkToSpeak())
+				{
+					SENTENCEG_PlayRndSz(ENT(pev), "SP_THROW", HGRUNT_SENTENCE_VOLUME, GRUNT_ATTN, 0, m_voicePitch);
+					JustSpoke();
+				}
+				return GetScheduleOfType(SCHED_RANGE_ATTACK2);
+			}
+			else if (OccupySlot(bits_SLOTS_HGRUNT_ENGAGE))
+			{
+				//!!!KELLY - grunt cannot see the enemy and has just decided to 
+				// charge the enemy's position. 
+				if (FOkToSpeak())// && RANDOM_LONG(0,1))
+				{
+					//SENTENCEG_PlayRndSz( ENT(pev), "SP_CHARGE", HGRUNT_SENTENCE_VOLUME, GRUNT_ATTN, 0, m_voicePitch);
+					m_iSentence = HGRUNT_SENT_CHARGE;
+					//JustSpoke();
+				}
+
+				return GetScheduleOfType(SCHED_GRUNT_ESTABLISH_LINE_OF_FIRE);
+			}
+			else
+			{
+				//!!!KELLY - grunt is going to stay put for a couple seconds to see if
+				// the enemy wanders back out into the open, or approaches the
+				// grunt's covered position. Good place for a taunt, I guess?
+				if (FOkToSpeak() && RANDOM_LONG(0, 1))
+				{
+					SENTENCEG_PlayRndSz(ENT(pev), "SP_TAUNT", HGRUNT_SENTENCE_VOLUME, GRUNT_ATTN, 0, m_voicePitch);
+					JustSpoke();
+				}
+				return GetScheduleOfType(SCHED_STANDOFF);
+			}
+		}
+
+		if (HasConditions(bits_COND_SEE_ENEMY) && !HasConditions(bits_COND_CAN_RANGE_ATTACK1))
+		{
+			return GetScheduleOfType(SCHED_GRUNT_ESTABLISH_LINE_OF_FIRE);
+		}
+	}
+	}
+
+	// no special cases here, call the base class
+	return CSquadMonster::GetSchedule();
+}
+
+
+//=========================================================
+// PainSound
+//=========================================================
+void CBioGrunt::PainSound(void)
+{
+	if (gpGlobals->time > m_flNextPainTime)
+	{
+#if 0
+		if (RANDOM_LONG(0, 99) < 5)
+		{
+			// pain sentences are rare
+			if (FOkToSpeak())
+			{
+				SENTENCEG_PlayRndSz(ENT(pev), "SP_PAIN", HGRUNT_SENTENCE_VOLUME, ATTN_NORM, 0, PITCH_NORM);
+				JustSpoke();
+				return;
+			}
+		}
+#endif 
+		switch (RANDOM_LONG(0, 6))
+		{
+		case 0:
+			EMIT_SOUND(ENT(pev), CHAN_VOICE, "spgrunt/gr_pain3.wav", 1, ATTN_NORM);
+			break;
+		case 1:
+			EMIT_SOUND(ENT(pev), CHAN_VOICE, "spgrunt/gr_pain4.wav", 1, ATTN_NORM);
+			break;
+		case 2:
+			EMIT_SOUND(ENT(pev), CHAN_VOICE, "spgrunt/gr_pain5.wav", 1, ATTN_NORM);
+			break;
+		case 3:
+			EMIT_SOUND(ENT(pev), CHAN_VOICE, "spgrunt/gr_pain1.wav", 1, ATTN_NORM);
+			break;
+		case 4:
+			EMIT_SOUND(ENT(pev), CHAN_VOICE, "spgrunt/gr_pain2.wav", 1, ATTN_NORM);
+			break;
+		}
+
+		m_flNextPainTime = gpGlobals->time + 1;
+	}
+}
+
+BOOL CBioGrunt::FOkToSpeak(void)
+{
+	// if someone else is talking, don't speak
+	if (gpGlobals->time <= CTalkMonster::g_talkWaitTime)
+		return FALSE;
+
+	if (pev->spawnflags & SF_MONSTER_GAG)
+	{
+		if (m_MonsterState != MONSTERSTATE_COMBAT)
+		{
+			// no talking outside of combat if gagged.
+			return FALSE;
+		}
+	}
+
+	// if player is not in pvs, don't speak
+//	if (FNullEnt(FIND_CLIENT_IN_PVS(edict())))
+//		return FALSE;
+
+	return TRUE;
+}
+
+//=========================================================
+//=========================================================
+void CBioGrunt::JustSpoke(void)
+{
+	CTalkMonster::g_talkWaitTime = gpGlobals->time + RANDOM_FLOAT(1.5, 2.0);
+	m_iSentence = HGRUNT_SENT_NONE;
+}
+
+//=========================================================
+// PrescheduleThink - this function runs after conditions
+// are collected and before scheduling code is run.
+//=========================================================
+void CBioGrunt::PrescheduleThink(void)
+{
+	if (InSquad() && m_hEnemy != NULL)
+	{
+		if (HasConditions(bits_COND_SEE_ENEMY))
+		{
+			// update the squad's last enemy sighting time.
+			MySquadLeader()->m_flLastEnemySightTime = gpGlobals->time;
+		}
+		else
+		{
+			if (gpGlobals->time - MySquadLeader()->m_flLastEnemySightTime > 5)
+			{
+				// been a while since we've seen the enemy
+				MySquadLeader()->m_fEnemyEluded = TRUE;
+			}
+		}
+	}
+}
+
+
+
+///конец био солдата
+
 ////////
 //===============//
-///Nazzi_mp44 обычный нацик но с мп44.
+///Nazzi_mp44.Начало элитного нацика с мп44
 
 //nazz_grunt_mp44
 
@@ -3130,12 +3754,14 @@ public:
 	void Precache(void);
 	void Shoot(void);
 	void HandleAnimEvent(MonsterEvent_t *pEvent);
+	void GibMonster(void);
+
 };
 
 
 
 ///
-///нацист спавн///
+///нацист c mp44 спавн///
 ///
 LINK_ENTITY_TO_CLASS(monster_human_NazzMp44grunt, CNazzGrunt)
 
@@ -3234,6 +3860,7 @@ void CNazzGrunt::Precache()
 	PRECACHE_SOUND("weapons/glauncher.wav");
 
 	PRECACHE_SOUND("weapons/sbarrel1.wav");
+	PRECACHE_SOUND("weapons/mp44/mp44_shoot.wav");
 
 	PRECACHE_SOUND("zombie/claw_miss2.wav");// because we use the basemonster SWIPE animation event
 
@@ -3274,6 +3901,45 @@ void CNazzGrunt::Shoot(void)
 	SetBlending(0, angDir.x);
 }
 
+void CNazzGrunt::GibMonster(void)
+{
+	Vector	vecGunPos;
+	Vector	vecGunAngles;
+
+	if (GetBodygroup(2) != 2)
+	{// throw a gun if the grunt has one
+		GetAttachment(0, vecGunPos, vecGunAngles);
+
+		CBaseEntity* pGun;
+		if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
+		{
+			pGun = DropItem("weapon_wrifle", vecGunPos, vecGunAngles);//выпадает снайпа
+		}
+		else
+		{
+			pGun = DropItem("weapon_mp44", vecGunPos, vecGunAngles);
+		}
+		if (pGun)
+		{
+			pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
+			pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
+		}
+
+		if (FBitSet(pev->weapons, HGRUNT_GRENADELAUNCHER))
+		{
+			pGun = DropItem("ammo_ARgrenades", vecGunPos, vecGunAngles);
+			if (pGun)
+			{
+				pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
+				pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
+			}
+		}
+	}
+
+	CBaseMonster::GibMonster();
+}
+
+
 
 
 ///weapon_mp44_nazzi-grunt(его оружие  в руках)
@@ -3298,7 +3964,7 @@ void CNazzGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 		// now spawn a gun.
 		if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
 		{
-			DropItem("weapon_crossbow", vecGunPos, vecGunAngles);
+			DropItem("weapon_wrifle", vecGunPos, vecGunAngles);
 		}
 		else
 		{
@@ -3366,7 +4032,7 @@ void CNazzGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 		{
 			crossbow();
 
-			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/xbow_fire1.wav", 1, ATTN_NORM);
+			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/k43/k43_fire.wav", 1, ATTN_NORM);
 		}
 
 		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, 384, 0.3);
@@ -3408,3 +4074,5 @@ void CNazzGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 		break;
 	}
 }
+
+

@@ -71,6 +71,12 @@ CVenom g_Venom;
 CStenGun g_StenGun; // ваше оружие
 CKnife g_Knife; //Объявляем класс ножа
 CMP44 g_Mp44; // ваше оружие
+CWrifle g_RifleK43; // ваше оружие
+CPPSH g_Ppsh; // ваше оружие
+CTOMMY g_Tommy; // ваше оружие
+CTeterev g_Teterev; // ваше оружие
+CMaria g_Maria; // ваше оружие
+CPlasmarifle g_Plasmarifle; // новая пушка, плазменная винтовка
 
 
 /*
@@ -629,6 +635,12 @@ void HUD_InitClientWeapons( void )
 	HUD_PrepEntity(&g_StenGun, &player); // ваше оружие стен
 	HUD_PrepEntity(&g_Knife, &player); //Прорисовка худа(нож)
 	HUD_PrepEntity(&g_Mp44, &player); // ваше оружие мп44
+	HUD_PrepEntity(&g_RifleK43, &player); // ваше оружие k43
+	HUD_PrepEntity(&g_Ppsh, &player); // ваше оружие ППШ
+	HUD_PrepEntity(&g_Tommy, &player); // ваше оружие TommyGun
+	HUD_PrepEntity(&g_Teterev, &player); // ваше оружие 
+	HUD_PrepEntity(&g_Maria, &player); // ваше оружие maria_colt
+	HUD_PrepEntity(&g_Plasmarifle, &player);
 }
 
 /*
@@ -761,6 +773,10 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 			pWeapon = &g_StenGun;
 			break;
 
+		case WEAPON_K43RIFLE: // ваше оружие
+			pWeapon = &g_StenGun;
+			break;
+
 		case WEAPON_KNIFE:
 			pWeapon = &g_Knife;
 			break;
@@ -769,6 +785,25 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 			pWeapon = &g_Mp44;
 			break;
 
+		case WEAPON_PPSH:
+			pWeapon = &g_Ppsh;
+			break;
+
+		case WEAPON_TOMMY:
+			pWeapon = &g_Tommy;
+			break;
+
+		case WEAPON_TETEREV:
+			pWeapon = &g_Teterev;
+			break;
+
+		case WEAPON_MARIA:
+			pWeapon = &g_Maria;
+			break;
+
+		case WEAPON_PLASMARIFLE:
+			pWeapon = &g_Plasmarifle;
+			break;
 	}
 
 	// Store pointer to our destination entity_state_t so we can get our origin, etc. from it

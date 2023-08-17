@@ -182,6 +182,7 @@ void CController :: SetYawSpeed ( void )
 int CController :: TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType )
 {
 	// HACK HACK -- until we fix this.
+	bitsDamageType |= DMG_ALWAYSGIB; //в начале функции
 	if ( IsAlive() )
 		PainSound();
 	return CBaseMonster::TakeDamage( pevInflictor, pevAttacker, flDamage, bitsDamageType );
@@ -389,7 +390,7 @@ void CController :: Precache()
 	PRECACHE_SOUND_ARRAY( pPainSounds );
 	PRECACHE_SOUND_ARRAY( pDeathSounds );
 
-	PRECACHE_MODEL( "sprites/xspark4.spr");
+	PRECACHE_MODEL( "sprites/xfireball3.spr.spr");//xfireball3.spr
 
 	UTIL_PrecacheOther( "controller_energy_ball" );
 	UTIL_PrecacheOther( "controller_head_ball" );
@@ -848,7 +849,7 @@ void CController :: RunAI( void )
 	{
 		if (m_pBall[i] == NULL)
 		{
-			m_pBall[i] = CSprite::SpriteCreate( "sprites/xspark4.spr", pev->origin, TRUE );
+			m_pBall[i] = CSprite::SpriteCreate( "sprites/xfireball3.spr", pev->origin, TRUE );
 			m_pBall[i]->SetTransparency( kRenderGlow, 255, 255, 255, 255, kRenderFxNoDissipation );
 			m_pBall[i]->SetAttachment( edict(), (i + 3) );
 			m_pBall[i]->SetScale( 1.0 );
@@ -1159,7 +1160,7 @@ void CControllerHeadBall :: Spawn( void )
 	pev->movetype = MOVETYPE_FLY;
 	pev->solid = SOLID_BBOX;
 
-	SET_MODEL(ENT(pev), "sprites/xspark4.spr");
+	SET_MODEL(ENT(pev), "sprites/xfireball3.spr");
 	pev->rendermode = kRenderTransAdd;
 	pev->rendercolor.x = 255;
 	pev->rendercolor.y = 255;
@@ -1184,7 +1185,7 @@ void CControllerHeadBall :: Spawn( void )
 
 void CControllerHeadBall :: Precache( void )
 {
-	PRECACHE_MODEL("sprites/xspark1.spr");
+	PRECACHE_MODEL("sprites/xfireball3.sprr");
 	PRECACHE_SOUND("debris/zap4.wav");
 	PRECACHE_SOUND("weapons/electro4.wav");
 }
@@ -1353,7 +1354,7 @@ void CControllerZapBall :: Spawn( void )
 	pev->movetype = MOVETYPE_FLY;
 	pev->solid = SOLID_BBOX;
 
-	SET_MODEL(ENT(pev), "sprites/xspark4.spr");
+	SET_MODEL(ENT(pev), "sprites/xfireball3.spr");
 	pev->rendermode = kRenderTransAdd;
 	pev->rendercolor.x = 255;
 	pev->rendercolor.y = 255;
@@ -1375,7 +1376,7 @@ void CControllerZapBall :: Spawn( void )
 
 void CControllerZapBall :: Precache( void )
 {
-	PRECACHE_MODEL("sprites/xspark4.spr");
+	PRECACHE_MODEL("sprites/xfireball3.spr");
 	// PRECACHE_SOUND("debris/zap4.wav");
 	// PRECACHE_SOUND("weapons/electro4.wav");
 }
@@ -1425,3 +1426,105 @@ void CControllerZapBall::ExplodeTouch( CBaseEntity *pOther )
 
 
 #endif		// !OEM && !HLDEMO
+
+class CLichBoss : public CController
+{
+public:
+
+	short g_sModelIndexMetalGibs; //добавил эту строчку сюда затем в прекеш свою
+	void Spawn(void);
+	void Precache(void);
+	void GibMonster(void);
+};
+LINK_ENTITY_TO_CLASS(monster_lich_boss, CLichBoss);
+
+//=========================================================
+// Spawn
+//=========================================================
+void CLichBoss::Spawn()
+{
+	Precache();
+
+	SET_MODEL(ENT(pev), "models/newNpc/boss_lych.mdl");
+	UTIL_SetSize(pev, Vector(-32, -32, 0), Vector(32, 32, 64));
+
+	pev->solid = SOLID_SLIDEBOX;
+	pev->movetype = MOVETYPE_FLY;
+	pev->flags |= FL_FLY;
+	m_bloodColor = BLOOD_COLOR_GREEN;
+	if (!pev->health) pev->health = gSkillData.controllerHealth;
+	//if (!pev->health) pev->health = 100;
+	//pev->health = gSkillData.controllerHealth;
+	pev->view_ofs = Vector(0, 0, -2);// position of the eyes relative to monster's origin.
+	m_flFieldOfView = VIEW_FIELD_FULL;// indicates the width of this monster's forward view cone ( as a dotproduct result )
+	m_MonsterState = MONSTERSTATE_NONE;
+
+	MonsterInit();
+}
+
+//=========================================================
+// Precache - precaches all resources this monster needs
+//=========================================================
+void CLichBoss::Precache()
+{
+	PRECACHE_MODEL("models/newNpc/boss_lych.mdl");
+
+	PRECACHE_SOUND_ARRAY(pAttackSounds);
+	PRECACHE_SOUND_ARRAY(pIdleSounds);
+	PRECACHE_SOUND_ARRAY(pAlertSounds);
+	PRECACHE_SOUND_ARRAY(pPainSounds);
+	PRECACHE_SOUND_ARRAY(pDeathSounds);
+
+	PRECACHE_MODEL("sprites/plasmo_fire.spr");
+
+	UTIL_PrecacheOther("controller_energy_ball");
+	UTIL_PrecacheOther("controller_head_ball");
+	g_sModelIndexMetalGibs = PRECACHE_MODEL("models/newNpc/lych_gib.mdl");//эта строчка тут овтеч за свой гиб
+}
+
+void CLichBoss::GibMonster(void)
+{
+	// delete balls
+	if (m_pBall[0])
+	{
+		UTIL_Remove(m_pBall[0]);
+		m_pBall[0] = NULL;
+	}
+	if (m_pBall[1])
+	{
+		UTIL_Remove(m_pBall[1]);
+		m_pBall[1] = NULL;
+	}
+	Vector vecOrigin = pev->origin;
+
+	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecOrigin);
+	WRITE_BYTE(TE_BREAKMODEL);
+
+	// position
+	WRITE_COORD(vecOrigin.x);
+	WRITE_COORD(vecOrigin.y);
+	WRITE_COORD(vecOrigin.z + 10);
+	// size
+	WRITE_COORD(0.01);
+	WRITE_COORD(0.01);
+	WRITE_COORD(0.01);
+	// velocity
+	WRITE_COORD(0);
+	WRITE_COORD(0);
+	WRITE_COORD(0);
+	// randomization of the velocity
+	WRITE_BYTE(30);
+	// Model
+	WRITE_SHORT(g_sModelIndexMetalGibs);	//model id#
+	// # of shards
+	WRITE_BYTE(RANDOM_LONG(4, 6));
+	// duration
+	WRITE_BYTE(100);// 10.0 seconds
+	// flags
+	WRITE_BYTE(BREAK_FLESH);
+	MESSAGE_END();
+	SetThink(&CBaseEntity::SUB_Remove);
+	pev->nextthink = gpGlobals->time;
+}
+
+

@@ -673,7 +673,7 @@ void CFGrunt::GibMonster(void)
 		}
 		else
 		{
-			pGun = DropItem("weapon_9mmAR", vecGunPos, vecGunAngles);
+			pGun = DropItem("weapon_sten", vecGunPos, vecGunAngles); //дропает пусть аптечку...
 		}
 		if (pGun)
 		{
@@ -1087,7 +1087,7 @@ void CFGrunt::HandleAnimEvent(MonsterEvent_t* pEvent)
 		}
 		else
 		{
-			DropItem("weapon_9mmAR", vecGunPos, vecGunAngles);
+			DropItem("weapon_sten", vecGunPos, vecGunAngles);
 		}
 		if (FBitSet(pev->weapons, FGRUNT_GRENADELAUNCHER))
 		{
@@ -1207,14 +1207,15 @@ void CFGrunt::Spawn()
 	if (pev->model)
 		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC 
 	else
-		SET_MODEL(ENT(pev), "models/hgruntSous.mdl");
+		SET_MODEL(ENT(pev), "models/fgrunt.mdl");
 	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
 
 	pev->solid = SOLID_SLIDEBOX;
 	pev->movetype = MOVETYPE_STEP;
 	m_bloodColor = BLOOD_COLOR_RED;
 	pev->effects = 0;
-	pev->health = gSkillData.hgruntHealth;
+	if (!pev->health) pev->health = gSkillData.hgruntHealth;
+//	pev->health = gSkillData.hgruntHealth;
 	m_flFieldOfView = 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState = MONSTERSTATE_NONE;
 	m_flNextGrenadeCheck = gpGlobals->time + 1;
@@ -1276,7 +1277,7 @@ void CFGrunt::Precache()
 	if (pev->model)
 		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC 
 	else
-		PRECACHE_MODEL("models/hgruntSous.mdl");
+		PRECACHE_MODEL("models/fgrunt.mdl");
 
 	PRECACHE_SOUND("hgrunt/gr_mgun1.wav");
 	PRECACHE_SOUND("hgrunt/gr_mgun2.wav");
@@ -1311,6 +1312,7 @@ void CFGrunt::Precache()
 
 	m_iBrassShell = PRECACHE_MODEL("models/shell.mdl");// brass shell
 	m_iShotgunShell = PRECACHE_MODEL("models/shotgunshell.mdl");
+	UTIL_PrecacheOther("item_healthkit");
 
 	TalkInit();
 	CTalkMonster::Precache();
@@ -1534,8 +1536,8 @@ LINK_ENTITY_TO_CLASS(monster_human_friend_grunt_dead, CDeadFGrunt);
 //=========================================================
 void CDeadFGrunt::Spawn(void)
 {
-	PRECACHE_MODEL("models/hgruntSous.mdl");
-	SET_MODEL(ENT(pev), "models/hgruntSous.mdl");
+	PRECACHE_MODEL("models/fgrunt.mdl");
+	SET_MODEL(ENT(pev), "models/fgrunt.mdl");
 
 	pev->effects = 0;
 	pev->yaw_speed = 8;
@@ -1585,4 +1587,1053 @@ void CDeadFGrunt::Spawn(void)
 }
 
 
+class CRussFGrunt : public CFGrunt
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	void TalkInit(void);
+	void HandleAnimEvent(MonsterEvent_t* pEvent);
+	void GibMonster(void);
+	static const char* pGruntSentences[];
 
+};
+
+LINK_ENTITY_TO_CLASS(monster_human_russfriend, CRussFGrunt);
+
+//=========================================================
+// Spawn
+//=========================================================
+void CRussFGrunt::Spawn()
+{
+	Precache();
+
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC 
+	else
+		SET_MODEL(ENT(pev), "models/newNpc/VasiliiClubnikin.mdl");
+	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
+
+	pev->solid = SOLID_SLIDEBOX;
+	pev->movetype = MOVETYPE_STEP;
+	m_bloodColor = BLOOD_COLOR_RED;
+	pev->effects = 0;
+	if (!pev->health) pev->health = gSkillData.hgruntHealth;
+	//pev->health = gSkillData.hgruntHealth;
+	m_flFieldOfView = 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
+	m_MonsterState = MONSTERSTATE_NONE;
+	m_flNextGrenadeCheck = gpGlobals->time + 1;
+	m_flNextPainTime = gpGlobals->time;
+	m_iSentence = FGRUNT_SENT_NONE;
+
+	m_afCapability = bits_CAP_HEAR | bits_CAP_TURN_HEAD | bits_CAP_DOORS_GROUP;
+
+	//m_fEnemyEluded = FALSE;
+	m_fFirstEncounter = TRUE;// this is true when the grunt spawns, because he hasn't encountered an enemy yet.
+
+	m_HackedGunPos = Vector(0, 0, 55);
+
+	if (pev->weapons == 0)
+	{
+		// initialize to original values
+		pev->weapons = FGRUNT_9MMAR | FGRUNT_HANDGRENADE;
+		// pev->weapons = FGRUNT_SHOTGUN;
+		// pev->weapons = FGRUNT_9MMAR | FGRUNT_GRENADELAUNCHER;
+	}
+
+	if (FBitSet(pev->weapons, FGRUNT_SHOTGUN))
+	{
+		SetBodygroup(GUN_GROUP, GUN_SHOTGUN);
+		m_cClipSize = 8;
+	}
+	else
+	{
+		m_cClipSize = GRUNT_CLIP_SIZE;
+	}
+	m_cAmmoLoaded = m_cClipSize;
+
+	if (RANDOM_LONG(0, 99) < 80)
+		pev->skin = 0;	// light skin
+	else
+		pev->skin = 1;	// dark skin
+
+	if (FBitSet(pev->weapons, FGRUNT_SHOTGUN))
+	{
+		SetBodygroup(HEAD_GROUP, HEAD_SHOTGUN);
+	}
+	else if (FBitSet(pev->weapons, FGRUNT_GRENADELAUNCHER))
+	{
+		SetBodygroup(HEAD_GROUP, HEAD_M203);
+		pev->skin = 1; // alway dark skin
+	}
+
+	CTalkMonster::g_talkWaitTime = 0;
+
+	MonsterInit();
+	SetUse(&CFGrunt::FollowerUse);
+}
+
+//=========================================================
+// Precache - precaches all resources this monster needs weapon_ppsh
+//=========================================================
+void CRussFGrunt::Precache()
+{
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC 
+	else
+		PRECACHE_MODEL("models/newNpc/VasiliiClubnikin.mdl");
+
+	PRECACHE_SOUND("hgrunt/gr_mgun1.wav");
+	PRECACHE_SOUND("hgrunt/gr_mgun2.wav");
+
+	PRECACHE_SOUND("fgrunt/death1.wav");
+	PRECACHE_SOUND("fgrunt/death2.wav");
+	PRECACHE_SOUND("fgrunt/death3.wav");
+	PRECACHE_SOUND("fgrunt/death4.wav");
+	PRECACHE_SOUND("fgrunt/death5.wav");
+	PRECACHE_SOUND("fgrunt/death6.wav");
+
+	PRECACHE_SOUND("fgrunt/pain1.wav");
+	PRECACHE_SOUND("fgrunt/pain2.wav");
+	PRECACHE_SOUND("fgrunt/pain3.wav");
+	PRECACHE_SOUND("fgrunt/pain4.wav");
+	PRECACHE_SOUND("fgrunt/pain5.wav");
+	PRECACHE_SOUND("fgrunt/pain6.wav");
+
+	PRECACHE_SOUND("hgrunt/gr_reload1.wav");
+
+	PRECACHE_SOUND("weapons/glauncher.wav");
+
+	PRECACHE_SOUND("weapons/sbarrel1.wav");
+
+	PRECACHE_SOUND("zombie/claw_miss2.wav");// because we use the basemonster SWIPE animation event
+
+	// get voice pitch
+	if (RANDOM_LONG(0, 1))
+		m_voicePitch = 109 + RANDOM_LONG(0, 7);
+	else
+		m_voicePitch = 100;
+
+	m_iBrassShell = PRECACHE_MODEL("models/shell.mdl");// brass shell
+	m_iShotgunShell = PRECACHE_MODEL("models/shotgunshell.mdl");
+	UTIL_PrecacheOther("item_healthkit");
+
+	TalkInit();
+	CTalkMonster::Precache();
+}
+
+const char* CRussFGrunt::pGruntSentences[] =
+{
+	"VC_GREN",
+	"VC_ALERT",
+	"VC_MONSTER",
+	"VC_COVER",
+	"VC_CLEAR",
+	"VC_THROW",
+	"VC_CHARGE",
+	"VC_TAUNT",
+};
+
+void CRussFGrunt::TalkInit()
+{
+	CTalkMonster::TalkInit();
+
+	m_szGrp[TLK_ANSWER] = "VC_ANSWER";
+	m_szGrp[TLK_QUESTION] = "VC_QUESTION";
+	m_szGrp[TLK_IDLE] = "VC_IDLE";
+	m_szGrp[TLK_STARE] = NULL;
+	m_szGrp[TLK_USE] = "VC_OK";
+	m_szGrp[TLK_UNUSE] = "VC_WAIT";
+	m_szGrp[TLK_STOP] = "VC_STOP";
+
+	m_szGrp[TLK_NOSHOOT] = "VC_SCARED";
+	m_szGrp[TLK_HELLO] = "VC_HELLO";
+
+	m_szGrp[TLK_PHELLO] = NULL;
+	m_szGrp[TLK_PIDLE] = NULL;
+	m_szGrp[TLK_PQUESTION] = NULL;
+
+	m_szGrp[TLK_PLHURT1] = "VC_CURE";
+	m_szGrp[TLK_PLHURT2] = NULL;
+	m_szGrp[TLK_PLHURT3] = NULL;
+
+
+	m_szGrp[TLK_SMELL] = NULL;
+
+	m_szGrp[TLK_WOUND] = "VC_WOUND";
+	m_szGrp[TLK_MORTAL] = "VC_MORTAL";
+
+	m_voicePitch = 100;
+
+}
+
+//=========================================================
+// HandleAnimEvent - catches the monster-specific messages
+// that occur when tagged animation frames are played.
+//=========================================================
+void CRussFGrunt::HandleAnimEvent(MonsterEvent_t* pEvent)
+{
+	Vector	vecShootDir;
+	Vector	vecShootOrigin;
+
+	switch (pEvent->event)
+	{
+	case FGRUNT_AE_DROP_GUN:
+	{
+		Vector	vecGunPos;
+		Vector	vecGunAngles;
+
+		GetAttachment(0, vecGunPos, vecGunAngles);
+
+		// switch to body group with no gun.
+		SetBodygroup(GUN_GROUP, GUN_NONE);
+
+		// now spawn a gun.
+		if (FBitSet(pev->weapons, FGRUNT_SHOTGUN))
+		{
+			DropItem("weapon_shotgun", vecGunPos, vecGunAngles);
+		}
+		else
+		{
+			DropItem("weapon_ppsh", vecGunPos, vecGunAngles);
+		}
+		if (FBitSet(pev->weapons, FGRUNT_GRENADELAUNCHER))
+		{
+			DropItem("ammo_ARgrenades", BodyTarget(pev->origin), vecGunAngles);
+		}
+
+	}
+	break;
+
+	case FGRUNT_AE_RELOAD:
+		EMIT_SOUND(ENT(pev), CHAN_WEAPON, "hgrunt/gr_reload1.wav", 1, ATTN_NORM);
+		m_cAmmoLoaded = m_cClipSize;
+		ClearConditions(bits_COND_NO_AMMO_LOADED);
+		break;
+
+	case FGRUNT_AE_GREN_TOSS:
+	{
+		UTIL_MakeVectors(pev->angles);
+		// CGrenade::ShootTimed( pev, pev->origin + gpGlobals->v_forward * 34 + Vector (0, 0, 32), m_vecTossVelocity, 3.5 );
+		CGrenade::ShootTimed(pev, GetGunPosition(), m_vecTossVelocity, 3.5);
+
+		m_fThrowGrenade = FALSE;
+		m_flNextGrenadeCheck = gpGlobals->time + 6;// wait six seconds before even looking again to see if a grenade can be thrown.
+		// !!!LATER - when in a group, only try to throw grenade if ordered.
+	}
+	break;
+
+	case FGRUNT_AE_GREN_LAUNCH:
+	{
+		EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/glauncher.wav", 0.8, ATTN_NORM);
+		CGrenade::ShootContact(pev, GetGunPosition(), m_vecTossVelocity);
+		m_fThrowGrenade = FALSE;
+		if (g_iSkillLevel == SKILL_HARD)
+			m_flNextGrenadeCheck = gpGlobals->time + RANDOM_FLOAT(2, 5);// wait a random amount of time before shooting again
+		else
+			m_flNextGrenadeCheck = gpGlobals->time + 6;// wait six seconds before even looking again to see if a grenade can be thrown.
+	}
+	break;
+
+	case FGRUNT_AE_GREN_DROP:
+	{
+		UTIL_MakeVectors(pev->angles);
+		CGrenade::ShootTimed(pev, pev->origin + gpGlobals->v_forward * 17 - gpGlobals->v_right * 27 + gpGlobals->v_up * 6, g_vecZero, 3);
+	}
+	break;
+
+	case FGRUNT_AE_BURST1:
+	{
+		if (FBitSet(pev->weapons, FGRUNT_9MMAR))
+		{
+			Shoot();
+
+			// the first round of the three round burst plays the sound and puts a sound in the world sound list.
+			if (RANDOM_LONG(0, 1))
+			{
+				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "hgrunt/gr_mgun1.wav", 1, ATTN_NORM);
+			}
+			else
+			{
+				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "hgrunt/gr_mgun2.wav", 1, ATTN_NORM);
+			}
+		}
+		else
+		{
+			Shotgun();
+
+			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/sbarrel1.wav", 1, ATTN_NORM);
+		}
+
+		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, 384, 0.3);
+	}
+	break;
+
+	case FGRUNT_AE_BURST2:
+	case FGRUNT_AE_BURST3:
+		Shoot();
+		break;
+
+	case FGRUNT_AE_KICK:
+	{
+		CBaseEntity* pHurt = Kick();
+
+		if (pHurt)
+		{
+			// SOUND HERE!
+			UTIL_MakeVectors(pev->angles);
+			pHurt->pev->punchangle.x = 15;
+			pHurt->pev->velocity = pHurt->pev->velocity + gpGlobals->v_forward * 100 + gpGlobals->v_up * 50;
+			pHurt->TakeDamage(pev, pev, gSkillData.hgruntDmgKick, DMG_CLUB);
+		}
+	}
+	break;
+
+	case FGRUNT_AE_CAUGHT_ENEMY:
+	{
+		if (FOkToSpeak())
+		{
+			SENTENCEG_PlayRndSz(ENT(pev), "FG_ALERT", FGRUNT_SENTENCE_VOLUME, GRUNT_ATTN, 0, m_voicePitch);
+			JustSpoke();
+		}
+
+	}
+
+	default:
+		CTalkMonster::HandleAnimEvent(pEvent);
+		break;
+	}
+}
+
+void CRussFGrunt::GibMonster(void)
+{
+	Vector	vecGunPos;
+	Vector	vecGunAngles;
+
+	if (GetBodygroup(2) != 2)
+	{// throw a gun if the grunt has one
+		GetAttachment(0, vecGunPos, vecGunAngles);
+
+		CBaseEntity* pGun;
+		if (FBitSet(pev->weapons, FGRUNT_SHOTGUN))
+		{
+			pGun = DropItem("weapon_shotgun", vecGunPos, vecGunAngles);
+		}
+		else
+		{
+			pGun = DropItem("weapon_ppsh", vecGunPos, vecGunAngles); //дропает пусть аптечку...
+		}
+		if (pGun)
+		{
+			pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
+			pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
+		}
+
+		if (FBitSet(pev->weapons, FGRUNT_GRENADELAUNCHER))
+		{
+			pGun = DropItem("ammo_ARgrenades", vecGunPos, vecGunAngles);
+			if (pGun)
+			{
+				pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
+				pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
+			}
+		}
+	}
+
+	CBaseMonster::GibMonster();
+}
+
+
+//===========================//
+//heavily armed Briton Grunt,// 
+//тяжело вооруженный британец//
+//===========================//
+
+class CHeavilyArmedBritonGrunt : public CFGrunt
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	void HandleAnimEvent(MonsterEvent_t* pEvent);
+	void GibMonster(void);
+	static const char* pGruntSentences[];
+
+};
+
+LINK_ENTITY_TO_CLASS(monster_human_heaviliarmedbriton, CHeavilyArmedBritonGrunt);
+
+//=========================================================
+// Spawn
+//=========================================================
+void CHeavilyArmedBritonGrunt::Spawn()
+{
+	Precache();
+
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC 
+	else
+		SET_MODEL(ENT(pev), "models/newNpc/HeavilyBriton.mdl");
+	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
+
+	pev->solid = SOLID_SLIDEBOX;
+	pev->movetype = MOVETYPE_STEP;
+	m_bloodColor = BLOOD_COLOR_RED;
+	pev->effects = 0;
+	if (!pev->health) pev->health = gSkillData.hgruntHealth;
+	//pev->health = gSkillData.hgruntHealth;
+	m_flFieldOfView = 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
+	m_MonsterState = MONSTERSTATE_NONE;
+	m_flNextGrenadeCheck = gpGlobals->time + 1;
+	m_flNextPainTime = gpGlobals->time;
+	m_iSentence = FGRUNT_SENT_NONE;
+
+	m_afCapability = bits_CAP_HEAR | bits_CAP_TURN_HEAD | bits_CAP_DOORS_GROUP;
+
+	//m_fEnemyEluded = FALSE;
+	m_fFirstEncounter = TRUE;// this is true when the grunt spawns, because he hasn't encountered an enemy yet.
+
+	m_HackedGunPos = Vector(0, 0, 55);
+
+	if (pev->weapons == 0)
+	{
+		// initialize to original values
+		pev->weapons = FGRUNT_9MMAR | FGRUNT_HANDGRENADE;
+		// pev->weapons = FGRUNT_SHOTGUN;
+		// pev->weapons = FGRUNT_9MMAR | FGRUNT_GRENADELAUNCHER;
+	}
+
+	if (FBitSet(pev->weapons, FGRUNT_SHOTGUN))
+	{
+		SetBodygroup(GUN_GROUP, GUN_SHOTGUN);
+		m_cClipSize = 8;
+	}
+	else
+	{
+		m_cClipSize = GRUNT_CLIP_SIZE;
+	}
+	m_cAmmoLoaded = m_cClipSize;
+
+	if (RANDOM_LONG(0, 99) < 80)
+		pev->skin = 0;	// light skin
+	else
+		pev->skin = 1;	// dark skin
+
+	if (FBitSet(pev->weapons, FGRUNT_SHOTGUN))
+	{
+		SetBodygroup(HEAD_GROUP, HEAD_SHOTGUN);
+	}
+	else if (FBitSet(pev->weapons, FGRUNT_GRENADELAUNCHER))
+	{
+		SetBodygroup(HEAD_GROUP, HEAD_M203);
+		pev->skin = 1; // alway dark skin
+	}
+
+	CTalkMonster::g_talkWaitTime = 0;
+
+	MonsterInit();
+	SetUse(&CFGrunt::FollowerUse);
+}
+
+//=========================================================
+// Precache - precaches all resources this monster needs weapon_ppsh
+//=========================================================
+void CHeavilyArmedBritonGrunt::Precache()
+{
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC 
+	else
+		PRECACHE_MODEL("models/newNpc/HeavilyBriton.mdl");
+
+	PRECACHE_SOUND("hgrunt/gr_mgun1.wav");
+	PRECACHE_SOUND("hgrunt/gr_mgun2.wav");
+
+	PRECACHE_SOUND("fgrunt/death1.wav");
+	PRECACHE_SOUND("fgrunt/death2.wav");
+	PRECACHE_SOUND("fgrunt/death3.wav");
+	PRECACHE_SOUND("fgrunt/death4.wav");
+	PRECACHE_SOUND("fgrunt/death5.wav");
+	PRECACHE_SOUND("fgrunt/death6.wav");
+
+	PRECACHE_SOUND("fgrunt/pain1.wav");
+	PRECACHE_SOUND("fgrunt/pain2.wav");
+	PRECACHE_SOUND("fgrunt/pain3.wav");
+	PRECACHE_SOUND("fgrunt/pain4.wav");
+	PRECACHE_SOUND("fgrunt/pain5.wav");
+	PRECACHE_SOUND("fgrunt/pain6.wav");
+
+	PRECACHE_SOUND("hgrunt/gr_reload1.wav");
+
+	PRECACHE_SOUND("weapons/glauncher.wav");
+
+	PRECACHE_SOUND("weapons/sbarrel1.wav");
+
+	PRECACHE_SOUND("zombie/claw_miss2.wav");// because we use the basemonster SWIPE animation event
+
+	// get voice pitch
+	if (RANDOM_LONG(0, 1))
+		m_voicePitch = 109 + RANDOM_LONG(0, 7);
+	else
+		m_voicePitch = 100;
+
+	m_iBrassShell = PRECACHE_MODEL("models/shell.mdl");// brass shell
+	m_iShotgunShell = PRECACHE_MODEL("models/shotgunshell.mdl");
+	UTIL_PrecacheOther("item_healthkit");
+
+	TalkInit();
+	CTalkMonster::Precache();
+}
+//Идея чтоб майор пейн как уникальный персонаж говорил свои реплики, все еще в зачатке.
+// Возможно он будет просто как персонаж,но в бою мы его не будем видеть. Либо будем, и поэтому ему надо как минимум 5-6 своих реплик.
+//На каждую категорию вопрос,ответ и тд свое. Чтоб все работало как надо,надо разобраться в этом как следует.(пример вася клубникин)
+// 
+// const char* CHeavilyArmedBritonGrunt::pGruntSentences[] =
+//
+// 
+// {
+//	"MP_GREN",
+//	"MP_ALERT",
+//	"MP_MONSTER",
+//	"MP_COVER",
+//	"MP_CLEAR",
+//	"MP_THROW",
+//	"MP_CHARGE",
+//	"MP_TAUNT",
+//};
+
+//void CHeavilyArmedBritonGrunt::TalkInit()
+//{
+//	CTalkMonster::TalkInit();
+//
+//	m_szGrp[TLK_ANSWER] = "MP_ANSWER";
+//	m_szGrp[TLK_QUESTION] = "MP_QUESTION";
+//	m_szGrp[TLK_IDLE] = "MP_IDLE";
+//	m_szGrp[TLK_STARE] = NULL;
+//	m_szGrp[TLK_USE] = "MP_OK";
+//	m_szGrp[TLK_UNUSE] = "MP_WAIT";
+//	m_szGrp[TLK_STOP] = "MP_STOP";
+//
+//	m_szGrp[TLK_NOSHOOT] = "MP_SCARED";
+//	m_szGrp[TLK_HELLO] = "MP_HELLO";
+//
+//	m_szGrp[TLK_PHELLO] = NULL;
+//	m_szGrp[TLK_PIDLE] = NULL;
+//	m_szGrp[TLK_PQUESTION] = NULL;
+//
+//	m_szGrp[TLK_PLHURT1] = "MP_CURE";
+//	m_szGrp[TLK_PLHURT2] = NULL;
+//	m_szGrp[TLK_PLHURT3] = NULL;
+//
+//
+//	m_szGrp[TLK_SMELL] = NULL;
+//
+//	m_szGrp[TLK_WOUND] = "MP_WOUND";
+//	m_szGrp[TLK_MORTAL] = "MP_MORTAL";
+//
+//	m_voicePitch = 100;
+//
+//}
+
+//=========================================================
+// HandleAnimEvent - catches the monster-specific messages
+// that occur when tagged animation frames are played.
+//=========================================================
+void CHeavilyArmedBritonGrunt::HandleAnimEvent(MonsterEvent_t* pEvent)
+{
+	Vector	vecShootDir;
+	Vector	vecShootOrigin;
+
+	switch (pEvent->event)
+	{
+	case FGRUNT_AE_DROP_GUN:
+	{
+		Vector	vecGunPos;
+		Vector	vecGunAngles;
+
+		GetAttachment(0, vecGunPos, vecGunAngles);
+
+		// switch to body group with no gun.
+		SetBodygroup(GUN_GROUP, GUN_NONE);
+
+		// now spawn a gun.
+		if (FBitSet(pev->weapons, FGRUNT_SHOTGUN))
+		{
+			DropItem("weapon_shotgun", vecGunPos, vecGunAngles);
+		}
+		else
+		{
+			DropItem("weapon_ppsh", vecGunPos, vecGunAngles);
+		}
+		if (FBitSet(pev->weapons, FGRUNT_GRENADELAUNCHER))
+		{
+			DropItem("ammo_ARgrenades", BodyTarget(pev->origin), vecGunAngles);
+		}
+
+	}
+	break;
+
+	case FGRUNT_AE_RELOAD:
+		EMIT_SOUND(ENT(pev), CHAN_WEAPON, "hgrunt/gr_reload1.wav", 1, ATTN_NORM);
+		m_cAmmoLoaded = m_cClipSize;
+		ClearConditions(bits_COND_NO_AMMO_LOADED);
+		break;
+
+	case FGRUNT_AE_GREN_TOSS:
+	{
+		UTIL_MakeVectors(pev->angles);
+		// CGrenade::ShootTimed( pev, pev->origin + gpGlobals->v_forward * 34 + Vector (0, 0, 32), m_vecTossVelocity, 3.5 );
+		CGrenade::ShootTimed(pev, GetGunPosition(), m_vecTossVelocity, 3.5);
+
+		m_fThrowGrenade = FALSE;
+		m_flNextGrenadeCheck = gpGlobals->time + 6;// wait six seconds before even looking again to see if a grenade can be thrown.
+		// !!!LATER - when in a group, only try to throw grenade if ordered.
+	}
+	break;
+
+	case FGRUNT_AE_GREN_LAUNCH:
+	{
+		EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/glauncher.wav", 0.8, ATTN_NORM);
+		CGrenade::ShootContact(pev, GetGunPosition(), m_vecTossVelocity);
+		m_fThrowGrenade = FALSE;
+		if (g_iSkillLevel == SKILL_HARD)
+			m_flNextGrenadeCheck = gpGlobals->time + RANDOM_FLOAT(2, 5);// wait a random amount of time before shooting again
+		else
+			m_flNextGrenadeCheck = gpGlobals->time + 6;// wait six seconds before even looking again to see if a grenade can be thrown.
+	}
+	break;
+
+	case FGRUNT_AE_GREN_DROP:
+	{
+		UTIL_MakeVectors(pev->angles);
+		CGrenade::ShootTimed(pev, pev->origin + gpGlobals->v_forward * 17 - gpGlobals->v_right * 27 + gpGlobals->v_up * 6, g_vecZero, 3);
+	}
+	break;
+
+	case FGRUNT_AE_BURST1:
+	{
+		if (FBitSet(pev->weapons, FGRUNT_9MMAR))
+		{
+			Shoot();
+
+			// the first round of the three round burst plays the sound and puts a sound in the world sound list.
+			if (RANDOM_LONG(0, 1))
+			{
+				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "hgrunt/gr_mgun1.wav", 1, ATTN_NORM);
+			}
+			else
+			{
+				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "hgrunt/gr_mgun2.wav", 1, ATTN_NORM);
+			}
+		}
+		else
+		{
+			Shotgun();
+
+			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/sbarrel1.wav", 1, ATTN_NORM);
+		}
+
+		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, 384, 0.3);
+	}
+	break;
+
+	case FGRUNT_AE_BURST2:
+	case FGRUNT_AE_BURST3:
+		Shoot();
+		break;
+
+	case FGRUNT_AE_KICK:
+	{
+		CBaseEntity* pHurt = Kick();
+
+		if (pHurt)
+		{
+			// SOUND HERE!
+			UTIL_MakeVectors(pev->angles);
+			pHurt->pev->punchangle.x = 15;
+			pHurt->pev->velocity = pHurt->pev->velocity + gpGlobals->v_forward * 100 + gpGlobals->v_up * 50;
+			pHurt->TakeDamage(pev, pev, gSkillData.hgruntDmgKick, DMG_CLUB);
+		}
+	}
+	break;
+
+	case FGRUNT_AE_CAUGHT_ENEMY:
+	{
+		if (FOkToSpeak())
+		{
+			SENTENCEG_PlayRndSz(ENT(pev), "FG_ALERT", FGRUNT_SENTENCE_VOLUME, GRUNT_ATTN, 0, m_voicePitch);
+			JustSpoke();
+		}
+
+	}
+
+	default:
+		CTalkMonster::HandleAnimEvent(pEvent);
+		break;
+	}
+}
+
+void CHeavilyArmedBritonGrunt::GibMonster(void)
+{
+	Vector	vecGunPos;
+	Vector	vecGunAngles;
+
+	if (GetBodygroup(2) != 2)
+	{// throw a gun if the grunt has one
+		GetAttachment(0, vecGunPos, vecGunAngles);
+
+		CBaseEntity* pGun;
+		if (FBitSet(pev->weapons, FGRUNT_SHOTGUN))
+		{
+			pGun = DropItem("weapon_shotgun", vecGunPos, vecGunAngles);
+		}
+		else
+		{
+			pGun = DropItem("ammo_venomclip", vecGunPos, vecGunAngles); //дропает пусть аптечку...
+		}
+		if (pGun)
+		{
+			pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
+			pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
+		}
+
+		if (FBitSet(pev->weapons, FGRUNT_GRENADELAUNCHER))
+		{
+			pGun = DropItem("ammo_ARgrenades", vecGunPos, vecGunAngles);
+			if (pGun)
+			{
+				pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
+				pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
+			}
+		}
+	}
+
+	CBaseMonster::GibMonster();
+}
+
+//===========================//
+//GruntUSA,// 
+//солдаты_USA//
+//===========================//
+
+class CUSAGrunt : public CFGrunt
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	void HandleAnimEvent(MonsterEvent_t* pEvent);
+	void GibMonster(void);
+	static const char* pGruntSentences[];
+
+};
+
+LINK_ENTITY_TO_CLASS(monster_human_USA_Grunt, CUSAGrunt);
+
+//=========================================================
+// Spawn
+//=========================================================
+void CUSAGrunt::Spawn()
+{
+	Precache();
+
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC 
+	else
+		SET_MODEL(ENT(pev), "models/newNpc/fgruntUSA.mdl");
+	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
+
+	pev->solid = SOLID_SLIDEBOX;
+	pev->movetype = MOVETYPE_STEP;
+	m_bloodColor = BLOOD_COLOR_RED;
+	pev->effects = 0;
+	if (!pev->health) pev->health = gSkillData.hgruntHealth;
+	//pev->health = gSkillData.hgruntHealth;
+	m_flFieldOfView = 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
+	m_MonsterState = MONSTERSTATE_NONE;
+	m_flNextGrenadeCheck = gpGlobals->time + 1;
+	m_flNextPainTime = gpGlobals->time;
+	m_iSentence = FGRUNT_SENT_NONE;
+
+	m_afCapability = bits_CAP_HEAR | bits_CAP_TURN_HEAD | bits_CAP_DOORS_GROUP;
+
+	//m_fEnemyEluded = FALSE;
+	m_fFirstEncounter = TRUE;// this is true when the grunt spawns, because he hasn't encountered an enemy yet.
+
+	m_HackedGunPos = Vector(0, 0, 55);
+
+	if (pev->weapons == 0)
+	{
+		// initialize to original values
+		pev->weapons = FGRUNT_9MMAR | FGRUNT_HANDGRENADE;
+		// pev->weapons = FGRUNT_SHOTGUN;
+		// pev->weapons = FGRUNT_9MMAR | FGRUNT_GRENADELAUNCHER;
+	}
+
+	if (FBitSet(pev->weapons, FGRUNT_SHOTGUN))
+	{
+		SetBodygroup(GUN_GROUP, GUN_SHOTGUN);
+		m_cClipSize = 8;
+	}
+	else
+	{
+		m_cClipSize = GRUNT_CLIP_SIZE;
+	}
+	m_cAmmoLoaded = m_cClipSize;
+
+	if (RANDOM_LONG(0, 99) < 80)
+		pev->skin = 0;	// light skin
+	else
+		pev->skin = 1;	// dark skin
+
+	if (FBitSet(pev->weapons, FGRUNT_SHOTGUN))
+	{
+		SetBodygroup(HEAD_GROUP, HEAD_SHOTGUN);
+	}
+	else if (FBitSet(pev->weapons, FGRUNT_GRENADELAUNCHER))
+	{
+		SetBodygroup(HEAD_GROUP, HEAD_M203);
+		pev->skin = 1; // alway dark skin
+	}
+
+	CTalkMonster::g_talkWaitTime = 0;
+
+	MonsterInit();
+	SetUse(&CFGrunt::FollowerUse);
+}
+
+//=========================================================
+// Precache - precaches all resources this monster needs weapon_ppsh
+//=========================================================
+void CUSAGrunt::Precache()
+{
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC 
+	else
+		PRECACHE_MODEL("models/newNpc/fgruntUSA.mdl");
+
+	PRECACHE_SOUND("fgrunt/fg_gun1.wav");
+	PRECACHE_SOUND("fgrunt/fg_gun2.wav");
+
+	PRECACHE_SOUND("fgrunt/death1.wav");
+	PRECACHE_SOUND("fgrunt/death2.wav");
+	PRECACHE_SOUND("fgrunt/death3.wav");
+	PRECACHE_SOUND("fgrunt/death4.wav");
+	PRECACHE_SOUND("fgrunt/death5.wav");
+	PRECACHE_SOUND("fgrunt/death6.wav");
+
+	PRECACHE_SOUND("fgrunt/pain1.wav");
+	PRECACHE_SOUND("fgrunt/pain2.wav");
+	PRECACHE_SOUND("fgrunt/pain3.wav");
+	PRECACHE_SOUND("fgrunt/pain4.wav");
+	PRECACHE_SOUND("fgrunt/pain5.wav");
+	PRECACHE_SOUND("fgrunt/pain6.wav");
+
+	PRECACHE_SOUND("hgrunt/gr_reload1.wav");
+	
+
+	PRECACHE_SOUND("weapons/glauncher.wav");
+
+	PRECACHE_SOUND("weapons/sbarrel1.wav");
+
+	PRECACHE_SOUND("zombie/claw_miss2.wav");// because we use the basemonster SWIPE animation event
+
+	// get voice pitch
+	if (RANDOM_LONG(0, 1))
+		m_voicePitch = 109 + RANDOM_LONG(0, 7);
+	else
+		m_voicePitch = 100;
+
+	m_iBrassShell = PRECACHE_MODEL("models/shell.mdl");// brass shell
+	m_iShotgunShell = PRECACHE_MODEL("models/shotgunshell.mdl");
+	UTIL_PrecacheOther("item_healthkit");
+
+	TalkInit();
+	CTalkMonster::Precache();
+}
+
+//const char* CHeavilyArmedBritonGrunt::pGruntSentences[] =
+//{
+//	"VC_GREN",
+//	"VC_ALERT",
+//	"VC_MONSTER",
+//	"VC_COVER",
+//	"VC_CLEAR",
+//	"VC_THROW",
+//	"VC_CHARGE",
+//	"VC_TAUNT",
+//};
+
+
+//=========================================================
+// HandleAnimEvent - catches the monster-specific messages
+// that occur when tagged animation frames are played.
+//=========================================================
+void CUSAGrunt::HandleAnimEvent(MonsterEvent_t* pEvent)
+{
+	Vector	vecShootDir;
+	Vector	vecShootOrigin;
+
+	switch (pEvent->event)
+	{
+	case FGRUNT_AE_DROP_GUN:
+	{
+		Vector	vecGunPos;
+		Vector	vecGunAngles;
+
+		GetAttachment(0, vecGunPos, vecGunAngles);
+
+		// switch to body group with no gun.
+		SetBodygroup(GUN_GROUP, GUN_NONE);
+
+		// now spawn a gun.
+		if (FBitSet(pev->weapons, FGRUNT_SHOTGUN))
+		{
+			DropItem("weapon_shotgun", vecGunPos, vecGunAngles);
+		}
+		else
+		{
+			DropItem("weapon_ppsh", vecGunPos, vecGunAngles);
+		}
+		if (FBitSet(pev->weapons, FGRUNT_GRENADELAUNCHER))
+		{
+			DropItem("ammo_ARgrenades", BodyTarget(pev->origin), vecGunAngles);
+		}
+
+	}
+	break;
+
+	case FGRUNT_AE_RELOAD:
+		EMIT_SOUND(ENT(pev), CHAN_WEAPON, "hgrunt/gr_reload1.wav", 1, ATTN_NORM);
+		m_cAmmoLoaded = m_cClipSize;
+		ClearConditions(bits_COND_NO_AMMO_LOADED);
+		break;
+
+	case FGRUNT_AE_GREN_TOSS:
+	{
+		UTIL_MakeVectors(pev->angles);
+		// CGrenade::ShootTimed( pev, pev->origin + gpGlobals->v_forward * 34 + Vector (0, 0, 32), m_vecTossVelocity, 3.5 );
+		CGrenade::ShootTimed(pev, GetGunPosition(), m_vecTossVelocity, 3.5);
+
+		m_fThrowGrenade = FALSE;
+		m_flNextGrenadeCheck = gpGlobals->time + 6;// wait six seconds before even looking again to see if a grenade can be thrown.
+		// !!!LATER - when in a group, only try to throw grenade if ordered.
+	}
+	break;
+
+	case FGRUNT_AE_GREN_LAUNCH:
+	{
+		EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/glauncher.wav", 0.8, ATTN_NORM);
+		CGrenade::ShootContact(pev, GetGunPosition(), m_vecTossVelocity);
+		m_fThrowGrenade = FALSE;
+		if (g_iSkillLevel == SKILL_HARD)
+			m_flNextGrenadeCheck = gpGlobals->time + RANDOM_FLOAT(2, 5);// wait a random amount of time before shooting again
+		else
+			m_flNextGrenadeCheck = gpGlobals->time + 6;// wait six seconds before even looking again to see if a grenade can be thrown.
+	}
+	break;
+
+	case FGRUNT_AE_GREN_DROP:
+	{
+		UTIL_MakeVectors(pev->angles);
+		CGrenade::ShootTimed(pev, pev->origin + gpGlobals->v_forward * 17 - gpGlobals->v_right * 27 + gpGlobals->v_up * 6, g_vecZero, 3);
+	}
+	break;
+
+	case FGRUNT_AE_BURST1:
+	{
+		if (FBitSet(pev->weapons, FGRUNT_9MMAR))
+		{
+			Shoot();
+
+			// the first round of the three round burst plays the sound and puts a sound in the world sound list.
+			if (RANDOM_LONG(0, 1))
+			{
+				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "fgrunt/fg_gun1.wav", 1, ATTN_NORM);
+			}
+			else
+			{
+				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "fgrunt/fg_gun2.wav", 1, ATTN_NORM);//fg_gun1 томми ган
+			}
+		}
+		else
+		{
+			Shotgun();
+
+			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/sbarrel1.wav", 1, ATTN_NORM);
+		}
+
+		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, 384, 0.3);
+	}
+	break;
+
+	case FGRUNT_AE_BURST2:
+	case FGRUNT_AE_BURST3:
+		Shoot();
+		break;
+
+	case FGRUNT_AE_KICK:
+	{
+		CBaseEntity* pHurt = Kick();
+
+		if (pHurt)
+		{
+			// SOUND HERE!
+			UTIL_MakeVectors(pev->angles);
+			pHurt->pev->punchangle.x = 15;
+			pHurt->pev->velocity = pHurt->pev->velocity + gpGlobals->v_forward * 100 + gpGlobals->v_up * 50;
+			pHurt->TakeDamage(pev, pev, gSkillData.hgruntDmgKick, DMG_CLUB);
+		}
+	}
+	break;
+
+	case FGRUNT_AE_CAUGHT_ENEMY:
+	{
+		if (FOkToSpeak())
+		{
+			SENTENCEG_PlayRndSz(ENT(pev), "FG_ALERT", FGRUNT_SENTENCE_VOLUME, GRUNT_ATTN, 0, m_voicePitch);
+			JustSpoke();
+		}
+
+	}
+
+	default:
+		CTalkMonster::HandleAnimEvent(pEvent);
+		break;
+	}
+}
+
+void CUSAGrunt::GibMonster(void)
+{
+	Vector	vecGunPos;
+	Vector	vecGunAngles;
+
+	if (GetBodygroup(2) != 2)
+	{// throw a gun if the grunt has one
+		GetAttachment(0, vecGunPos, vecGunAngles);
+
+		CBaseEntity* pGun;
+		if (FBitSet(pev->weapons, FGRUNT_SHOTGUN))
+		{
+			pGun = DropItem("weapon_shotgun", vecGunPos, vecGunAngles);
+		}
+		else
+		{
+			pGun = DropItem("ammo_venomclip", vecGunPos, vecGunAngles); //дропает пусть аптечку...
+		}
+		if (pGun)
+		{
+			pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
+			pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
+		}
+
+		if (FBitSet(pev->weapons, FGRUNT_GRENADELAUNCHER))
+		{
+			pGun = DropItem("ammo_ARgrenades", vecGunPos, vecGunAngles);
+			if (pGun)
+			{
+				pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
+				pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
+			}
+		}
+	}
+
+	CBaseMonster::GibMonster();
+}

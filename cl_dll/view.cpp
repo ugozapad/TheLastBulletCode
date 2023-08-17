@@ -161,6 +161,10 @@ void V_InterpolateAngles( float *start, float *end, float *output, float frac )
 } */
 
 // Quakeworld bob code, this fixes jitters in the mutliplayer since the clock (pparams->time) isn't quite linear
+extern bool InRun;
+extern bool InDuck;
+extern bool InJump;
+
 float V_CalcBob ( struct ref_params_s *pparams )
 {
 	static	double	bobtime;
@@ -168,11 +172,16 @@ float V_CalcBob ( struct ref_params_s *pparams )
 	float	cycle;
 	static float	lasttime;
 	vec3_t	vel;
-	
+	if (!pparams->onground)
+		InJump = true;
+
 
 	if ( pparams->onground == -1 ||
 		 pparams->time == lasttime )
 	{
+		if (bob)
+			InRun = true;
+
 		// just use old value
 		return bob;	
 	}

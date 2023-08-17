@@ -185,10 +185,15 @@ int gmsgSetFOV = 0;
 int gmsgShowMenu = 0;
 int gmsgGeigerRange = 0;
 int gmsgTeamNames = 0;
+int gmsgWaterSplash = 0;
+
 
 int gmsgStatusText = 0;
 int gmsgStatusValue = 0; 
 int gmsgZoom = 0;
+
+
+int gmsgImpact = 0;
 
 
 
@@ -229,16 +234,20 @@ void LinkUserMessages( void )
 	gmsgItemPickup = REG_USER_MSG( "ItemPickup", -1 );
 	gmsgHideWeapon = REG_USER_MSG( "HideWeapon", 1 );
 	gmsgSetFOV = REG_USER_MSG( "SetFOV", 1 );
-	gmsgShowMenu = REG_USER_MSG( "ShowMenu", -1 );
+	//gmsgShowMenu = REG_USER_MSG( "ShowMenu", -1 );
 	gmsgShake = REG_USER_MSG("ScreenShake", sizeof(ScreenShake));
 	gmsgFade = REG_USER_MSG("ScreenFade", sizeof(ScreenFade));
 	gmsgAmmoX = REG_USER_MSG("AmmoX", 2);
 	gmsgTeamNames = REG_USER_MSG( "TeamNames", -1 );
+	gmsgWaterSplash = REG_USER_MSG("WaterSplash", -1);
+
 
 	gmsgStatusText = REG_USER_MSG("StatusText", -1);
 	gmsgStatusValue = REG_USER_MSG("StatusValue", 3); 
 	gmsgZoom = REG_USER_MSG("ZoomHud", 1);
 
+
+	gmsgImpact = REG_USER_MSG("Impact", -1);
 }
 
 LINK_ENTITY_TO_CLASS( player, CBasePlayer );
@@ -1138,8 +1147,13 @@ void CBasePlayer::TabulateAmmo()
 	ammo_rockets = AmmoInventory( GetAmmoIndex( "rockets" ) );
 	ammo_uranium = AmmoInventory( GetAmmoIndex( "uranium" ) );
 	ammo_hornets = AmmoInventory( GetAmmoIndex( "Hornets" ) );
+	ammo_plasmo = AmmoInventory(GetAmmoIndex("plasmo"));
 	ammo_338 = AmmoInventory(GetAmmoIndex("338"));
 	ammo_mp44 = AmmoInventory(GetAmmoIndex("mp44"));
+	ammo_wrifle = AmmoInventory(GetAmmoIndex("k43"));
+	ammo_ppsh = AmmoInventory(GetAmmoIndex("ppsh"));
+	ammo_tommy = AmmoInventory(GetAmmoIndex("tommy"));
+	ammo_pm = AmmoInventory(GetAmmoIndex("makarov"));
 }
 
 
@@ -3553,6 +3567,9 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 		GiveNamedItem( "ammo_ARgrenades" );
 		GiveNamedItem( "weapon_handgrenade" );
 		GiveNamedItem( "weapon_tripmine" );
+		GiveNamedItem("ammo_plasmo");
+		GiveNamedItem("weapon_plasmorifle");
+		
 #ifndef OEM_BUILD
 		GiveNamedItem( "weapon_357" );
 		GiveNamedItem( "ammo_357" );
@@ -3573,6 +3590,8 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 		GiveNamedItem("ammo_sten");//наши патроны
 		GiveNamedItem("weapon_knife");
 		GiveNamedItem("weapon_mp44");
+		GiveNamedItem("weapon_wrifle");
+		GiveNamedItem("ammo_wrifle");
 
 #endif
 		gEvilImpulse101 = FALSE;

@@ -40,9 +40,16 @@ void EV_SnarkFire( struct event_args_s *args );
 void EV_FireSniper(struct event_args_s* args);
 void EV_FireVenom(struct event_args_s* args);
 void EV_FireVenom2(struct event_args_s* args);
+void EV_SpinVenom(struct event_args_s* args);
 void EV_StenFire(struct event_args_s *args); // ваше оружие
 void EV_KnifeFire(struct event_args_s *args);
 void EV_Mp44Fire(struct event_args_s *args); // ваше оружие
+void EV_RifleK43Fire(struct event_args_s* args); // ваше оружие
+void EV_PpshFire(struct event_args_s* args); // ваше оружие
+void EV_TommyFire(struct event_args_s* args); // ваше оружие
+void EV_TeterevFire(struct event_args_s* args);
+void EV_MariaFire(struct event_args_s* args);
+void EV_PlasmaFire(struct event_args_s* args);
 
 void EV_TrainPitchAdjust( struct event_args_s *args );
 }
@@ -70,6 +77,7 @@ void Game_HookEvents( void )
 	gEngfuncs.pfnHookEvent( "events/mp52.sc",					EV_FireMP52 );
 	gEngfuncs.pfnHookEvent( "events/venom.sc",					EV_FireVenom);
 	gEngfuncs.pfnHookEvent(	"events/venom2.sc",					EV_FireVenom2);
+	gEngfuncs.pfnHookEvent( "events/venom3.sc",					EV_SpinVenom);
 	gEngfuncs.pfnHookEvent( "events/python.sc",					EV_FirePython );
 	gEngfuncs.pfnHookEvent( "events/gauss.sc",					EV_FireGauss );
 	gEngfuncs.pfnHookEvent( "events/gaussspin.sc",				EV_SpinGauss );
@@ -86,5 +94,11 @@ void Game_HookEvents( void )
 	gEngfuncs.pfnHookEvent(	"events/sniper.sc",					EV_FireSniper);
 	gEngfuncs.pfnHookEvent("events/sten.sc",                    EV_StenFire);//добавить
 	gEngfuncs.pfnHookEvent("events/mp44.sc", EV_StenFire);
+	gEngfuncs.pfnHookEvent("events/k43.sc", EV_RifleK43Fire);
+	gEngfuncs.pfnHookEvent("events/ppsh.sc", EV_PpshFire);
+	gEngfuncs.pfnHookEvent("events/tommy.sc", EV_TommyFire);
+	gEngfuncs.pfnHookEvent("events/teterev.sc", EV_TeterevFire);
+	gEngfuncs.pfnHookEvent("events/maria.sc", EV_MariaFire);
+	gEngfuncs.pfnHookEvent("events/plasmarifle.sc", EV_PlasmaFire);
 
 }

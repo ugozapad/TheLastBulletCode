@@ -23,6 +23,8 @@
 #include "soundent.h"
 #include "gamerules.h"
 
+#define VENOM_WIND_TIME 0.6f
+
 enum venom_e
 {
 	VENOM_LONGIDLE = 0,
@@ -30,9 +32,12 @@ enum venom_e
 	VENOM_LAUNCH,
 	VENOM_RELOAD,
 	VENOM_DEPLOY,
-	VENOM_FIRE1,
+	VENOM_FIRE1, 
 	VENOM_FIRE2,
 	VENOM_FIRE3,
+	VENOM_SPINUP,
+	VENOM_SPINDOWN
+
 };
 
 
@@ -56,6 +61,10 @@ void CVenom::Spawn()
 	m_iId = WEAPON_VENOM;
 
 	m_iDefaultAmmo = VENOM_DEFAULT_GIVE;
+
+	m_flRotationSpeed = 0;
+
+	m_fInAttack = 0;
 
 	FallInit();// get ready to fall down.
 }
@@ -89,6 +98,115 @@ void CVenom::Precache(void)
 
 	m_usVenom = PRECACHE_EVENT(1, "events/venom.sc");
 	m_usVenom2 = PRECACHE_EVENT(1, "events/venom2.sc");
+	m_usVenom3 = PRECACHE_EVENT(1, "events/venom3.sc");
+}
+
+void CVenom::Holster(int skiplocal)
+{
+	m_flRotationSpeed = 0;
+}
+
+
+void CVenom::ItemPostFrame()
+{
+
+	if ((m_fInReload) && (m_pPlayer->m_flNextAttack <= 0.0))
+	{
+#if 0 // FIXME, need ammo on client to make this work right
+		// complete the reload. 
+		int j = min(iMaxClip() - m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
+
+		// Add them to the clip
+		m_iClip += j;
+		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= j;
+#else	
+		m_iClip += 10;
+#endif
+		m_fInReload = FALSE;
+	}
+
+	if (!m_flRotationSpeed)
+	{
+		m_flPlayerSpeed = m_pPlayer->pev->maxspeed;
+	}
+
+	float flLastRotationSpeed = m_flRotationSpeed;
+
+	if ((m_pPlayer->pev->button & IN_ATTACK2) && (m_flNextSecondaryAttack <= 0.0))
+	{
+		if (pszAmmo2() && !m_pPlayer->m_rgAmmo[SecondaryAmmoIndex()])
+		{
+			m_fFireOnEmpty = TRUE;
+		}
+
+		SecondaryAttack();
+		m_pPlayer->pev->button &= ~IN_ATTACK2;
+	}
+	else if ((m_pPlayer->pev->button & IN_ATTACK) && (m_flNextPrimaryAttack <= 0.0))
+	{
+		if ((m_iClip == 0 && pszAmmo1()) || (iMaxClip() == -1 && !m_pPlayer->m_rgAmmo[PrimaryAmmoIndex()]))
+		{
+			m_fFireOnEmpty = TRUE;
+		}
+
+		if (m_iClip > 0)
+		{
+			if (m_flRotationSpeed < 0.99f)
+			{
+				Spinup();
+			}
+			else
+			{
+				PrimaryAttack();
+			}
+		}
+	}
+	else if (m_pPlayer->pev->button & IN_RELOAD && iMaxClip() != WEAPON_NOCLIP && !m_fInReload)
+	{
+		// reload when reload is pressed, or if no buttons are down and weapon is empty.
+		Reload();
+	}
+	else if (!(m_pPlayer->pev->button & (IN_ATTACK | IN_ATTACK2)))
+	{
+		// no fire buttons down
+
+		m_fFireOnEmpty = FALSE;
+
+		// weapon is useable. Reload if empty and weapon has waited as long as it has to after firing
+		if (m_iClip == 0 && !(iFlags() & ITEM_FLAG_NOAUTORELOAD) && m_flNextPrimaryAttack < 0.0)
+		{
+			Reload();
+			return;
+		}
+		else
+		{
+			ReduceRotation();
+		}
+
+
+		// If the speed changed, modify our movement speed
+		if (m_flRotationSpeed != flLastRotationSpeed)
+		{
+			m_pPlayer->pev->maxspeed = m_flPlayerSpeed * (1.0f - (m_flRotationSpeed * 0.5f)); //SetMaxSpeed(m_flOwnersMaxSpeed * (1.0 - (m_flRotationSpeed * 0.5)));
+		}
+		
+		
+		if (m_fInAttack)
+		{
+				SendWeaponAnim(VENOM_SPINDOWN);
+				m_fInAttack = 0;
+		}
+		
+
+		WeaponIdle();
+		return;
+	}
+
+	// catch all
+	if (ShouldWeaponIdle())
+	{
+		WeaponIdle();
+	}
 }
 
 int CVenom::GetItemInfo(ItemInfo* p)
@@ -99,8 +217,8 @@ int CVenom::GetItemInfo(ItemInfo* p)
 	p->pszAmmo2 = "ARgrenades";
 	p->iMaxAmmo2 = M203_GRENADE_MAX_CARRY;
 	p->iMaxClip = VENOM_MAX_CLIP;
-	p->iSlot = 3;
-	p->iPosition = 4;
+	p->iSlot = 4;
+	p->iPosition = 6;
 	p->iFlags = 0;
 	p->iId = m_iId = WEAPON_VENOM;
 	p->iWeight = VENOM_WEIGHT;
@@ -125,6 +243,26 @@ BOOL CVenom::Deploy()
 	return DefaultDeploy("models/v_venom.mdl", "models/p_venom.mdl", VENOM_DEPLOY, "338");
 }
 
+
+void CVenom::Spinup()
+{
+	int flags;
+#if defined( CLIENT_WEAPONS )
+	flags = FEV_NOTHOST;
+#else
+	flags = 0;
+#endif
+	m_flRotationSpeed = min(1, m_flRotationSpeed + (gpGlobals->frametime / VENOM_WIND_TIME));
+	//PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usVenom3, 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0, 0, 0, 0, 0, 0);
+	
+	if (!m_fInAttack)
+	{
+		SendWeaponAnim(VENOM_SPINUP);
+		m_fInAttack = 1;
+	}
+
+	
+}
 
 void CVenom::PrimaryAttack()
 {
@@ -158,6 +296,7 @@ void CVenom::PrimaryAttack()
 	// player "shoot" animation
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 
+	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 	Vector vecSrc = m_pPlayer->GetGunPosition();
 	Vector vecAiming = m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
 	Vector vecDir;
@@ -165,7 +304,7 @@ void CVenom::PrimaryAttack()
 #ifdef CLIENT_DLL
 	if (!bIsMultiplayer())
 #else
-	if (!g_pGameRules->IsMultiplayer())
+	if (g_pGameRules->IsMultiplayer())
 #endif
 	{
 		// optimized multiplayer. Widened to make it easier to hit a moving player
@@ -175,7 +314,12 @@ void CVenom::PrimaryAttack()
 	{
 		// single player spread
 		vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, VECTOR_CONE_3DEGREES, 8192, BULLET_PLAYER_338, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed);
+	
+		m_pPlayer->WeaponScreenPunch(1.3, 2.);
+
 	}
+
+
 
 	int flags;
 #if defined( CLIENT_WEAPONS )
@@ -196,60 +340,22 @@ void CVenom::PrimaryAttack()
 		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.1;
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15);
+	m_fInAttack = 0;
 }
 
 
 
 void CVenom::SecondaryAttack(void)
 {
-	// don't fire underwater
-	if (m_pPlayer->pev->waterlevel == 3)
+	
+}
+
+void CVenom::ReduceRotation(void)
+{
+	if (m_flRotationSpeed > 0)
 	{
-		PlayEmptySound();
-		m_flNextPrimaryAttack = 0.15;
-		return;
+		m_flRotationSpeed = max(0, m_flRotationSpeed - (gpGlobals->frametime / VENOM_WIND_TIME));
 	}
-
-	if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] == 0)
-	{
-		PlayEmptySound();
-		return;
-	}
-
-	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
-	m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
-
-	m_pPlayer->m_iExtraSoundTypes = bits_SOUND_DANGER;
-	m_pPlayer->m_flStopExtraSoundTime = UTIL_WeaponTimeBase() + 0.2;
-
-	m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]--;
-
-	// player "shoot" animation
-	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-
-	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
-
-	// we don't add in player velocity anymore.
-	CGrenade::ShootContact(m_pPlayer->pev,
-		m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 16,
-		gpGlobals->v_forward * 800);
-
-	int flags;
-#if defined( CLIENT_WEAPONS )
-	flags = FEV_NOTHOST;
-#else
-	flags = 0;
-#endif
-
-	PLAYBACK_EVENT(flags, m_pPlayer->edict(), m_usVenom2);
-
-	m_flNextPrimaryAttack = GetNextAttackDelay(1);
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 5;// idle pretty soon after shooting.
-
-	if (!m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType])
-		// HEV suit - indicate out of ammo condition
-		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 }
 
 void CVenom::Reload(void)
@@ -258,9 +364,15 @@ void CVenom::Reload(void)
 		return;
 
 	/*int iResult;*/
+	if (m_flRotationSpeed > 0)
+	{
+		ReduceRotation();
+	}
+	else
+	{
 
-
-	/*iResult = */DefaultReload(VENOM_MAX_CLIP, VENOM_RELOAD, 1.5);
+		/*iResult = */DefaultReload(VENOM_MAX_CLIP, VENOM_RELOAD, 4.0);
+	}
 
 
 	/*if (iResult)

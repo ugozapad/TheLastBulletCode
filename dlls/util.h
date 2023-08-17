@@ -165,7 +165,7 @@ inline BOOL FStringNull(int iString)			{ return iString == iStringNull; }
 // All monsters need this data
 #define		DONT_BLEED			-1
 #define		BLOOD_COLOR_RED		(BYTE)247
-#define		BLOOD_COLOR_YELLOW	(BYTE)195
+#define		BLOOD_COLOR_YELLOW	(BYTE)148//195
 #define		BLOOD_COLOR_GREEN	BLOOD_COLOR_YELLOW
 
 typedef enum 
@@ -510,6 +510,7 @@ void EMIT_SOUND_SUIT(edict_t *entity, const char *sample);
 void EMIT_GROUPID_SUIT(edict_t *entity, int isentenceg);
 void EMIT_GROUPNAME_SUIT(edict_t *entity, const char *groupname);
 
+
 #define PRECACHE_SOUND_ARRAY( a ) \
 	{ for (int i = 0; i < ARRAYSIZE( a ); i++ ) PRECACHE_SOUND((char *) a [i]); }
 
@@ -544,3 +545,6 @@ int UTIL_SharedRandomLong( unsigned int seed, int low, int high );
 float UTIL_SharedRandomFloat( unsigned int seed, float low, float high );
 
 float UTIL_WeaponTimeBase( void );
+
+
+//void ImpactBullet(TraceResult* ptr, Vector vecSrc, Vector vecEnd);

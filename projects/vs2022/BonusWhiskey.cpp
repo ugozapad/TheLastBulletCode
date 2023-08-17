@@ -24,7 +24,7 @@
 
 extern int gmsgItemPickup;
 
-class CEatHealthKit : public CItem
+class CwhiskeyHealthKit : public CItem
 {
 	void Spawn(void);
 	void Precache(void);
@@ -40,7 +40,7 @@ class CEatHealthKit : public CItem
 };
 
 
-LINK_ENTITY_TO_CLASS(item_Eathealthkit, CEatHealthKit);
+LINK_ENTITY_TO_CLASS(item_whiskeyhealthkit, CwhiskeyHealthKit);
 
 /*
 TYPEDESCRIPTION	CEatHealthKit::m_SaveData[] =
@@ -52,7 +52,7 @@ TYPEDESCRIPTION	CEatHealthKit::m_SaveData[] =
 IMPLEMENT_SAVERESTORE( CHealthKit, CItem);
 */
 
-void CEatHealthKit::Spawn(void)
+void CwhiskeyHealthKit::Spawn(void)
 {
 	Precache();
 	if (pev->model)
@@ -61,12 +61,12 @@ void CEatHealthKit::Spawn(void)
 	}
 	else
 	{
-		SET_MODEL(ENT(pev), "models/newHealthykit/w_EatHelth.mdl");
+		SET_MODEL(ENT(pev), "models/newHealthykit/w_bonuswhiskey.mdl");
 	}
 	CItem::Spawn();
 }
 
-void CEatHealthKit::Precache(void)
+void CwhiskeyHealthKit::Precache(void)
 {
 	if (pev->model)
 	{
@@ -74,25 +74,25 @@ void CEatHealthKit::Precache(void)
 	}
 	else
 	{
-		PRECACHE_MODEL("models/newHealthykit/w_EatHelth.mdl");
+		PRECACHE_MODEL("models/newHealthykit/w_bonuswhiskey.mdl");
 	}
-	PRECACHE_SOUND("TLB/healtyeat/eating.wav");
+	PRECACHE_SOUND("TLB/healtyeat/whiskey.wav");
 }
 
-BOOL CEatHealthKit::MyTouch(CBasePlayer *pPlayer)
+BOOL CwhiskeyHealthKit::MyTouch(CBasePlayer *pPlayer)
 {
 	if (pPlayer->pev->deadflag != DEAD_NO)
 	{
 		return FALSE;
 	}
 
-	if (pPlayer->TakeHealth(gSkillData.healthkitCapacity, DMG_GENERIC))
+	if (pPlayer->TakeHealth(gSkillData.whiskeyHealth, DMG_GENERIC))
 	{
 		MESSAGE_BEGIN(MSG_ONE, gmsgItemPickup, NULL, pPlayer->pev);
 		WRITE_STRING(STRING(pev->classname));
 		MESSAGE_END();
 
-		EMIT_SOUND(ENT(pPlayer->pev), CHAN_ITEM, "TLB/healtyeat/eating.wav", 1, ATTN_NORM);
+		EMIT_SOUND(ENT(pPlayer->pev), CHAN_ITEM, "TLB/healtyeat/whiskey.wav", 1, ATTN_NORM);
 
 		if (g_pGameRules->ItemShouldRespawn(this))
 		{

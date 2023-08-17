@@ -23,6 +23,7 @@
 #include	"cbase.h"
 #include	"monsters.h"
 #include	"schedule.h"
+#include <explode.h>
 
 
 //=========================================================
@@ -352,4 +353,161 @@ int CZombie::IgnoreConditions ( void )
 	return iIgnore;
 	
 }
+
+//новый зомбяка, из крипты. Ну крч та мумия красно-одноглазая.
+
+class CCryptZombie : public CZombie
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	void GibMonster(void);
+	short g_sModelIndexMetalGibs; //добавил эту строчку сюда затем в прекеш свою
+	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType);
+	void DeathSound(void);
+	static const char* pDeathSounds[];
+};
+
+
+
+LINK_ENTITY_TO_CLASS(monster_cryptzombie, CCryptZombie);
+
+void CCryptZombie::Spawn()
+{
+	Precache();
+
+	if (pev->model)
+		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC 
+	else
+		SET_MODEL(ENT(pev), "models/newNpc/zombieCryptKnife.mdl");
+	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
+
+	pev->solid = SOLID_SLIDEBOX;
+	pev->movetype = MOVETYPE_STEP;
+	m_bloodColor = DONT_BLEED;
+	//m_bloodColor = BLOOD_COLOR_GREEN;
+	pev->health = gSkillData.zombieHealth;
+	pev->view_ofs = VEC_VIEW;// position of the eyes relative to monster's origin.
+	m_flFieldOfView = 0.5;// indicates the width of this monster's forward view cone ( as a dotproduct result )
+	m_MonsterState = MONSTERSTATE_NONE;
+	m_afCapability = bits_CAP_DOORS_GROUP;
+
+	MonsterInit();
+}
+
+const char* CCryptZombie::pDeathSounds[] =
+{
+	"zombie/die1.wav",
+	"zombie/die2.wav",
+	"zombie/die3.wav",
+};
+
+
+void CCryptZombie::Precache()
+{
+	int i;
+
+	if (pev->model)
+		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC 
+	else
+		PRECACHE_MODEL("models/newNpc/zombieCryptKnife.mdl");
+
+
+	for (i = 0; i < ARRAYSIZE(pAttackHitSounds); i++)
+		PRECACHE_SOUND((char*)pAttackHitSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAttackMissSounds); i++)
+		PRECACHE_SOUND((char*)pAttackMissSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAttackSounds); i++)
+		PRECACHE_SOUND((char*)pAttackSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pIdleSounds); i++)
+		PRECACHE_SOUND((char*)pIdleSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pAlertSounds); i++)
+		PRECACHE_SOUND((char*)pAlertSounds[i]);
+
+	for (i = 0; i < ARRAYSIZE(pPainSounds); i++)
+		PRECACHE_SOUND((char*)pPainSounds[i]);
+	g_sModelIndexMetalGibs = PRECACHE_MODEL("models/newNpc/zmb_crypt_gib.mdl");
+
+	
+	PRECACHE_SOUND_ARRAY(pDeathSounds);
+	
+}
+
+
+
+
+void CCryptZombie::DeathSound(void)
+{
+	EMIT_SOUND(ENT(pev), CHAN_VOICE, pDeathSounds[RANDOM_LONG(0, ARRAYSIZE(pDeathSounds) - 1)], 1, ATTN_NORM);
+}
+
+
+
+void CCryptZombie::GibMonster(void)
+{
+	
+	Vector vecOrigin = pev->origin;
+
+	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecOrigin);
+	WRITE_BYTE(TE_BREAKMODEL);
+
+	// position
+	WRITE_COORD(vecOrigin.x);
+	WRITE_COORD(vecOrigin.y);
+	WRITE_COORD(vecOrigin.z + 10);
+	// size
+	WRITE_COORD(0.01);
+	WRITE_COORD(0.01);
+	WRITE_COORD(0.01);
+	// velocity
+	WRITE_COORD(0);
+	WRITE_COORD(0);
+	WRITE_COORD(0);
+	// randomization of the velocity
+	WRITE_BYTE(30);
+	// Model
+	WRITE_SHORT(g_sModelIndexMetalGibs);	//model id#
+	// # of shards
+	WRITE_BYTE(RANDOM_LONG(4, 6));
+	// duration
+	WRITE_BYTE(100);// 10.0 seconds
+	// flags
+	WRITE_BYTE(BREAK_FLESH);
+	MESSAGE_END();
+	SetThink(&CBaseEntity::SUB_Remove);
+	pev->nextthink = gpGlobals->time;
+	
+	DeathSound();
+}
+
+
+int CCryptZombie::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
+{
+	// Take 30% damage from bullets
+	if (bitsDamageType == DMG_BULLET)
+	{
+		Vector vecDir = pev->origin - (pevInflictor->absmin + pevInflictor->absmax) * 0.5;
+		vecDir = vecDir.Normalize();
+		float flForce = DamageForce(flDamage);
+		pev->velocity = pev->velocity + vecDir * flForce;
+		flDamage *= 0.3;
+	}
+
+	// HACK HACK -- until we fix this.
+	bitsDamageType |= DMG_ALWAYSGIB;//для гиба(разрыва на куски вместо смерти)
+	if (IsAlive())
+		PainSound();
+	return CBaseMonster::TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+
+}
+
+
+//bitsDamageType |= DMG_ALWAYSGIB;
+
+
+
 

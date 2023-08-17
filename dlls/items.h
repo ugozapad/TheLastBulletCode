@@ -23,7 +23,10 @@ public:
 	CBaseEntity*	Respawn( void );
 	void	EXPORT ItemTouch( CBaseEntity *pOther );
 	void	EXPORT Materialize( void );
-	virtual BOOL MyTouch( CBasePlayer *pPlayer ) { return FALSE; };
+	virtual BOOL MyTouch( CBasePlayer *pPlayer ) { return FALSE; }; //шн€га
+	/*void Use(CBaseEntity* pActivator, CBaseEntity* pCaller,
+		USE_TYPE useType, float value);*/
+	//int ObjectCaps() { return FCAP_IMPULSE_USE; };//добавл€ем и тут какую-то шн€гу-шн€га это подбирание пушки на ≈
 };
 
 #endif // ITEMS_H

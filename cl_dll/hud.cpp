@@ -128,6 +128,18 @@ int __MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 {
 	return gHUD.MsgFunc_GameMode( pszName, iSize, pbuf );
 }
+int __MsgFunc_WaterSplash(const char* pszName, int iSize, void* pbuf)
+{
+	gHUD.MsgFunc_WaterSplash(pszName, iSize, pbuf);
+	return 1;
+}
+
+int __MsgFunc_Impact(const char* pszName, int iSize, void* pbuf)
+{
+	gHUD.MsgFunc_Impact(pszName, iSize, pbuf);
+	return 1;
+}
+
 
 // TFFree Command Menu
 void __CmdFunc_OpenCommandMenu(void)
@@ -287,9 +299,10 @@ int __MsgFunc_AllowSpec(const char *pszName, int iSize, void *pbuf)
 // This is called every time the DLL is loaded
 void CHud :: Init( void )
 {
-
+	
 	cl_rollangle = gEngfuncs.pfnRegisterVariable("cl_rollangle", "0.65", FCVAR_CLIENTDLL | FCVAR_ARCHIVE);
 	cl_rollspeed = gEngfuncs.pfnRegisterVariable("cl_rollspeed", "300", FCVAR_CLIENTDLL | FCVAR_ARCHIVE);
+	//RainInfo = gEngfuncs.pfnRegisterVariable("cl_raininfo", "0", 0);	// rain tutorial
 
 	HOOK_MESSAGE( Logo );
 	HOOK_MESSAGE( ResetHUD );
@@ -297,22 +310,18 @@ void CHud :: Init( void )
 	HOOK_MESSAGE( InitHUD );
 	HOOK_MESSAGE( ViewMode );
 	HOOK_MESSAGE( SetFOV );
-	HOOK_MESSAGE( Concuss );
+	
 
 	// TFFree CommandMenu
-	HOOK_COMMAND( "+commandmenu", OpenCommandMenu );
-	HOOK_COMMAND( "-commandmenu", CloseCommandMenu );
-	HOOK_COMMAND( "ForceCloseCommandMenu", ForceCloseCommandMenu );
-	HOOK_COMMAND( "special", InputPlayerSpecial );
-	HOOK_COMMAND( "togglebrowser", ToggleServerBrowser );
 
-	HOOK_MESSAGE( ValClass );
+
+	
 	HOOK_MESSAGE( TeamNames );
-	HOOK_MESSAGE( Feign );
-	HOOK_MESSAGE( Detpack );
+	
+
 	HOOK_MESSAGE( MOTD );
-	HOOK_MESSAGE( BuildSt );
-	HOOK_MESSAGE( RandomPC );
+	
+
 	HOOK_MESSAGE( ServerName );
 	HOOK_MESSAGE( ScoreInfo );
 	HOOK_MESSAGE( TeamScore );
@@ -320,9 +329,13 @@ void CHud :: Init( void )
 
 	HOOK_MESSAGE( Spectator );
 	HOOK_MESSAGE( AllowSpec );
+	HOOK_MESSAGE(WaterSplash);
 	
 	HOOK_MESSAGE( SpecFade );
 	HOOK_MESSAGE( ResetFade );
+
+	HOOK_MESSAGE(Impact);
+
 
 	// VGUI Menus
 	HOOK_MESSAGE( VGUIMenu );
@@ -524,6 +537,7 @@ void CHud :: VidInit( void )
 	m_AmmoSecondary.VidInit();
 	m_TextMessage.VidInit();
 	m_StatusIcons.VidInit();
+	m_Zoom.VidInit();
 	GetClientVoiceMgr()->VidInit();
 }
 

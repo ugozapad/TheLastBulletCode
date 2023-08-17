@@ -132,6 +132,11 @@ void CGameRules::RefreshSkillData ( void )
 
 	//Agrunt		
 	gSkillData.agruntHealth = GetSkillCvar( "sk_agrunt_health" );
+	//Sgrunt
+	gSkillData.supergruntHealth = GetSkillCvar("sk_supergrunt_health");
+	//SBossGrunt
+	gSkillData.bosssgruntHealth = GetSkillCvar("sk_BossSupgrunt_health");
+	
 	gSkillData.agruntDmgPunch = GetSkillCvar( "sk_agrunt_dmg_punch");
 
 	// Apache 
@@ -170,6 +175,12 @@ void CGameRules::RefreshSkillData ( void )
 	gSkillData.hgruntDmgKick = GetSkillCvar( "sk_hgrunt_kick");
 	gSkillData.hgruntShotgunPellets = GetSkillCvar( "sk_hgrunt_pellets");
 	gSkillData.hgruntGrenadeSpeed = GetSkillCvar( "sk_hgrunt_gspeed");
+
+	// Pitdrone
+	//gSkillData.pitdroneHealth = GetSkillCvar("sk_pitdrone_health");
+	gSkillData.pitdroneDmgBite = GetSkillCvar("sk_pitdrone_dmg_bite");
+	gSkillData.pitdroneDmgWhip = GetSkillCvar("sk_pitdrone_dmg_whip");
+	gSkillData.pitdroneDmgSpit = GetSkillCvar("sk_pitdrone_dmg_spit");
 
 	// Houndeye
 	gSkillData.houndeyeHealth = GetSkillCvar( "sk_houndeye_health");
@@ -269,8 +280,21 @@ void CGameRules::RefreshSkillData ( void )
 	// MP44AMMO
 	gSkillData.plrDmgMP44AMM = GetSkillCvar("sk_plr_MP44AMM_bullet");
 
+	////// PPSH
+	gSkillData.plrDmgPPSHAMMO = GetSkillCvar("sk_plr_PPSHAMMO_bullet");
+
+	////// TOMMY
+	gSkillData.plrDmgTOMMYAMMO = GetSkillCvar("sk_plr_TOMMYAMMO_bullet");
+
+	// K43
+	gSkillData.plrDmgK43 = GetSkillCvar("sk_plr_K43_bullet");
+
 	// Rifle
 	gSkillData.plrDmgSniper = GetSkillCvar("sk_plr_snpr_bullet");
+
+	//plasmo
+	gSkillData.plrDmgPlasma = GetSkillCvar("sk_plr_plasmo_bullet");
+
 
 	// MONSTER WEAPONS
 	gSkillData.monDmg12MM = GetSkillCvar( "sk_12mm_bullet");
@@ -295,6 +319,18 @@ void CGameRules::RefreshSkillData ( void )
 	gSkillData.healthchargerCapacity = GetSkillCvar ( "sk_healthcharger" );
 	gSkillData.healthkitCapacity = GetSkillCvar ( "sk_healthkit" );
 	gSkillData.scientistHeal = GetSkillCvar ( "sk_scientist_heal" );
+
+	//new healthykit
+	gSkillData.cacaohealth = GetSkillCvar("sk_cacaohealthkit");
+	gSkillData.whiskeyHealth = GetSkillCvar("sk_whiskeyhealthkit");
+	gSkillData.EatHealthKit = GetSkillCvar("sk_Eathealthkit");
+	
+	//new Armor
+	gSkillData.ArmorBody = GetSkillCvar("sk_ArmorBody");
+	gSkillData.JacketArmor = GetSkillCvar("sk_JacketArmor");
+	gSkillData.ArmorHelmet = GetSkillCvar("sk_ArmorHelmet");
+	gSkillData.DowaHelmet = GetSkillCvar("sk_DowaHelmet");
+
 
 	// monster damage adj
 	gSkillData.monHead = GetSkillCvar( "sk_monster_head" );

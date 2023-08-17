@@ -346,3 +346,12 @@ int CBasePlayerWeapon::ExtractClipAmmo( CBasePlayerWeapon *pWeapon ) { return 0;
 void CBasePlayerWeapon::RetireWeapon( void ) { }
 void CSoundEnt::InsertSound ( int iType, const Vector &vecOrigin, int iVolume, float flDuration ) {}
 void RadiusDamage( Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType ){}
+//начиная отсюдова(и ниже) идет строчки чтоб вся 
+//эта шняга целиком работала потому что это голдсурс детка!
+
+//void CBasePlayerAmmo::Use(CBaseEntity* pActivator, CBaseEntity* pCaller,
+//	USE_TYPE useType, float value) { }
+//void CBasePlayerWeapon::Use(CBaseEntity* pActivator, CBaseEntity* pCaller,
+//	USE_TYPE useType, float value) { }
+//void CBasePlayerItem::Use(CBaseEntity* pActivator, CBaseEntity* pCaller,
+//	USE_TYPE useType, float value) { }//до сюдова.

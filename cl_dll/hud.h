@@ -67,6 +67,8 @@ class CHudBase
 {
 public:
 	POSITION  m_pos;
+
+
 	int   m_type;
 	int	  m_iFlags; // active, moving, 
 	virtual		~CHudBase() {}
@@ -560,15 +562,11 @@ public:
 	int Init(void);
 	int VidInit(void);
 	int Draw(float flTime);
-	int MsgFunc_ZoomHUD(const char* pszName, int iSize, void* pbuf);
+	int MsgFunc_ZoomHud(const char* pszName, int iSize, void* pbuf);
 	void DrawQuad(float xmin, float ymin, float xmax, float ymax);
 	int m_iHudMode;
 private:
-	HSPRITE m_hBottom_Left;
-	HSPRITE m_hBottom_Right;
-	HSPRITE m_hTop_Left;
-	HSPRITE m_hTop_Right;
-	HSPRITE m_hBlack;
+	HSPRITE m_hScope;
 };
 
 class CHud
@@ -591,12 +589,16 @@ public:
 	double m_flTimeDelta; // the difference between flTime and fOldTime
 	Vector	m_vecOrigin;
 	Vector	m_vecAngles;
+	int                         NormalSize;
+	int                         RealSize;
 	int		m_iKeyBits;
 	int		m_iHideHUDDisplay;
 	int		m_iFOV;
 	int		m_Teamplay;
 	int		m_iRes;
 	cvar_t  *m_pCvarStealMouse;
+	//cvar_t* m_pCvarDraw;
+	//cvar_t* RainInfo; // rain tutorial
 	cvar_t	*m_pCvarDraw;
 
 	int m_iFontHeight;
@@ -665,6 +667,10 @@ public:
 	void _cdecl MsgFunc_ViewMode( const char *pszName, int iSize, void *pbuf );
 	int _cdecl MsgFunc_SetFOV(const char *pszName,  int iSize, void *pbuf);
 	int  _cdecl MsgFunc_Concuss( const char *pszName, int iSize, void *pbuf );
+	int _cdecl MsgFunc_WaterSplash(const char* pszName, int iSize, void* pbuf);
+	int _cdecl MsgFunc_Impact(const char* pszName, int iSize, void* pbuf);
+
+
 
 	// Screen information
 	SCREENINFO	m_scrinfo;
@@ -684,7 +690,6 @@ public:
 };
 
 extern CHud gHUD;
-
 extern int g_iPlayerClass;
 extern int g_iTeamNumber;
 extern int g_iUser1;

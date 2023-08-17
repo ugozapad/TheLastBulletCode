@@ -178,6 +178,4 @@ public:
 			return pSchedule;\
 		}
 
-
-
 #endif	//MONSTERS_H

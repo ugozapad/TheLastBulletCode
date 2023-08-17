@@ -83,6 +83,8 @@ void CEgon::Precache( void )
 
 	m_usEgonFire = PRECACHE_EVENT ( 1, "events/egon_fire.sc" );
 	m_usEgonStop = PRECACHE_EVENT ( 1, "events/egon_stop.sc" );
+
+	UTIL_PrecacheOther("controller_energy_ball");
 }
 
 

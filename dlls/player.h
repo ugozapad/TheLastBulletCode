@@ -88,7 +88,8 @@ enum sbar_data
 class CBasePlayer : public CBaseMonster
 {
 public:
-	
+
+
 	// Spectator camera
 	void	Observer_FindNextPlayer( bool bReverse );
 	void	Observer_HandleButtons();
@@ -129,6 +130,14 @@ public:
 
 	unsigned int		m_afPhysicsFlags;	// physics flags - set when 'normal' physics should be revisited or overriden
 	float				m_fNextSuicideTime; // the time after which the player can next use the suicide command
+	
+	//это типо строчки для начала разброса, я честно хз адо ли оно так как у меня и так из-за квак системы тресет, если надумаю удалять то послед 2 строки у мп44)
+	void WeaponScreenPunch(float flValue, float flZValue)
+	{
+		pev->punchangle.x += RANDOM_FLOAT(-flValue, flValue);
+		pev->punchangle.y += RANDOM_FLOAT(-flValue, flValue);
+		pev->punchangle.z += RANDOM_FLOAT(-flValue, flZValue);
+	}
 
 
 // these are time-sensitive things that we keep track of
@@ -333,5 +342,8 @@ public:
 
 extern int	gmsgHudText;
 extern BOOL gInitHUD;
+
+//extern int gmsgImpact;
+
 
 #endif // PLAYER_H

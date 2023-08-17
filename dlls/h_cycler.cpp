@@ -28,6 +28,7 @@
 #include "weapons.h"
 #include "player.h"
 
+extern int gmsImpackt;
 
 #define TEMP_FOR_SCREEN_SHOTS
 #ifdef TEMP_FOR_SCREEN_SHOTS //===================================================
@@ -40,6 +41,7 @@ public:
 	int TakeDamage( entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType );
 	void Spawn( void );
 	void Think( void );
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType);
 	//void Pain( float flDamage );
 	void Use ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 
@@ -87,6 +89,26 @@ void CCyclerProbe :: Spawn( void )
 {
 	pev->origin = pev->origin + Vector ( 0, 0, 16 );
 	GenericCyclerSpawn( "models/prdroid.mdl", Vector(-16,-16,-16), Vector(16,16,16));
+}
+
+void CCycler::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
+{
+	
+	//if (ptr->iHitgroup != 0)
+	//{
+	//	//MESSAGE_BEGIN(MSG_ALL, gmsgImpact);
+	//	WRITE_SHORT(ptr->iHitgroup);
+	//	WRITE_BYTE(1);
+	//	WRITE_COORD(ptr->vecEndPos.x);
+	//	WRITE_COORD(ptr->vecEndPos.y);
+	//	WRITE_COORD(ptr->vecEndPos.z);
+
+	//	WRITE_COORD(ptr->vecPlaneNormal.x);
+	//	WRITE_COORD(ptr->vecPlaneNormal.y);
+	//	WRITE_COORD(ptr->vecPlaneNormal.z);
+	//	MESSAGE_END();
+	//}
+	AddMultiDamage(pevAttacker, this, flDamage, bitsDamageType);
 }
 
 
@@ -140,6 +162,9 @@ void CCycler :: Spawn( )
 	{
 		m_animate = 1;
 	}
+
+	m_bloodColor = DONT_BLEED;
+	pev->takedamage = DAMAGE_NO;
 }
 
 

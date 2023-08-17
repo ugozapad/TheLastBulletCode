@@ -16,6 +16,11 @@
 // skill.h - skill level concerns
 //=========================================================
 
+//в этих трех файлах прописывается скилл неписей и итемов
+//gamerules.cpp
+//skill.h
+//game.cpp
+
 struct skilldata_t
 {
 
@@ -23,7 +28,10 @@ struct skilldata_t
 
 // Monster Health & Damage
 	float	agruntHealth;
+	float supergruntHealth;
+	float bosssgruntHealth;
 	float agruntDmgPunch;
+
 
 	float apacheHealth;
 	
@@ -89,7 +97,9 @@ struct skilldata_t
 	float turretHealth;
 	float miniturretHealth;
 	float sentryHealth;
-
+	float pitdroneDmgSpit;
+	float pitdroneDmgBite;
+	float pitdroneDmgWhip;
 
 // Player Weapons
 	float plrDmgCrowbar;
@@ -110,7 +120,11 @@ struct skilldata_t
 	float plrDmgTripmine;
 	float plrDmgSniper;
 	float plrDmgMP44AMM;
-	
+	float plrDmgK43;
+	float plrDmgPPSHAMMO;
+	float plrDmgTOMMYAMMO;
+	float plrDmgPlasma;
+
 // weapons shared by monsters
 	float monDmg9MM;
 	float monDmgMP5;
@@ -123,6 +137,14 @@ struct skilldata_t
 	float healthchargerCapacity;
 	float healthkitCapacity;
 	float scientistHeal;
+	float cacaohealth;
+	float whiskeyHealth;
+	float EatHealthKit;
+	float ArmorBody; //бронежелет
+	float JacketArmor; //куртка
+	float ArmorHelmet;// немецкий шлем
+	float DowaHelmet;//  шлем довакина
+	
 
 // monster damage adj
 	float monHead;

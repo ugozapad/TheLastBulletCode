@@ -828,6 +828,12 @@ void CHudAmmo::UserCmd_PrevWeapon(void)
 // Drawing code
 //-------------------------------------------------------------------------
 
+
+bool InDuck;
+bool InRun;
+bool InJump;
+
+
 int CHudAmmo::Draw(float flTime)
 {
 	int a, x, y, r, g, b;
@@ -922,6 +928,8 @@ int CHudAmmo::Draw(float flTime)
 		SPR_DrawAdditive(0, x, y - iOffset, &m_pWeapon->rcAmmo);
 	}
 
+
+
 	// Does weapon have seconday ammo?
 	if (pw->iAmmo2Type > 0) 
 	{
@@ -938,8 +946,89 @@ int CHudAmmo::Draw(float flTime)
 			SPR_Set(m_pWeapon->hAmmo2, r, g, b);
 			int iOffset = (m_pWeapon->rcAmmo2.bottom - m_pWeapon->rcAmmo2.top)/8;
 			SPR_DrawAdditive(0, x, y - iOffset, &m_pWeapon->rcAmmo2);
+
+			
+
 		}
 	}
+	gHUD.NormalSize = 11;
+	r = 0;
+	g = 255;
+	b = 0;
+	a = 200;
+
+
+	int iHeight = 10;
+	int iWidth = 1;
+
+
+	int cross_size = gHUD.NormalSize;
+	if (InRun)
+		gHUD.RealSize += 10;
+
+	if (InDuck)
+
+		gHUD.RealSize -= 10;
+
+	if (InJump)
+
+		gHUD.RealSize += 10;
+	InJump = false;
+	InRun = false;
+
+
+	cross_size += (gHUD.RealSize - cross_size) / 10;
+
+	gHUD.RealSize += (gHUD.NormalSize - gHUD.RealSize) / 10;
+
+
+	// Left
+	x = ScreenWidth / 2 - cross_size;
+	y = ScreenHeight / 2;
+	y -= 2;
+	FillRGBA(x, y, -iHeight, iWidth, r, g, b, a);
+	// povtor
+	x = ScreenWidth / 2 - cross_size;
+	y = ScreenHeight / 2;
+	y += 2;
+	FillRGBA(x, y, -iHeight, iWidth, r, g, b, a);
+
+	// Right
+	x = ScreenWidth / 2 + cross_size + 1;
+	y = ScreenHeight / 2;
+	y -= 2;
+	FillRGBA(x, y, iHeight, iWidth, r, g, b, a);
+	// povtor
+	x = ScreenWidth / 2 + cross_size + 1;
+	y = ScreenHeight / 2;
+	y += 2;
+	FillRGBA(x, y, iHeight, iWidth, r, g, b, a);
+
+	// Up
+	x = ScreenWidth / 2;
+	x -= 2;
+	y = ScreenHeight / 2 - cross_size;
+	FillRGBA(x, y, iWidth, -iHeight, r, g, b, a);
+	// povtor
+	x = ScreenWidth / 2;
+	x += 2;
+	y = ScreenHeight / 2 - cross_size;
+	FillRGBA(x, y, iWidth, -iHeight, r, g, b, a);
+
+	// Down
+	x = ScreenWidth / 2;
+	x -= 2;
+	y = ScreenHeight / 2 + cross_size;
+	FillRGBA(x, y, iWidth, iHeight, r, g, b, a);
+	// povtor
+	x = ScreenWidth / 2;
+	x += 2;
+	y = ScreenHeight / 2 + cross_size;
+	FillRGBA(x, y, iWidth, iHeight, r, g, b, a);
+
+
+
+
 	return 1;
 }
 

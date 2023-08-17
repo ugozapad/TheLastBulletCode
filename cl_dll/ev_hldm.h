@@ -19,6 +19,9 @@ typedef	enum
 	BULLET_PLAYER_CROWBAR, // crowbar swipe
 	BULLET_PLAYER_338,
 	BULLET_PLAYER_MP44AMM, // mp44
+	BULLET_PLAYER_PPSHAMMO, //ןןר
+	BULLET_PLAYER_TOMMYAMMO, //עמללט
+	BULLET_PLAYER_K43,
 	BULLET_MONSTER_9MM,
 	BULLET_MONSTER_MP5,
 	BULLET_MONSTER_12MM,
@@ -72,6 +75,8 @@ enum venom_e
 	VENOM_FIRE1,
 	VENOM_FIRE2,
 	VENOM_FIRE3,
+	VENOM_SPINUP,
+	VENOM_SPINDOWN
 };
 
 enum python_e {
@@ -104,5 +109,7 @@ void EV_HLDM_GunshotDecalTrace( pmtrace_t *pTrace, char *decalName );
 void EV_HLDM_DecalGunshot( pmtrace_t *pTrace, int iBulletType );
 int EV_HLDM_CheckTracer( int idx, float *vecSrc, float *end, float *forward, float *right, int iBulletType, int iTracerFreq, int *tracerCount );
 void EV_HLDM_FireBullets( int idx, float *forward, float *right, float *up, int cShots, float *vecSrc, float *vecDirShooting, float flDistance, int iBulletType, int iTracerFreq, int *tracerCount, float flSpreadX, float flSpreadY );
+void EV_HLDM_MuzzleFlash(vec3_t pos, float amount);
+//void EV_HLDM_Particles(vec_t Pos_X, vec_t Pos_Y, vec_t Pos_Z, float PosNorm_X, float PosNorm_Y, float PosNorm_Z, int DoPuff, int Material);
 
 #endif // EV_HLDMH

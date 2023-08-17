@@ -136,6 +136,14 @@ public:
 	
 };
 
+enum GrappleTarget
+{
+	GRAPPLE_NOT_A_TARGET = 0,
+	GRAPPLE_SMALL = 1,
+	GRAPPLE_MEDIUM = 2,
+	GRAPPLE_LARGE = 3,
+	GRAPPLE_FIXED = 4,
+};
 
 //
 // Base Entity.  All entity types derive from this
@@ -143,6 +151,9 @@ public:
 class CBaseEntity 
 {
 public:
+
+	void		FireBulletsWater(Vector vecEnd, Vector vecSrc);
+
 	// Constructor.  Set engine to use C/C++ callback functions
 	// pointers to engine data
 	entvars_t *pev;		// Don't need to save/restore this pointer, the engine resets it
@@ -359,6 +370,12 @@ public:
 	int ammo_argrens;
 	int ammo_338;
 	int ammo_mp44;
+	int ammo_wrifle;
+	int ammo_ppsh;
+	int ammo_tommy;
+	int ammo_pm;
+	int ammo_plasmo;
+	
 	
 	//Special stuff for grenades and satchels.
 	float m_flStartThrow;

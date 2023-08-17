@@ -122,6 +122,30 @@ void CGrenade::Explode( TraceResult *pTrace, int bitsDamageType )
 		int sparkCount = RANDOM_LONG(0,3);
 		for ( int i = 0; i < sparkCount; i++ )
 			Create( "spark_shower", pev->origin, pTrace->vecPlaneNormal, NULL );
+
+		//тряска во время взрыва
+		UTIL_ScreenShake(pev->origin, 3, 175, 4, 350);
+
+		// pev->origin это координаты вспышки... и это цвет во время бабаха!
+
+		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+
+		WRITE_BYTE(TE_DLIGHT);
+		WRITE_COORD(pev->origin.x); // Позиция...
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z);
+		WRITE_BYTE(30); // Радиус (300 унитов).
+
+		WRITE_BYTE(184); // Оттенок красного
+		WRITE_BYTE(134); // Оттенок зеленого
+		WRITE_BYTE(11); // Оттенок синего
+
+
+
+		WRITE_BYTE(2); // Продолжительность вспышки
+		WRITE_BYTE(10); // Кол-во кадров
+		MESSAGE_END();
+
 	}
 }
 

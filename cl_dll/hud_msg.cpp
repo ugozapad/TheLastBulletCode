@@ -21,10 +21,28 @@
 #include "parsemsg.h"
 #include "r_efx.h"
 
+
 #include "particleman.h"
 extern IParticleMan *g_pParticleMan;
 
 #define MAX_CLIENTS 32
+
+extern void EV_HLDM_WaterSplash(float x, float y, float z);
+
+extern void EV_HLDM_Particles(vec_t Pos_X, vec_t Pos_Y, vec_t Pos_Z, float PosNorm_X, float PosNorm_Y, float PosNorm_Z, int DoPuff, int Material);
+
+int CHud::MsgFunc_WaterSplash(const char* pszName, int iSize, void* pbuf)
+{
+	BEGIN_READ(pbuf, iSize);
+	float X, Y, Z;
+
+	X = READ_COORD();
+	Y = READ_COORD();
+	Z = READ_COORD();
+
+	EV_HLDM_WaterSplash(X, Y, Z);
+	return 1;
+}
 
 #if !defined( _TFC )
 extern BEAM *pBeam;
@@ -34,6 +52,53 @@ extern BEAM *pBeam2;
 #if defined( _TFC )
 void ClearEventList( void );
 #endif
+
+//new
+int CHud::MsgFunc_Impact(const char* pszName, int iSize, void* pbuf)
+
+{
+	
+		BEGIN_READ(pbuf, iSize);
+
+		int MatType = READ_SHORT();
+	
+		int DoPuffSpr = READ_BYTE();
+	
+
+		
+		vec_t Pos_X, Pos_Y, Pos_Z;
+	
+		float PosNorm_X, PosNorm_Y, PosNorm_Z;
+	
+
+		
+		Pos_X = READ_COORD();
+	
+		Pos_Y = READ_COORD();
+	
+		Pos_Z = READ_COORD();
+	
+
+		
+		PosNorm_X = READ_COORD();
+	
+		PosNorm_Y = READ_COORD();
+	
+		PosNorm_Z = READ_COORD();
+	
+
+		
+//EV_HLDM_Particles(Pos_X, Pos_Y, Pos_Z, PosNorm_X, PosNorm_Y, PosNorm_Z, DoPuffSpr, MatType);
+	
+
+		
+		return 1;
+	
+}
+
+
+//end enw
+
 
 /// USER-DEFINED SERVER MESSAGE HANDLERS
 
