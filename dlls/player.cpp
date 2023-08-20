@@ -192,6 +192,7 @@ int gmsgStatusText = 0;
 int gmsgStatusValue = 0; 
 int gmsgZoom = 0;
 
+int gmsgShowUseHud = 0;
 
 int gmsgImpact = 0;
 
@@ -246,6 +247,7 @@ void LinkUserMessages( void )
 	gmsgStatusValue = REG_USER_MSG("StatusValue", 3); 
 	gmsgZoom = REG_USER_MSG("ZoomHud", 1);
 
+	gmsgShowUseHud = REG_USER_MSG("ShowUseHud", 1);
 
 	gmsgImpact = REG_USER_MSG("Impact", -1);
 }

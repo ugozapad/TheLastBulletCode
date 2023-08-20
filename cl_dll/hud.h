@@ -569,6 +569,25 @@ private:
 	HSPRITE m_hScope;
 };
 
+//
+//-----------------------------------------------------
+//
+class CHudUse : public CHudBase
+{
+public:
+	int Init(void);
+	int VidInit(void);
+	int Draw(float flTime);
+	void DrawQuad(float xmin, float ymin, float xmax, float ymax);
+
+	// MESSAGE IMPLEMENTATION
+	int MsgFunc_ShowUseHud(const char* pszName, int iSize, void* pbuf);
+
+private:
+	HSPRITE		m_hIcon;
+	int			m_bHudMode;
+};
+
 class CHud
 {
 private:
@@ -647,7 +666,8 @@ public:
 	CHudTextMessage m_TextMessage;
 	CHudStatusIcons m_StatusIcons;
 	CHudBenchmark	m_Benchmark;
-	CHudZoom m_Zoom;
+	CHudZoom		m_Zoom;
+	CHudUse			m_Use;
 
 	void Init( void );
 	void VidInit( void );
