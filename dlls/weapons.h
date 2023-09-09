@@ -1230,6 +1230,7 @@ public:
 	BOOL Deploy(void);
 	void Reload(void);
 	void Spinup(void);
+	void Spindown(void);
 	void ReduceRotation(void);
 	void Holster(int skiplocal = 0);
 	//void SpawnClip(void);

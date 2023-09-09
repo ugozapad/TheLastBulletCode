@@ -2707,10 +2707,19 @@ void EV_FireVenom2(event_args_t* args)
 
 void EV_SpinVenom(event_args_t* args)
 {
-	if (EV_IsLocal(args->entindex))
-	{
-		//gEngfuncs.pEventAPI->EV_WeaponAnimation(VENOM_SPINUP, 2);
+	int idx = args->entindex;
+	float* origin = args->origin;
 
+	if (EV_IsLocal(idx))
+	{
+		if (!args->bparam1)
+		{//gEngfuncs.pEventAPI->EV_WeaponAnimation(VENOM_SPINUP, 2);
+			gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/venom/spinstart.wav", 1, ATTN_NORM, 0, 100);
+		}
+		else
+		{
+			gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/venom/spinend.wav", 1, ATTN_NORM, 0, 100);
+		}
 	}
 }
 //======================

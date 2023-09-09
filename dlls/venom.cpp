@@ -191,11 +191,7 @@ void CVenom::ItemPostFrame()
 		}
 		
 		
-		if (m_fInAttack)
-		{
-				SendWeaponAnim(VENOM_SPINDOWN);
-				m_fInAttack = 0;
-		}
+		Spindown();
 		
 
 		WeaponIdle();
@@ -258,10 +254,28 @@ void CVenom::Spinup()
 	if (!m_fInAttack)
 	{
 		SendWeaponAnim(VENOM_SPINUP);
+		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usVenom3, 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0, 0, 0, 0, m_fInAttack, 0);
 		m_fInAttack = 1;
 	}
 
 	
+}
+
+void CVenom::Spindown()
+{
+	int flags;
+#if defined( CLIENT_WEAPONS )
+	flags = FEV_NOTHOST;
+#else
+	flags = 0;
+#endif
+	if (m_fInAttack)
+	{
+		SendWeaponAnim(VENOM_SPINDOWN);
+		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usVenom3, 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0, 0, 0, 0, m_fInAttack, 0);
+		m_fInAttack = 0;
+	}
+	else return;
 }
 
 void CVenom::PrimaryAttack()
