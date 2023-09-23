@@ -3243,7 +3243,7 @@ void CBioGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 		
 		else
 		{
-			DropItem("item_healthkit", vecGunPos, vecGunAngles);
+			DropItem("weapon_plasmarifle", vecGunPos, vecGunAngles);
 		}
 
 	}
