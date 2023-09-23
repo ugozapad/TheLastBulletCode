@@ -719,7 +719,7 @@ void CGargantua :: PrescheduleThink( void )
 //=========================================================
 int	CGargantua :: Classify ( void )
 {
-	return	CLASS_ALIEN_MONSTER;
+	return	CLASS_HUMAN_MILITARY;
 }
 
 //=========================================================

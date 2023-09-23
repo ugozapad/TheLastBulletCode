@@ -388,7 +388,7 @@ void CAGrunt :: PainSound ( void )
 //=========================================================
 int	CAGrunt :: Classify ( void )
 {
-	return	CLASS_ALIEN_MILITARY;
+	return	CLASS_HUMAN_MILITARY;
 }
 
 //=========================================================
