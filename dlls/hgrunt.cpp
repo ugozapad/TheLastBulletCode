@@ -3193,7 +3193,7 @@ void CBioGrunt::GibMonster(void)
 		}
 		else
 		{
-			pGun = DropItem("item_healthkit", vecGunPos, vecGunAngles);
+			pGun = DropItem("weapon_plasmarifle", vecGunPos, vecGunAngles);
 		}
 		if (pGun)
 		{
