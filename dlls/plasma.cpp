@@ -279,7 +279,7 @@ void CPlasma::Explode( void )
 	else
 		pevOwner = NULL;
 
-	::RadiusDamage ( pev->origin, pev, pevOwner, pev->dmg = 10, 120, CLASS_PLAYER_BIOWEAPON, DMG_GENERIC | DMG_ENERGYBEAM | DMG_RADIATION );
+	::RadiusDamage ( pev->origin, pev, pevOwner, pev->dmg = 4, 120, CLASS_PLAYER_BIOWEAPON, DMG_GENERIC | DMG_ENERGYBEAM | DMG_RADIATION );
 
 	if (m_iPrimaryMode)
 	{
