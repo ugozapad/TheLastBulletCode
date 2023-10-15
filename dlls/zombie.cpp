@@ -384,7 +384,7 @@ void CCryptZombie::Spawn()
 
 	pev->solid = SOLID_SLIDEBOX;
 	pev->movetype = MOVETYPE_STEP;
-	m_bloodColor = DONT_BLEED;
+	m_bloodColor = BLOOD_COLOR_GREEN;
 	//m_bloodColor = BLOOD_COLOR_GREEN;
 	pev->health = gSkillData.zombieHealth;
 	pev->view_ofs = VEC_VIEW;// position of the eyes relative to monster's origin.

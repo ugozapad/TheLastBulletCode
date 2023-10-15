@@ -1620,33 +1620,30 @@ void CBadbarney::DeclineFollowing(void)
 }
 
 
+//ALIEN FRIEND START
 
 
-
-
-///
-//New Fat Barney
-//
-
-
-class CAgentMen : public CBarney
+class CFAlienman : public CBarney
 {
 public:
 	void Spawn(void);
 	void Precache(void);
-	void Killed(entvars_t* pevAttacker, int iGib);
+	int Classify(void);
+	void BarneyFirePistol(void);
+	void HandleAnimEvent(MonsterEvent_t* pEvent);
+
 };
 
-LINK_ENTITY_TO_CLASS(monster_agent_men, CAgentMen);
+LINK_ENTITY_TO_CLASS(monster_friend_alien, CFAlienman);
 
-void CAgentMen::Spawn()
+void CFAlienman::Spawn()
 {
 	Precache();
 
 	if (pev->model)
 		SET_MODEL(ENT(pev), STRING(pev->model)); //LRC 
 	else
-		SET_MODEL(ENT(pev), "models/newNpc/Agent_Spy.mdl");
+		SET_MODEL(ENT(pev), "models/newNpc/friend_barn_alien.mdl");
 	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
 
 	pev->solid = SOLID_SLIDEBOX;
@@ -1671,15 +1668,15 @@ void CAgentMen::Spawn()
 //=========================================================
 // Precache - precaches all resources this monster needs
 //=========================================================
-void CAgentMen::Precache()
+void CFAlienman::Precache()
 {
 	if (pev->model)
 		PRECACHE_MODEL((char*)STRING(pev->model)); //LRC 
 	else
-		PRECACHE_MODEL("models/newNpc/Agent_Spy.mdl");
+		PRECACHE_MODEL("models/newNpc/friend_barn_alien.mdl");
 
-	PRECACHE_SOUND("barney/ba_attack1.wav");
-	PRECACHE_SOUND("barney/ba_attack2.wav");
+	PRECACHE_SOUND("alien/g_shoot.wav");
+	PRECACHE_SOUND("alien/g_shoot.wav");
 
 	PRECACHE_SOUND("barney/ba_pain1.wav");
 	PRECACHE_SOUND("barney/ba_pain2.wav");
@@ -1695,24 +1692,86 @@ void CAgentMen::Precache()
 	CTalkMonster::Precache();
 }
 
-
-void CAgentMen::Killed(entvars_t* pevAttacker, int iGib)
+int	CFAlienman::Classify(void)
 {
-	if (pev->body < BARNEY_BODY_GUNGONE)
-	{// drop the gun!
-		Vector vecGunPos;
-		Vector vecGunAngles;
-
-		pev->body = BARNEY_BODY_GUNGONE;
-
-		GetAttachment(0, vecGunPos, vecGunAngles);
-
-		CBaseEntity* pGun = DropItem("weapon_9mmhandgun", vecGunPos, vecGunAngles);
-	}
-
-	SetUse(NULL);
-	CBaseMonster::Killed(pevAttacker, iGib);
+	return	CLASS_PLAYER_ALLY;
 }
+
+void CFAlienman::BarneyFirePistol(void)
+{
+	Vector vecShootOrigin;
+
+	UTIL_MakeVectors(pev->angles);
+	vecShootOrigin = pev->origin + Vector(0, 0, 55);
+	Vector vecShootDir = ShootAtEnemy(vecShootOrigin);
+
+	Vector angDir = UTIL_VecToAngles(vecShootDir);
+	SetBlending(0, angDir.x);
+	pev->effects = EF_MUZZLEFLASH;
+
+	FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_2DEGREES, 1024, BULLET_MONSTER_9MM);
+
+	int pitchShift = RANDOM_LONG(0, 20);
+
+	// Only shift about half the time
+	if (pitchShift > 10)
+		pitchShift = 0;
+	else
+		pitchShift -= 5;
+	EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "alien/g_shoot.wav", 1, ATTN_NORM, 0, 100 + pitchShift);
+
+	CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, 384, 0.3);
+
+	// UNDONE: Reload?
+	m_cAmmoLoaded--;// take away a bullet!
+
+	CSprite* pMuzzleFlash = CSprite::SpriteCreate("sprites/muzzle_redshock.spr", pev->origin, TRUE);
+	if (pMuzzleFlash)
+	{
+		pMuzzleFlash->SetAttachment(edict(), 1);
+		pMuzzleFlash->pev->scale = 0.5;
+		pMuzzleFlash->pev->rendermode = kRenderTransAdd;
+		pMuzzleFlash->pev->renderamt = 255;
+		pMuzzleFlash->AnimateAndDie(25);
+	}
+}
+
+void CFAlienman::HandleAnimEvent(MonsterEvent_t* pEvent)
+{
+	switch (pEvent->event)
+	{
+	case BARNEY_AE_SHOOT:
+		BarneyFirePistol();
+		break;
+
+	case BARNEY_AE_DRAW:
+		// barney's bodygroup switches here so he can pull gun from holster
+		pev->body = BARNEY_BODY_GUNDRAWN;
+		m_fGunDrawn = TRUE;
+		break;
+
+	case BARNEY_AE_HOLSTER:
+		// change bodygroup to replace gun in holster
+		pev->body = BARNEY_BODY_GUNHOLSTERED;
+		m_fGunDrawn = FALSE;
+		break;
+
+	default:
+		CTalkMonster::HandleAnimEvent(pEvent);
+	}
+}
+
+//ALIEN FRIEND END
+
+
+
+
+///
+//New Fat Barney
+//
+
+
+
 
 /// <summary>
 /// Dead mad Barney

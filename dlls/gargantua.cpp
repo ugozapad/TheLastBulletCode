@@ -376,14 +376,7 @@ const char *CGargantua::pBreatheSounds[] =
 	"garg/gar_breathe3.wav",
 };
 
-class CBoss : public CGargantua
-{
-public:
-	void Spawn(void);
-	void Precache(void);
-};
 
-LINK_ENTITY_TO_CLASS(monster_achiless, CBoss);
 //=========================================================
 // AI Schedules Specific to this monster
 //=========================================================
@@ -683,6 +676,8 @@ void CGargantua :: FlameDamage( Vector vecStart, Vector vecEnd, entvars_t *pevIn
 }
 
 
+////
+
 void CGargantua :: FlameDestroy( void )
 {
 	int i;
@@ -765,7 +760,7 @@ void CGargantua :: Spawn()
 
 	pev->solid			= SOLID_SLIDEBOX;
 	pev->movetype		= MOVETYPE_STEP;
-	m_bloodColor		= BLOOD_COLOR_GREEN;
+	m_bloodColor = DONT_BLEED; /*BLOOD_COLOR_GREEN*/
 	pev->health			= gSkillData.gargantuaHealth;
 	//pev->view_ofs		= Vector ( 0, 0, 96 );// taken from mdl file
 	m_flFieldOfView		= -0.2;// width of forward view cone ( as a dotproduct result )
@@ -1149,7 +1144,7 @@ void CGargantua::RunTask( Task_t *pTask )
 					bodyPart = RANDOM_LONG( 0, pev->body-1 );
 
 				pGib->pev->body = bodyPart;
-				pGib->m_bloodColor = BLOOD_COLOR_YELLOW;
+				pGib->m_bloodColor = DONT_BLEED;// BLOOD_COLOR_YELLOW;
 				pGib->m_material = matNone;
 				pGib->pev->origin = pev->origin;
 				pGib->pev->velocity = UTIL_RandomBloodVector() * RANDOM_FLOAT( 300, 500 );
@@ -1285,6 +1280,17 @@ void CSmoker::Think( void )
 		UTIL_Remove( this );
 }
 
+class CBoss : public CGargantua
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	int  Classify(void);
+};
+
+LINK_ENTITY_TO_CLASS(monster_achiless, CBoss);
+
+
 void CBoss::Spawn()
 {
 	Precache();
@@ -1294,7 +1300,7 @@ void CBoss::Spawn()
 
 	pev->solid = SOLID_SLIDEBOX;
 	pev->movetype = MOVETYPE_STEP;
-	m_bloodColor = BLOOD_COLOR_GREEN;
+	m_bloodColor = DONT_BLEED; // BLOOD_COLOR_GREEN
 	pev->health = gSkillData.gargantuaHealth;
 	//pev->view_ofs		= Vector ( 0, 0, 96 );// taken from mdl file
 	m_flFieldOfView = -0.2;// width of forward view cone ( as a dotproduct result )
@@ -1357,6 +1363,11 @@ void CBoss::Precache()
 
 	for (i = 0; i < ARRAYSIZE(pBreatheSounds); i++)
 		PRECACHE_SOUND((char*)pBreatheSounds[i]);
+}
+
+int	CBoss::Classify(void)
+{
+	return	CLASS_HUMAN_MILITARY;
 }
 
 void CSpiral::Spawn( void )

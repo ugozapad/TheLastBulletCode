@@ -2896,7 +2896,10 @@ class CBioGrunt : public CHGrunt
 public:
 	void Spawn(void);
 	void Precache(void);
+	int  Classify(void);
+	int IRelationship(CBaseEntity* pTarget);
 	void Shoot(void);
+	void crossbow ( void );
 	void HandleAnimEvent(MonsterEvent_t *pEvent);
 	void GibMonster(void);
 	void IdleSound(void);
@@ -3108,6 +3111,22 @@ void CBioGrunt::Precache()
 	UTIL_PrecacheOther ("item_healthkit");
 }
 
+int	CBioGrunt::Classify(void)
+{
+	return	CLASS_HUMAN_MILITARY;
+}
+
+
+int CBioGrunt::IRelationship(CBaseEntity* pTarget)
+{
+	if (FClassnameIs(pTarget->pev, "monster_alien_grunt") || (FClassnameIs(pTarget->pev, "monster_alien_slave")))
+	{
+		return R_NM;
+	}
+
+	return CSquadMonster::IRelationship(pTarget);
+}
+
 //=========================================================
 // Shoot
 //=========================================================
@@ -3146,8 +3165,41 @@ void CBioGrunt::Shoot(void)
 
 
 }
+//Ты задаешься вопросом. "Какой нахуй арбалет?" А я скажу. Это дробавик.
+void CBioGrunt::crossbow(void)
+{
+	if (m_hEnemy == NULL)
+	{
+		return;
+	}
 
+	Vector vecShootOrigin = GetGunPosition();
+	Vector vecShootDir = ShootAtEnemy(vecShootOrigin);
 
+	UTIL_MakeVectors(pev->angles);
+
+	Vector	vecShellVelocity = gpGlobals->v_right * RANDOM_FLOAT(40, 90) + gpGlobals->v_up * RANDOM_FLOAT(75, 200) + gpGlobals->v_forward * RANDOM_FLOAT(-40, 40);
+	EjectBrass(vecShootOrigin - vecShootDir * 24, vecShellVelocity, pev->angles.y, m_iShotgunShell, TE_BOUNCE_SHOTSHELL);
+	FireBullets(gSkillData.hgruntShotgunPellets, vecShootOrigin, vecShootDir, VECTOR_CONE_15DEGREES, 2048, BULLET_PLAYER_BUCKSHOT, 0); // shoot +-7.5 degrees
+
+	pev->effects |= EF_MUZZLEFLASH;
+
+	m_cAmmoLoaded--;// take away a bullet!
+
+	Vector angDir = UTIL_VecToAngles(vecShootDir);
+	SetBlending(0, angDir.x);
+
+	CSprite* pMuzzleFlash = CSprite::SpriteCreate("sprites/muzzle_shock.spr", pev->origin, TRUE);
+	if (pMuzzleFlash)
+	{
+		pMuzzleFlash->SetAttachment(edict(), 1);
+		pMuzzleFlash->pev->scale = 0.5;
+		pMuzzleFlash->pev->rendermode = kRenderTransAdd;
+		pMuzzleFlash->pev->renderamt = 255;
+		pMuzzleFlash->AnimateAndDie(25);
+	}
+
+}
 
 
 
@@ -3189,7 +3241,7 @@ void CBioGrunt::GibMonster(void)
 		CBaseEntity* pGun;
 		if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
 		{
-			pGun = DropItem("weapon_sniperrifle", vecGunPos, vecGunAngles);
+			pGun = DropItem("item_whiskeyhealthkit", vecGunPos, vecGunAngles);//выпадение дробавика(или в данном случае хилки)
 		}
 		else
 		{
@@ -3238,12 +3290,12 @@ void CBioGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 		// now spawn a gun.
 		if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
 		{
-			DropItem("weapon_sniperrifle", vecGunPos, vecGunAngles);
+			DropItem("item_whiskeyhealthkit", vecGunPos, vecGunAngles); //выпадение дробавика(или в данном случае хилки)
 		}
 		
 		else
 		{
-			DropItem("weapon_plasmarifle", vecGunPos, vecGunAngles);
+			DropItem("weapon_plasmarifle", vecGunPos, vecGunAngles);//
 		}
 
 	}
