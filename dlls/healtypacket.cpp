@@ -108,6 +108,3 @@ BOOL CHealthPacket::MyTouch(CBasePlayer* pPlayer)
 
 	return FALSE;
 }
-
-
-

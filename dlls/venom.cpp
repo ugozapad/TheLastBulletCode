@@ -104,6 +104,8 @@ void CVenom::Precache(void)
 void CVenom::Holster(int skiplocal)
 {
 	m_flRotationSpeed = 0;
+
+	CBasePlayerWeapon::Holster();
 }
 
 
