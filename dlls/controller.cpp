@@ -1547,6 +1547,8 @@ public:
 	void Spawn(void);
 	void Precache(void);
 	void Killed(entvars_t* pevAttacker, int iGib);
+	void DyingThink();
+	void StartupThink();
 
 
 };
@@ -1574,6 +1576,25 @@ void CFinBoss::Spawn()
 	m_MonsterState = MONSTERSTATE_NONE;
 
 	MonsterInit();
+
+
+	//SetThink(&CFinBoss::StartupThink);
+	//pev->nextthink = gpGlobals->time + 0.1;
+}
+
+
+void CFinBoss::StartupThink()
+{
+	
+
+	if (pev->health <= 0)
+	{
+		SetThink(&CFinBoss::DyingThink);
+	}
+
+
+	SetThink(&CFinBoss::StartupThink);
+	pev->nextthink = gpGlobals->time + 0.1;
 }
 
 //=========================================================
@@ -1609,6 +1630,7 @@ void CFinBoss::Killed(entvars_t* pevAttacker, int iGib)
 	*/
 
 	// fade balls
+
 	if (m_pBall[0])
 	{
 		m_pBall[0]->SUB_StartFadeOut();
@@ -1632,16 +1654,93 @@ void CFinBoss::Killed(entvars_t* pevAttacker, int iGib)
 		pSmoker->pev->dmg = 0;		// 0 radial distribution
 		pSmoker->pev->nextthink = gpGlobals->time + 2.5;	// Start in 2.5 seconds
 
-		UTIL_Sparks(pev->origin);
+		Vector vecDir, vecSrc, vecAngles;
+
+		UTIL_MakeAimVectors(pev->angles);
+		
+		for (int i = 0; i < 10; i++)
+		{
+			do {
+				vecDir = Vector(RANDOM_FLOAT(-1, 1), RANDOM_FLOAT(-1, 1), RANDOM_FLOAT(-1, 1));
+			} while (DotProduct(vecDir, vecDir) > 1.0);
+
+			//vecDir = vecDir + 2 * gpGlobals->v_up;
 
 
+			vecSrc = pev->origin;
+
+			TraceResult tr;
+
+			UTIL_TraceLine(vecSrc, vecSrc + vecDir * 4096, ignore_monsters, ENT(pev), &tr);
 
 
-	
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_BEAMENTPOINT);
+			WRITE_SHORT(entindex() + 0x1000);
+			WRITE_COORD(tr.vecEndPos.x);
+			WRITE_COORD(tr.vecEndPos.y);
+			WRITE_COORD(tr.vecEndPos.z);
+			WRITE_SHORT(g_sModelIndexLaser);
+			WRITE_BYTE(0); // frame start
+			WRITE_BYTE(10); // framerate
+			WRITE_BYTE(100); // life
+			WRITE_BYTE(100);  // width
+			WRITE_BYTE(120);   // noise
+			WRITE_BYTE(64);   // r, g, b
+			WRITE_BYTE(128);   // r, g, b
+			WRITE_BYTE(255);   // r, g, b
+			WRITE_BYTE(255);	// brightness
+			WRITE_BYTE(10);		// speed
+			MESSAGE_END();
+
+			UTIL_Sparks(pev->origin);
+		}
+
 	}
 
 
-
+	//SetThink(NULL);
 	CSquadMonster::Killed(pevAttacker, iGib);
 }
 
+void CFinBoss::DyingThink()
+{
+	pev->nextthink = gpGlobals->time + 0.1;
+
+	Vector vecDir, vecSrc, vecAngles;
+
+	UTIL_MakeAimVectors(pev->angles);
+
+	do {
+		vecDir = Vector(RANDOM_FLOAT(-1, 1), RANDOM_FLOAT(-1, 1), RANDOM_FLOAT(-1, 1));
+	} while (DotProduct(vecDir, vecDir) > 1.0);
+
+	//vecDir = vecDir + 2 * gpGlobals->v_up;
+
+	vecSrc = pev->origin;
+
+	TraceResult tr;
+
+	UTIL_TraceLine(vecSrc, vecSrc + vecDir * 4096, ignore_monsters, ENT(pev), &tr);
+
+	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+	WRITE_BYTE(TE_BEAMENTPOINT);
+	WRITE_SHORT(entindex() + 0x1000);
+	WRITE_COORD(tr.vecEndPos.x);
+	WRITE_COORD(tr.vecEndPos.y);
+	WRITE_COORD(tr.vecEndPos.z);
+	WRITE_SHORT(g_sModelIndexLaser);
+	WRITE_BYTE(0); // frame start
+	WRITE_BYTE(10); // framerate
+	WRITE_BYTE(5); // life
+	WRITE_BYTE(100);  // width
+	WRITE_BYTE(120);   // noise
+	WRITE_BYTE(64);   // r, g, b
+	WRITE_BYTE(128);   // r, g, b
+	WRITE_BYTE(255);   // r, g, b
+	WRITE_BYTE(255);	// brightness
+	WRITE_BYTE(10);		// speed
+	MESSAGE_END();
+
+	UTIL_Sparks(pev->origin);
+}
