@@ -3417,7 +3417,7 @@ void CBioGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 
 			ClearMultiDamage();
 
-			crossbow(-1);
+			//crossbow(-1);
 			crossbow(1);
 
 			ApplyMultiDamage(pev, pev);
