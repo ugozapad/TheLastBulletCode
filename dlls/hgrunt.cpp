@@ -2916,7 +2916,7 @@ public:
 	int m_iBeams;
 	void ClearBeams(void);
 	void Killed(entvars_t* pevAttacker, int iGib);
-	
+	BOOL CheckRangeAttack1(float flDot, float flDist);
 };
 
 const char* CBioGrunt::pBioGruntSentences[] =
@@ -2950,6 +2950,8 @@ void CBioGrunt::SpeakSentence(void)
 //=========================================================
 void CBioGrunt::StartTask(Task_t* pTask)
 {
+	ClearBeams();
+
 	m_iTaskStatus = TASKSTATUS_RUNNING;
 
 	switch (pTask->iTask)
@@ -3420,9 +3422,10 @@ void CBioGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 			//crossbow(-1);
 			crossbow(1);
 
+			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/npc_gaus.wav", 1, ATTN_NORM);
 			ApplyMultiDamage(pev, pev);
 
-			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/k43/k43_fire.wav", 1, ATTN_NORM);
+			m_flNextAttack = gpGlobals->time + RANDOM_FLOAT(0.5, 4.0);
 		}
 
 		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, 384, 0.3);
@@ -3463,6 +3466,16 @@ void CBioGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 		CSquadMonster::HandleAnimEvent(pEvent);
 		break;
 	}
+}
+
+BOOL CBioGrunt::CheckRangeAttack1(float flDot, float flDist)
+{
+	if (m_flNextAttack > gpGlobals->time)
+	{
+		return FALSE;
+	}
+
+	return CSquadMonster::CheckRangeAttack1(flDot, flDist);
 }
 
 void CBioGrunt::IdleSound(void)
