@@ -76,7 +76,7 @@ void CHealthPacket::Precache(void)
 	{
 		PRECACHE_MODEL("models/newHealthykit/w_healtypacket.mdl");
 	}
-	PRECACHE_SOUND("items/smallmedkit1");
+	PRECACHE_SOUND("items/smallmedkit1.wav");
 }
 
 BOOL CHealthPacket::MyTouch(CBasePlayer* pPlayer)
@@ -92,7 +92,7 @@ BOOL CHealthPacket::MyTouch(CBasePlayer* pPlayer)
 		WRITE_STRING(STRING(pev->classname));
 		MESSAGE_END();
 
-		EMIT_SOUND(ENT(pPlayer->pev), CHAN_ITEM, "items/smallmedkit1", 1, ATTN_NORM);
+		EMIT_SOUND(ENT(pPlayer->pev), CHAN_ITEM, "items/smallmedkit1.wav", 1, ATTN_NORM);
 
 		if (g_pGameRules->ItemShouldRespawn(this))
 		{
