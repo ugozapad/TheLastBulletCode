@@ -760,7 +760,7 @@ void CGargantua::Spawn()
 
 	pev->solid = SOLID_SLIDEBOX;
 	pev->movetype = MOVETYPE_STEP;
-	m_bloodColor = DONT_BLEED; /*BLOOD_COLOR_GREEN*/
+	m_bloodColor = BLOOD_COLOR_GREEN;
 	pev->health = gSkillData.gargantuaHealth;
 	//pev->view_ofs		= Vector ( 0, 0, 96 );// taken from mdl file
 	m_flFieldOfView = -0.2;// width of forward view cone ( as a dotproduct result )
@@ -895,7 +895,7 @@ void CGargantua::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecD
 			MESSAGE_END();
 		}
 
-		flDamage *= 0.8;
+		flDamage *= 0.5;
 		//flDamage -= 20;
 		//if (flDamage <= 0)
 		//	flDamage = 0.1;// don't hurt the monster much, but allow bits_COND_LIGHT_DAMAGE to be generated
@@ -1190,7 +1190,7 @@ void CGargantua::RunTask(Task_t* pTask)
 					bodyPart = RANDOM_LONG(0, pev->body - 1);
 
 				pGib->pev->body = bodyPart;
-				pGib->m_bloodColor = DONT_BLEED;// BLOOD_COLOR_YELLOW;
+				pGib->m_bloodColor = BLOOD_COLOR_YELLOW;
 				pGib->m_material = matNone;
 				pGib->pev->origin = pev->origin;
 				pGib->pev->velocity = UTIL_RandomBloodVector() * RANDOM_FLOAT(300, 500);
