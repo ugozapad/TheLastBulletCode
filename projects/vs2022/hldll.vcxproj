@@ -71,9 +71,9 @@
       <ModuleDefinitionFile>$(ProjectDir)..\..\dlls\hl.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>if not exist "..\..\..\game\mod_hl\dlls" mkdir "..\..\..\game\mod_hl\dlls"
-copy "$(TargetPath)" "..\..\..\game\mod_hl\dlls\$(TargetName).dll"
-copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\dlls\$(TargetName).pdb"
+      <Command>if not exist "..\..\..\tlbu\TLBUE\dlls" mkdir "..\..\..\tlbu\TLBUE\dlls"
+copy "$(TargetPath)" "..\..\..\tlbu\TLBUE\dlls\$(TargetName).dll"
+copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\tlbu\TLBUE\dlls\$(TargetName).pdb"
 </Command>
     </PostBuildEvent>
     <PostBuildEvent>

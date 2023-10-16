@@ -445,7 +445,7 @@ void W_Precache(void)
 
 	// Venom
 	UTIL_PrecacheOtherWeapon("weapon_venom");
-	UTIL_PrecacheOther("ammo_338");
+	//UTIL_PrecacheOther("ammo_338");
 
 #if !defined( OEM_BUILD ) && !defined( HLDEMO_BUILD )
 	// satchel charge

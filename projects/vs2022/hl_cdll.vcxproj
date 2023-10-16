@@ -73,9 +73,9 @@
       </BaseAddress>
     </Link>
     <PostBuildEvent>
-      <Command>if not exist "..\..\..\game\mod_hl\cl_dlls" mkdir "..\..\..\game\mod_hl\cl_dlls"
-copy "$(TargetPath)" "..\..\..\game\mod_hl\cl_dlls\$(TargetName).dll"
-copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\game\mod_hl\cl_dlls\$(TargetName).pdb"
+      <Command>if not exist "..\..\..\tlbu\TLBUE\cl_dlls" mkdir "..\..\..\tlbu\TLBUE\cl_dlls"
+copy "$(TargetPath)" "..\..\..\tlbu\TLBUE\cl_dlls\$(TargetName).dll"
+copy "$(TargetDir)\$(TargetName).pdb" "..\..\..\tlbu\TLBUE\cl_dlls\$(TargetName).pdb"
 </Command>
     </PostBuildEvent>
     <PostBuildEvent>

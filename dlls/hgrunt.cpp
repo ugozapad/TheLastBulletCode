@@ -2899,7 +2899,7 @@ public:
 	int  Classify(void);
 	int IRelationship(CBaseEntity* pTarget);
 	void Shoot(void);
-	void crossbow ( void );
+	void crossbow ( int side );
 	void HandleAnimEvent(MonsterEvent_t *pEvent);
 	void GibMonster(void);
 	void IdleSound(void);
@@ -2911,7 +2911,11 @@ public:
 	void PrescheduleThink(void);
 	void SpeakSentence( void );
 	void StartTask(Task_t* pTask);
-	
+
+	CBeam* m_pBeam[8];
+	int m_iBeams;
+	void ClearBeams(void);
+	void Killed(entvars_t* pevAttacker, int iGib);
 	
 };
 
@@ -3166,39 +3170,92 @@ void CBioGrunt::Shoot(void)
 
 }
 //“ы задаешьс€ вопросом. " акой нахуй арбалет?" ј € скажу. Ёто дробавик.
-void CBioGrunt::crossbow(void)
+void CBioGrunt::crossbow(int side)
 {
-	if (m_hEnemy == NULL)
-	{
+	//if (m_hEnemy == NULL)
+	//{
+	//	return;
+	//}
+
+	//Vector vecShootOrigin = GetGunPosition();
+	//Vector vecShootDir = ShootAtEnemy(vecShootOrigin);
+
+	//UTIL_MakeVectors(pev->angles);
+
+	//Vector	vecShellVelocity = gpGlobals->v_right * RANDOM_FLOAT(40, 90) + gpGlobals->v_up * RANDOM_FLOAT(75, 200) + gpGlobals->v_forward * RANDOM_FLOAT(-40, 40);
+	//EjectBrass(vecShootOrigin - vecShootDir * 24, vecShellVelocity, pev->angles.y, m_iShotgunShell, TE_BOUNCE_SHOTSHELL);
+	//FireBullets(gSkillData.hgruntShotgunPellets, vecShootOrigin, vecShootDir, VECTOR_CONE_15DEGREES, 2048, BULLET_PLAYER_BUCKSHOT, 0); // shoot +-7.5 degrees
+
+	//pev->effects |= EF_MUZZLEFLASH;
+
+	//m_cAmmoLoaded--;// take away a bullet!
+
+	//Vector angDir = UTIL_VecToAngles(vecShootDir);
+	//SetBlending(0, angDir.x);
+
+	//CSprite* pMuzzleFlash = CSprite::SpriteCreate("sprites/muzzle_shock.spr", pev->origin, TRUE);
+	//if (pMuzzleFlash)
+	//{
+	//	pMuzzleFlash->SetAttachment(edict(), 1);
+	//	pMuzzleFlash->pev->scale = 0.5;
+	//	pMuzzleFlash->pev->rendermode = kRenderTransAdd;
+	//	pMuzzleFlash->pev->renderamt = 255;
+	//	pMuzzleFlash->AnimateAndDie(25);
+	//}
+
+	Vector vecSrc, vecAim;
+	TraceResult tr;
+	CBaseEntity* pEntity;
+
+	if (m_iBeams >= 8)
 		return;
-	}
 
-	Vector vecShootOrigin = GetGunPosition();
-	Vector vecShootDir = ShootAtEnemy(vecShootOrigin);
+	vecSrc = pev->origin + gpGlobals->v_up * 36;
+	vecAim = ShootAtEnemy(vecSrc);
+	float deflection = 0.01;
+	vecAim = vecAim + side * gpGlobals->v_right * RANDOM_FLOAT(0, deflection) + gpGlobals->v_up * RANDOM_FLOAT(-deflection, deflection);
+	UTIL_TraceLine(vecSrc, vecSrc + vecAim * 1024, dont_ignore_monsters, ENT(pev), &tr);
 
-	UTIL_MakeVectors(pev->angles);
+	m_pBeam[m_iBeams] = CBeam::BeamCreate("sprites/lgtning.spr", 50);
+	if (!m_pBeam[m_iBeams])
+		return;
 
-	Vector	vecShellVelocity = gpGlobals->v_right * RANDOM_FLOAT(40, 90) + gpGlobals->v_up * RANDOM_FLOAT(75, 200) + gpGlobals->v_forward * RANDOM_FLOAT(-40, 40);
-	EjectBrass(vecShootOrigin - vecShootDir * 24, vecShellVelocity, pev->angles.y, m_iShotgunShell, TE_BOUNCE_SHOTSHELL);
-	FireBullets(gSkillData.hgruntShotgunPellets, vecShootOrigin, vecShootDir, VECTOR_CONE_15DEGREES, 2048, BULLET_PLAYER_BUCKSHOT, 0); // shoot +-7.5 degrees
+	m_pBeam[m_iBeams]->PointEntInit(tr.vecEndPos, entindex());
+	m_pBeam[m_iBeams]->SetEndAttachment(side < 0 ? 2 : 1);
+	m_pBeam[m_iBeams]->SetColor(148, 0, 211); //фиолетовые лучи
+	m_pBeam[m_iBeams]->SetBrightness(255);
+	m_pBeam[m_iBeams]->SetNoise(20);
+	m_iBeams++;
 
-	pev->effects |= EF_MUZZLEFLASH;
-
-	m_cAmmoLoaded--;// take away a bullet!
-
-	Vector angDir = UTIL_VecToAngles(vecShootDir);
-	SetBlending(0, angDir.x);
-
-	CSprite* pMuzzleFlash = CSprite::SpriteCreate("sprites/muzzle_shock.spr", pev->origin, TRUE);
-	if (pMuzzleFlash)
+	pEntity = CBaseEntity::Instance(tr.pHit);
+	if (pEntity != NULL && pEntity->pev->takedamage)
 	{
-		pMuzzleFlash->SetAttachment(edict(), 1);
-		pMuzzleFlash->pev->scale = 0.5;
-		pMuzzleFlash->pev->rendermode = kRenderTransAdd;
-		pMuzzleFlash->pev->renderamt = 255;
-		pMuzzleFlash->AnimateAndDie(25);
+		pEntity->TraceAttack(pev, gSkillData.slaveDmgZap, vecAim, &tr, DMG_SHOCK);
 	}
+	UTIL_EmitAmbientSound(ENT(pev), tr.vecEndPos, "weapons/electro4.wav", 0.5, ATTN_NORM, 0, RANDOM_LONG(140, 160));
 
+}
+
+void CBioGrunt::ClearBeams()
+{
+	for (int i = 0; i < 8; i++)
+	{
+		if (m_pBeam[i])
+		{
+			UTIL_Remove(m_pBeam[i]);
+			m_pBeam[i] = NULL;
+		}
+	}
+	m_iBeams = 0;
+	pev->skin = 0;
+
+	STOP_SOUND(ENT(pev), CHAN_WEAPON, "debris/zap4.wav");
+}
+
+void CBioGrunt::Killed(entvars_t* pevAttacker, int iGib)
+{
+	ClearBeams();
+	CSquadMonster::Killed(pevAttacker, iGib);
 }
 
 
@@ -3241,11 +3298,11 @@ void CBioGrunt::GibMonster(void)
 		CBaseEntity* pGun;
 		if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
 		{
-			pGun = DropItem("item_whiskeyhealthkit", vecGunPos, vecGunAngles);//выпадение дробавика(или в данном случае хилки)
+			pGun = DropItem("weapon_plasmarifle", vecGunPos, vecGunAngles);//выпадение дробавика(в данном случае как раз патронов от плазмы)
 		}
 		else
 		{
-			pGun = DropItem("weapon_plasmarifle", vecGunPos, vecGunAngles);
+			pGun = DropItem("item_healthkitpacket", vecGunPos, vecGunAngles);
 		}
 		if (pGun)
 		{
@@ -3290,12 +3347,12 @@ void CBioGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 		// now spawn a gun.
 		if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
 		{
-			DropItem("item_whiskeyhealthkit", vecGunPos, vecGunAngles); //выпадение дробавика(или в данном случае хилки)
+			DropItem("weapon_plasmarifle", vecGunPos, vecGunAngles); //выпадение дробавика(или в данном случае хилки)
 		}
 		
 		else
 		{
-			DropItem("weapon_plasmarifle", vecGunPos, vecGunAngles);//
+			DropItem("item_healthkitpacket", vecGunPos, vecGunAngles);//
 		}
 
 	}
@@ -3356,7 +3413,14 @@ void CBioGrunt::HandleAnimEvent(MonsterEvent_t *pEvent)
 		}
 		else
 		{
-			crossbow();
+			ClearBeams();
+
+			ClearMultiDamage();
+
+			crossbow(-1);
+			crossbow(1);
+
+			ApplyMultiDamage(pev, pev);
 
 			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/k43/k43_fire.wav", 1, ATTN_NORM);
 		}

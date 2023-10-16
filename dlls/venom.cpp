@@ -141,6 +141,9 @@ void CVenom::ItemPostFrame()
 			m_fFireOnEmpty = TRUE;
 		}
 
+#ifndef CLIENT_DLL
+		m_pPlayer->TabulateAmmo();
+#endif
 		SecondaryAttack();
 		m_pPlayer->pev->button &= ~IN_ATTACK2;
 	}
@@ -150,6 +153,10 @@ void CVenom::ItemPostFrame()
 		{
 			m_fFireOnEmpty = TRUE;
 		}
+
+#ifndef CLIENT_DLL
+		m_pPlayer->TabulateAmmo();
+#endif
 
 		if (m_iClip > 0)
 		{
