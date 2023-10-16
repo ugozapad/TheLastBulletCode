@@ -3174,13 +3174,13 @@ void CBioGrunt::Shoot(void)
 //Ты задаешься вопросом. "Какой нахуй арбалет?" А я скажу. Это дробавик.
 void CBioGrunt::crossbow(int side)
 {
-	//if (m_hEnemy == NULL)
-	//{
-	//	return;
-	//}
+	if (m_hEnemy == NULL)
+	{
+		return;
+	}
 
-	//Vector vecShootOrigin = GetGunPosition();
-	//Vector vecShootDir = ShootAtEnemy(vecShootOrigin);
+	Vector vecShootOrigin = GetGunPosition();
+	Vector vecShootDir = ShootAtEnemy(vecShootOrigin);
 
 	//UTIL_MakeVectors(pev->angles);
 
@@ -3192,8 +3192,8 @@ void CBioGrunt::crossbow(int side)
 
 	//m_cAmmoLoaded--;// take away a bullet!
 
-	//Vector angDir = UTIL_VecToAngles(vecShootDir);
-	//SetBlending(0, angDir.x);
+	Vector angDir = UTIL_VecToAngles(vecShootDir);
+	SetBlending(0, angDir.x);
 
 	//CSprite* pMuzzleFlash = CSprite::SpriteCreate("sprites/muzzle_shock.spr", pev->origin, TRUE);
 	//if (pMuzzleFlash)
