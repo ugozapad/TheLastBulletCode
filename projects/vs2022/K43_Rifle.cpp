@@ -23,15 +23,15 @@
 #include "gamerules.h"
 
 
-enum python_e {
-	PYTHON_IDLE1 = 0,
-	PYTHON_FIDGET,
-	PYTHON_FIRE1,
-	PYTHON_RELOAD,
-	PYTHON_HOLSTER,
-	PYTHON_DRAW,
-	PYTHON_IDLE2,
-	PYTHON_IDLE3
+enum wrifle_e {
+	WRIFLE_IDLE1 = 0,
+	WRIFLE_FIDGET,
+	WRIFLE_FIRE1,
+	WRIFLE_RELOAD,
+	WRIFLE_HOLSTER,
+	WRIFLE_DRAW,
+	WRIFLE_IDLE2,
+	WRIFLE_IDLE3
 };
 
 LINK_ENTITY_TO_CLASS(weapon_wrifle, CWrifle);
@@ -113,7 +113,7 @@ BOOL CWrifle::Deploy()
 		pev->body = 0;
 	}
 
-	return DefaultDeploy("models/v_rifle.mdl", "models/p_rifle.mdl", PYTHON_DRAW, "python", UseDecrement(), pev->body);
+	return DefaultDeploy("models/v_rifle.mdl", "models/p_rifle.mdl", WRIFLE_DRAW, "python", UseDecrement(), pev->body);
 }
 
 
@@ -128,7 +128,7 @@ void CWrifle::Holster(int skiplocal /* = 0 */)
 
 	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 1.0;
 	m_flTimeWeaponIdle = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15);
-	SendWeaponAnim(PYTHON_HOLSTER);
+	SendWeaponAnim(WRIFLE_HOLSTER);
 }
 
 void CWrifle::SecondaryAttack(void)
@@ -234,7 +234,7 @@ void CWrifle::Reload(void)
 	bUseScope = g_pGameRules->IsMultiplayer();
 #endif
 
-	DefaultReload(10, PYTHON_RELOAD, 2.0, bUseScope);
+	DefaultReload(10, WRIFLE_RELOAD, 2.0, bUseScope);
 }
 
 
@@ -251,25 +251,25 @@ void CWrifle::WeaponIdle(void)
 	float flRand = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 0, 1);
 	if (flRand <= 0.5)
 	{
-		iAnim = PYTHON_IDLE1;
+		iAnim = WRIFLE_IDLE1;
 		m_flTimeWeaponIdle = (70.0 / 30.0);
 	}
 	else if (flRand <= 0.7)
 	{
-		iAnim = PYTHON_IDLE2;
+		iAnim = WRIFLE_IDLE2;
 		m_flTimeWeaponIdle = (60.0 / 30.0);
 	}
 	else if (flRand <= 0.9)
 	{
-		iAnim = PYTHON_IDLE3;
+		iAnim = WRIFLE_IDLE3;
 		m_flTimeWeaponIdle = (88.0 / 30.0);
 	}
 	else
 	{
-		iAnim = PYTHON_FIDGET;
+		iAnim = WRIFLE_FIDGET;
 		m_flTimeWeaponIdle = (170.0 / 30.0);
 	}
-
+	
 	int bUseScope = FALSE;
 #ifdef CLIENT_DLL
 	bUseScope = bIsMultiplayer();

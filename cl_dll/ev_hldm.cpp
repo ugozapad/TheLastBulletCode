@@ -324,9 +324,10 @@ void EV_HLDM_DecalGunshot( pmtrace_t *pTrace, int iBulletType )
 		case BULLET_PLAYER_BUCKSHOT:
 		case BULLET_PLAYER_357:
 		case BULLET_PLAYER_MP44AMM:
-		case BULLET_PLAYER_K43:
 		case BULLET_PLAYER_PPSHAMMO:
 		case BULLET_PLAYER_TOMMYAMMO:
+		case BULLET_PLAYER_K43:
+		case BULLET_PLAYER_SNIPER:
 
 		default:
 			// smoke and decal
@@ -483,6 +484,13 @@ void EV_HLDM_FireBullets( int idx, float *forward, float *right, float *up, int 
 				break;
 
 			case BULLET_PLAYER_K43:
+
+				EV_HLDM_PlayTextureSound(idx, &tr, vecSrc, vecEnd, iBulletType);
+				EV_HLDM_DecalGunshot(&tr, iBulletType);
+
+				break;
+
+			case BULLET_PLAYER_SNIPER:
 
 				EV_HLDM_PlayTextureSound(idx, &tr, vecSrc, vecEnd, iBulletType);
 				EV_HLDM_DecalGunshot(&tr, iBulletType);
@@ -2555,16 +2563,6 @@ void EV_RifleK43Fire(event_args_t* args)
 //======================
 // SnipeRIFLE START
 //======================
-enum sniperrifle_e {
-	SNIPERRIFLE_DRAW = 0,
-	SNIPERRIFLE_SLOWIDLE,
-	SNIPERRIFLE_FIRE1,
-	SNIPERRIFLE_FIRELASTROUND,
-	SNIPERRIFLE_RELOAD,
-	/*SNIPERRIFLE_RELOAD2,*/
-	SNIPERRIFLE_SLOWIDLEEMPTY,
-	SNIPERRIFLE_HOLSTER,
-};
 
 void EV_FireSniper(event_args_t* args)
 {
@@ -2591,7 +2589,7 @@ void EV_FireSniper(event_args_t* args)
 	{
 		// Add muzzle flash to current weapon model
 		EV_MuzzleFlash();
-		gEngfuncs.pEventAPI->EV_WeaponAnimation(empty ? SNIPERRIFLE_FIRELASTROUND : SNIPERRIFLE_FIRE1, 1.5);
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(PYTHON_FIRE1, 1.5);
 
 		V_PunchAxis(0, -5.0);
 	}
@@ -2603,7 +2601,7 @@ void EV_FireSniper(event_args_t* args)
 
 	VectorCopy(forward, vecAiming);
 
-	EV_HLDM_FireBullets(idx, forward, right, up, 1, vecSrc, vecAiming, 8192, BULLET_PLAYER_K43, 0, 0, args->fparam1, args->fparam2);
+	EV_HLDM_FireBullets(idx, forward, right, up, 1, vecSrc, vecAiming, 8192, BULLET_PLAYER_SNIPER, 0, 0, args->fparam1, args->fparam2);
 }
 //======================
 // SNIPERIFLE END 

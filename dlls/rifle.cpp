@@ -24,14 +24,14 @@
 
 
 enum python_e {
-	PYTHON_IDLE1 = 0,
-	PYTHON_FIDGET,
-	PYTHON_FIRE1,
-	PYTHON_RELOAD,
-	PYTHON_HOLSTER,
-	PYTHON_DRAW,
-	PYTHON_IDLE2,
-	PYTHON_IDLE3
+	SNIPER_IDLE1 = 0,
+	SNIPER_FIDGET,
+	SNIPER_FIRE1,
+	SNIPER_RELOAD,
+	SNIPER_HOLSTER,
+	SNIPER_DRAW,
+	SNIPER_IDLE2,
+	SNIPER_IDLE3
 };
 
 LINK_ENTITY_TO_CLASS(weapon_sniperrifle, CSniperrifle);
@@ -111,7 +111,7 @@ BOOL CSniperrifle::Deploy()
 		pev->body = 0;
 	}
 
-	return DefaultDeploy("models/v_sniper.mdl", "models/p_sniper.mdl", PYTHON_DRAW, "k43", UseDecrement(), pev->body);
+	return DefaultDeploy("models/v_sniper.mdl", "models/p_sniper.mdl", SNIPER_DRAW, "k43", UseDecrement(), pev->body);
 }
 
 
@@ -126,7 +126,7 @@ void CSniperrifle::Holster(int skiplocal /* = 0 */)
 	}
 	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 1.0;
 	m_flTimeWeaponIdle = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15);
-	SendWeaponAnim(PYTHON_HOLSTER);
+	SendWeaponAnim(SNIPER_HOLSTER);
 }
 
 //void CSniperrifle::SecondaryAttack(void)
@@ -250,7 +250,7 @@ void CSniperrifle::Reload(void)
 	bUseScope = g_pGameRules->IsMultiplayer();
 #endif
 
-	DefaultReload(5, PYTHON_RELOAD, 4.1, bUseScope);
+	DefaultReload(5, SNIPER_RELOAD, 4.1, bUseScope);
 }
 
 
@@ -269,22 +269,22 @@ void CSniperrifle::WeaponIdle(void)
 	float flRand = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 0, 1);
 	if (flRand <= 0.5)
 	{
-		iAnim = PYTHON_IDLE1;
+		iAnim = SNIPER_IDLE1;
 		m_flTimeWeaponIdle = (70.0 / 30.0);
 	}
 	else if (flRand <= 0.7)
 	{
-		iAnim = PYTHON_IDLE2;
+		iAnim = SNIPER_IDLE2;
 		m_flTimeWeaponIdle = (60.0 / 30.0);
 	}
 	else if (flRand <= 0.9)
 	{
-		iAnim = PYTHON_IDLE3;
+		iAnim = SNIPER_IDLE3;
 		m_flTimeWeaponIdle = (88.0 / 30.0);
 	}
 	else
 	{
-		iAnim = PYTHON_FIDGET;
+		iAnim = SNIPER_FIDGET;
 		m_flTimeWeaponIdle = (170.0 / 30.0);
 	}
 
