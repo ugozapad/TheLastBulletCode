@@ -2529,7 +2529,7 @@ void EV_RifleK43Fire(event_args_t* args)
 		// Add muzzle flash to current weapon model
 		EV_MuzzleFlash();
 		gHUD.RealSize += 70;
-		gEngfuncs.pEventAPI->EV_WeaponAnimation(PYTHON_FIRE1, multiplayer ? 1 : 0);
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(2, multiplayer ? 1 : 0);
 
 		V_PunchAxis(0, -10.0);
 	}

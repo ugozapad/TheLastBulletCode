@@ -125,7 +125,7 @@ public:
 #define _357_MAX_CARRY			36
 #define BUCKSHOT_MAX_CARRY		125
 #define BOLT_MAX_CARRY			50
-#define ROCKET_MAX_CARRY		5
+#define ROCKET_MAX_CARRY		8
 #define HANDGRENADE_MAX_CARRY	10
 #define SATCHEL_MAX_CARRY		5
 #define TRIPMINE_MAX_CARRY		5
@@ -145,7 +145,7 @@ public:
 #define MP5_MAX_CLIP			30
 #define SHOTGUN_MAX_CLIP		8
 #define CROSSBOW_MAX_CLIP		5
-#define RPG_MAX_CLIP			1
+#define RPG_MAX_CLIP			4
 #define GAUSS_MAX_CLIP			WEAPON_NOCLIP
 #define EGON_MAX_CLIP			WEAPON_NOCLIP
 #define HORNETGUN_MAX_CLIP		WEAPON_NOCLIP
@@ -853,7 +853,7 @@ public:
 
 	void Spawn( void );
 	void Precache( void );
-	void Reload( void );
+	//void Reload( void );
 	int iItemSlot( void ) { return 4; }
 	int GetItemInfo(ItemInfo *p);
 	int AddToPlayer( CBasePlayer *pPlayer );
@@ -866,11 +866,11 @@ public:
 	void SecondaryAttack( void );
 	void WeaponIdle( void );
 
-	void UpdateSpot( void );
+	//void UpdateSpot( void );
 	BOOL ShouldWeaponIdle( void ) { return TRUE; };
 
-	CLaserSpot *m_pSpot;
-	int m_fSpotActive;
+	//CLaserSpot *m_pSpot;
+	//int m_fSpotActive;
 	int m_cActiveRockets;// how many missiles in flight from this launcher right now?
 
 	virtual BOOL UseDecrement( void )

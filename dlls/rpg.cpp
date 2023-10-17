@@ -112,7 +112,7 @@ CRpgRocket *CRpgRocket::CreateRpgRocket( Vector vecOrigin, Vector vecAngles, CBa
 	pRocket->Spawn();
 	pRocket->SetTouch( &CRpgRocket::RocketTouch );
 	pRocket->m_pLauncher = pLauncher;// remember what RPG fired me. 
-	pRocket->m_pLauncher->m_cActiveRockets++;// register this missile as active for the launcher
+	//pRocket->m_pLauncher->m_cActiveRockets++;// register this missile as active for the launcher
 	pRocket->pev->owner = pOwner->edict();
 
 	return pRocket;
@@ -152,11 +152,11 @@ void CRpgRocket :: Spawn( void )
 //=========================================================
 void CRpgRocket :: RocketTouch ( CBaseEntity *pOther )
 {
-	if ( m_pLauncher )
-	{
-		// my launcher is still around, tell it I'm dead.
-		m_pLauncher->m_cActiveRockets--;
-	}
+	//if ( m_pLauncher )
+	//{
+	//	// my launcher is still around, tell it I'm dead.
+	//	m_pLauncher->m_cActiveRockets--;
+	//}
 
 	STOP_SOUND( edict(), CHAN_VOICE, "weapons/rocket1.wav" );
 	ExplodeTouch( pOther );
@@ -282,53 +282,52 @@ void CRpgRocket :: FollowThink( void  )
 
 
 
-void CRpg::Reload( void )
-{
-	int iResult;
-
-	if ( m_iClip == 1 )
-	{
-		// don't bother with any of this if don't need to reload.
-		return;
-	}
-
-	if ( m_pPlayer->ammo_rockets <= 0 )
-		return;
-
-	// because the RPG waits to autoreload when no missiles are active while  the LTD is on, the
-	// weapons code is constantly calling into this function, but is often denied because 
-	// a) missiles are in flight, but the LTD is on
-	// or
-	// b) player is totally out of ammo and has nothing to switch to, and should be allowed to
-	//    shine the designator around
-	//
-	// Set the next attack time into the future so that WeaponIdle will get called more often
-	// than reload, allowing the RPG LTD to be updated
-	
-	m_flNextPrimaryAttack = GetNextAttackDelay(0.5);
-
-	if ( m_cActiveRockets && m_fSpotActive )
-	{
-		// no reloading when there are active missiles tracking the designator.
-		// ward off future autoreload attempts by setting next attack time into the future for a bit. 
-		return;
-	}
-
-#ifndef CLIENT_DLL
-	if ( m_pSpot && m_fSpotActive )
-	{
-		m_pSpot->Suspend( 2.1 );
-		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.1;
-	}
-#endif
-
-	if ( m_iClip == 0 )
-		iResult = DefaultReload( RPG_MAX_CLIP, RPG_RELOAD, 2 );
-	
-	if ( iResult )
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat( m_pPlayer->random_seed, 10, 15 );
-	
-}
+//void CRpg::Reload( void )
+//{
+//	int iResult;
+//
+//	if ( m_iClip == 1 )
+//	{
+//		// don't bother with any of this if don't need to reload.
+//		return;
+//	}
+//
+//	if ( m_pPlayer->ammo_rockets <= 0 )
+//		return;
+//
+//	// because the RPG waits to autoreload when no missiles are active while  the LTD is on, the
+//	// weapons code is constantly calling into this function, but is often denied because 
+//	// a) missiles are in flight, but the LTD is on
+//	// or
+//	// b) player is totally out of ammo and has nothing to switch to, and should be allowed to
+//	//    shine the designator around
+//	//
+//	// Set the next attack time into the future so that WeaponIdle will get called more often
+//	// than reload, allowing the RPG LTD to be updated
+//	
+//	m_flNextPrimaryAttack = GetNextAttackDelay(0.5);
+//
+//	if ( m_cActiveRockets && m_fSpotActive )
+//	{
+//		// no reloading when there are active missiles tracking the designator.
+//		// ward off future autoreload attempts by setting next attack time into the future for a bit. 
+//		return;
+//	}
+//
+//#ifndef CLIENT_DLL
+//	if ( m_pSpot && m_fSpotActive )
+//	{
+//		m_pSpot->Suspend( 2.1 );
+//		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.1;
+//	}
+//#endif
+//
+//	iResult = DefaultReload( RPG_MAX_CLIP, RPG_RELOAD, 2 );
+//	
+//	//if ( iResult )
+//		//m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat( m_pPlayer->random_seed, 10, 15 );
+//	
+//}
 
 void CRpg::Spawn( )
 {
@@ -336,7 +335,7 @@ void CRpg::Spawn( )
 	m_iId = WEAPON_RPG;
 
 	SET_MODEL(ENT(pev), "models/w_rpg.mdl");
-	m_fSpotActive = 1;
+	//m_fSpotActive = 1;
 
 #ifdef CLIENT_DLL
 	if ( bIsMultiplayer() )
@@ -364,7 +363,7 @@ void CRpg::Precache( void )
 
 	PRECACHE_SOUND("items/9mmclip1.wav");
 
-	UTIL_PrecacheOther( "laser_spot" );
+	//UTIL_PrecacheOther( "laser_spot" );
 	UTIL_PrecacheOther( "rpg_rocket" );
 
 	PRECACHE_SOUND("weapons/rocketfire1.wav");
@@ -381,7 +380,7 @@ int CRpg::GetItemInfo(ItemInfo *p)
 	p->iMaxAmmo1 = ROCKET_MAX_CARRY;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
-	p->iMaxClip = RPG_MAX_CLIP;
+	p->iMaxClip = WEAPON_NOCLIP;
 	p->iSlot = 3;
 	p->iPosition = 0;
 	p->iId = m_iId = WEAPON_RPG;
@@ -416,7 +415,7 @@ BOOL CRpg::Deploy( )
 
 BOOL CRpg::CanHolster( void )
 {
-	if ( m_fSpotActive && m_cActiveRockets )
+	if (m_cActiveRockets )
 	{
 		// can't put away while guiding a missile.
 		return FALSE;
@@ -433,13 +432,13 @@ void CRpg::Holster( int skiplocal /* = 0 */ )
 	
 	SendWeaponAnim( RPG_HOLSTER1 );
 
-#ifndef CLIENT_DLL
-	if (m_pSpot)
-	{
-		m_pSpot->Killed( NULL, GIB_NEVER );
-		m_pSpot = NULL;
-	}
-#endif
+//#ifndef CLIENT_DLL
+//	if (m_pSpot)
+//	{
+//		m_pSpot->Killed( NULL, GIB_NEVER );
+//		m_pSpot = NULL;
+//	}
+//#endif
 
 }
 
@@ -447,8 +446,16 @@ void CRpg::Holster( int skiplocal /* = 0 */ )
 
 void CRpg::PrimaryAttack()
 {
-	if ( m_iClip )
+	/*if ( m_iClip )
+	{*/
+
+	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 	{
+		PlayEmptySound();
+		m_flNextPrimaryAttack = 0.15;
+		return;
+	}
+
 		m_pPlayer->m_iWeaponVolume = LOUD_GUN_VOLUME;
 		m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
 
@@ -477,22 +484,22 @@ void CRpg::PrimaryAttack()
 
 		PLAYBACK_EVENT( flags, m_pPlayer->edict(), m_usRpg );
 
-		m_iClip--; 
+		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
 				
-		m_flNextPrimaryAttack = GetNextAttackDelay(1.5);
+		m_flNextPrimaryAttack = 0.5f;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5;
-	}
+	/*}
 	else
 	{
 		PlayEmptySound( );
-	}
-	UpdateSpot( );
+	}*/
+	//UpdateSpot( );
 }
 
 
 void CRpg::SecondaryAttack()
 {
-	m_fSpotActive = ! m_fSpotActive;
+	/*m_fSpotActive = ! m_fSpotActive;
 
 #ifndef CLIENT_DLL
 	if (!m_fSpotActive && m_pSpot)
@@ -502,13 +509,13 @@ void CRpg::SecondaryAttack()
 	}
 #endif
 
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.2;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.2;*/
 }
 
 
 void CRpg::WeaponIdle( void )
 {
-	UpdateSpot( );
+	//UpdateSpot( );
 
 	ResetEmptySound( );
 
@@ -519,14 +526,14 @@ void CRpg::WeaponIdle( void )
 	{
 		int iAnim;
 		float flRand = UTIL_SharedRandomFloat( m_pPlayer->random_seed, 0, 1 );
-		if (flRand <= 0.75 || m_fSpotActive)
+		if (flRand <= 0.75)
 		{
 			if ( m_iClip == 0 )
 				iAnim = RPG_IDLE_UL;
 			else
 				iAnim = RPG_IDLE;
 
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 90.0 / 15.0;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0;
 		}
 		else
 		{
@@ -539,7 +546,8 @@ void CRpg::WeaponIdle( void )
 		}
 
 		SendWeaponAnim( iAnim );
-	}
+		
+	} 
 	else
 	{
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1;
@@ -548,29 +556,29 @@ void CRpg::WeaponIdle( void )
 
 
 
-void CRpg::UpdateSpot( void )
-{
-
-#ifndef CLIENT_DLL
-	if (m_fSpotActive)
-	{
-		if (!m_pSpot)
-		{
-			m_pSpot = CLaserSpot::CreateSpot();
-		}
-
-		UTIL_MakeVectors( m_pPlayer->pev->v_angle );
-		Vector vecSrc = m_pPlayer->GetGunPosition( );;
-		Vector vecAiming = gpGlobals->v_forward;
-
-		TraceResult tr;
-		UTIL_TraceLine ( vecSrc, vecSrc + vecAiming * 8192, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr );
-		
-		UTIL_SetOrigin( m_pSpot->pev, tr.vecEndPos );
-	}
-#endif
-
-}
+//void CRpg::UpdateSpot( void )
+//{
+//
+//#ifndef CLIENT_DLL
+//	if (m_fSpotActive)
+//	{
+//		if (!m_pSpot)
+//		{
+//			m_pSpot = CLaserSpot::CreateSpot();
+//		}
+//
+//		UTIL_MakeVectors( m_pPlayer->pev->v_angle );
+//		Vector vecSrc = m_pPlayer->GetGunPosition( );;
+//		Vector vecAiming = gpGlobals->v_forward;
+//
+//		TraceResult tr;
+//		UTIL_TraceLine ( vecSrc, vecSrc + vecAiming * 8192, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr );
+//		
+//		UTIL_SetOrigin( m_pSpot->pev, tr.vecEndPos );
+//	}
+//#endif
+//
+//}
 
 
 class CRpgAmmo : public CBasePlayerAmmo
