@@ -357,7 +357,7 @@ void CHeadCrab :: LeapTouch ( CBaseEntity *pOther )
 	{
 		EMIT_SOUND_DYN( edict(), CHAN_WEAPON, RANDOM_SOUND_ARRAY(pBiteSounds), GetSoundVolue(), ATTN_IDLE, 0, GetVoicePitch() );
 		
-		pOther->TakeDamage( pev, pev, GetDamageAmount(), DMG_SLASH );
+		pOther->TakeDamage( pev, pev, GetDamageAmount(), DMG_SHOCK );
 	}
 
 	SetTouch( NULL );
